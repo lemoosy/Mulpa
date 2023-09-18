@@ -25,7 +25,10 @@
   "physicsStartAwake": true,
   "properties": [],
   "solid": false,
-  "spriteId": null,
+  "spriteId": {
+    "name": "spr_exit",
+    "path": "sprites/spr_exit/spr_exit.yy",
+  },
   "spriteMaskId": null,
   "visible": true,
 }
