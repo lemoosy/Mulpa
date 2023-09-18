@@ -52,7 +52,12 @@ public:
 	ListData* PopFirst();
 
 	/// @brief Vérifie si une valeur est dans la liste.
-	bool IsIn(ListData* value) const;
+	/// @return Pointeur vers la valeur si elle est dans la liste, nullptr sinon.
+	ListData* IsIn(ListData* value) const;
+
+	/// @brief Retire une valeur de la liste.
+	/// @return Pointeur vers la valeur retirée si elle est dans la liste, nullptr sinon.
+	ListData* Remove(ListData* value);
 
 	/// @brief Affiche la liste.
 	void Print() const;
@@ -110,7 +115,7 @@ ListData* List<ListData>::PopFirst()
 }
 
 template<typename ListData>
-bool List<ListData>::IsIn(ListData* value) const
+ListData* List<ListData>::IsIn(ListData* value) const
 {
 	ListNode<ListData>* curr = m_first;
 
@@ -118,13 +123,52 @@ bool List<ListData>::IsIn(ListData* value) const
 	{
 		if (*value == *(curr->m_value))
 		{
-			return true;
+			return curr->m_value;
 		}
 		
 		curr = curr->m_next;
 	}
 
-	return false;
+	return nullptr;
+}
+
+template<typename ListData>
+ListData* List<ListData>::Remove(ListData* value)
+{
+	ListNode<ListData>* prev = nullptr;
+	ListNode<ListData>* curr = m_first;
+
+	while (curr)
+	{
+		if (*value == *(curr->m_value))
+		{
+			ListNode<ListData>* next = current->m_next;
+
+			if (prev)
+			{
+				prev->m_next = next;
+			}
+			else
+			{
+				m_first = next;
+			}
+
+			ListData* res = curr->m_value;
+
+			delete curr;
+
+			m_size--;
+
+			return res;
+		}
+		else
+		{
+			prev = curr;
+			curr = curr->m_next;
+		}
+	}
+
+	return nullptr;
 }
 
 template<typename ListData>
