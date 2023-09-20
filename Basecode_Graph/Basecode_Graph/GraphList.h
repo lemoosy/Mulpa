@@ -144,11 +144,10 @@ Arc* Graph::GetSuccessors(int u, int* size)
 
 	while (curr)
 	{
-		arcs[arcsCursor] = curr->;
+		arcs[arcsCursor] = *(curr->m_value);
 		arcsCursor++;
 		curr->m_next;
 	}
-
 
 	*size = _size;
 
@@ -164,8 +163,23 @@ Arc* Graph::GetPredecessors(int v, int* size)
 	Arc* arcs = new Arc[_size];
 	int arcsCursor = 0;
 
+	for (int u = 0; u < m_size; u++)
+	{
+		ListNode<Arc>* curr = m_nodes[u].m_arcs->GetFirst();
 
+		while (curr)
+		{
+			Arc* arc = curr->m_value;
 
+			if (arc->m_v == v)
+			{
+				arcs[arcsCursor] = *arc;
+				arcsCursor++;
+			}
+			
+			curr->m_next;
+		}
+	}
 
 	*size = _size;
 
