@@ -73,10 +73,10 @@ void Graph::SetWeight(int u, int v, float w)
 	assert((0 <= u) && (u < m_size));
 	assert((0 <= v) && (v < m_size));
 
-	/// Si on souhaite supprimer un arc.
+	/// Si on souhaite supprimer l'arc.
 	if (w < 0.0f)
 	{
-		/// Si l'arc existe, on le supprime.
+		/// Si l'arc existe, on le supprime et on met à jour les valences.
 		if (m_matrix[u][v] >= 0.0f)
 		{
 			m_matrix[u][v] = -1.0f;
@@ -88,7 +88,7 @@ void Graph::SetWeight(int u, int v, float w)
 	/// Si on souhaite ajouter un arc.
 	else
 	{
-		/// Si l'arc n'existe pas, on met a jour les valences.
+		/// Si l'arc n'existe pas, on crée un arc et on met à jour les valences.
 		if (m_matrix[u][v] < 0.0f)
 		{
 			m_negValency[v]++;
@@ -118,7 +118,7 @@ Arc* Graph::GetSuccessors(int u, int* size)
 	Arc* arcs = new Arc[_size];
 	int arcsCursor = 0;
 
-	for (int v = 0; v < _size; v++)
+	for (int v = 0; v < m_size; v++)
 	{
 		float w = m_matrix[u][v];
 
@@ -144,7 +144,7 @@ Arc* Graph::GetPredecessors(int v, int* size)
 	Arc* arcs = new Arc[_size];
 	int arcsCursor = 0;
 
-	for (int u = 0; u < _size; u++)
+	for (int u = 0; u < m_size; u++)
 	{
 		float w = m_matrix[u][v];
 

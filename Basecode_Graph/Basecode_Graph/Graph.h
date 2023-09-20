@@ -23,7 +23,7 @@ public:
 
 #else
 
-/// @brief Classe représentant un noeud dans un graphe
+/// @brief Classe représentant un noeud dans un graphe (liste d'adjacence).
 class GraphNode
 {
 public:
@@ -41,17 +41,20 @@ public:
 	int m_posValency;
 
 	GraphNode();
+
+	~GraphNode();
 };
 
 /// @brief Classe mère pour la classe Graph (liste d'adjacence).
 class GraphMother
 {
+public:
+
 	/// @brief Nombre de noeuds dans le graphe.
 	int m_size;
 
 	/// @brief Noeuds du graphe.
 	GraphNode* m_nodes;
-
 };
 
 #endif // GRAPH_MATRIX
