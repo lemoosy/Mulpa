@@ -1,26 +1,7 @@
+#include "Settings.h"
 #include "Graph.h"
 
-Arc::Arc(int u, int v, float w)
+List<int>* Dijkstra(Graph& graph, int u, int v)
 {
-	assert(w >= 0.0f);
-
-	u = u;
-	v = v;
-	w = w;
+	return nullptr;
 }
-
-GraphNode::GraphNode()
-{
-	m_arcs = new List<Arc>();
-	m_negValency = 0;
-	m_posValency = 0;
-}
-
-Graph::Graph(int size)
-{
-	assert(size > 0);
-
-	m_size = size;
-	m_nodes = new GraphNode[size];
-}
-

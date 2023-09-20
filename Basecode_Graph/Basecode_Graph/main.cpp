@@ -1,7 +1,17 @@
 #include <iostream>
 
+#include "Graph.h"
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    Graph graph(5);
+
+    graph.SetWeight(3, 2, 20);
+    graph.SetWeight(3, 4, 10);
+
+    graph.Print();
+
+
+
+    return EXIT_SUCCESS;
 }
