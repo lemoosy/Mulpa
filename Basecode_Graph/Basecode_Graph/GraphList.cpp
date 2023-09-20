@@ -36,6 +36,19 @@ Graph::~Graph()
 	delete[] m_nodes;
 }
 
+void Graph::Print() const
+{
+	cout << "Graph (size=" << m_size << ") :\n\n";
+
+	for (int u = 0; u < m_size; u++)
+	{
+		cout << "(" << u << ") >> ";
+		m_nodes[u].m_arcs->Print();
+	}
+
+	cout << endl;
+}
+
 void Graph::SetWeight(int u, int v, float w)
 {
 	assert((0 <= u) && (u < m_size));
@@ -70,7 +83,7 @@ void Graph::SetWeight(int u, int v, float w)
 	{
 		Arc* res = arcs->IsIn(arc);
 
-		/// Si l'arc existe, on le modifie.
+		/// Si l'arc existe, on met à jour le poids de l'arc.
 		if (res)
 		{
 			delete arc;
@@ -120,7 +133,7 @@ Arc* Graph::GetSuccessors(int u, int* size)
 	{
 		arcs[arcsCursor] = *(curr->m_value);
 		arcsCursor++;
-		curr->m_next;
+		curr = curr->m_next;
 	}
 
 	*size = _size;
@@ -154,7 +167,7 @@ Arc* Graph::GetPredecessors(int v, int* size)
 				break;
 			}
 			
-			curr->m_next;
+			curr = curr->m_next;
 		}
 	}
 

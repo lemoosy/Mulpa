@@ -14,7 +14,19 @@ Arc::Arc(int u, int v, float w)
 	m_w = w;
 }
 
+void Arc::Print() const
+{
+	cout << m_u << ", " << m_v << ", " << m_w;
+}
+
 bool operator==(const Arc& a, const Arc& b)
 {
     return (a.m_v == b.m_v);
+}
+
+ostream& operator<<(ostream& stream, Arc& arc)
+{
+	arc.Print();
+
+	return stream;
 }

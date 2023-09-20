@@ -99,6 +99,7 @@ public:
 	/// @param size Pointeur vers un entier qui contiendra le nombre d'arcs entrants.
 	/// @return Un tableau d'arcs entrants.
 	Arc* GetPredecessors(int v, int* size);
-};
 
-List<int>* Dijkstra(Graph& graph, int u, int v);
+	/// @brief Retourne une liste d'entiers (identifiants des noeuds) correspondant au plus court chemin entre deux noeuds.
+	List<int>* Dijkstra(int startID, int endID);
+};

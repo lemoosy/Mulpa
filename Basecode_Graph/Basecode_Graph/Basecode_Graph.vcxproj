@@ -133,13 +133,13 @@
   <ItemGroup>
     <ClCompile Include="Arc.cpp" />
     <ClCompile Include="Graph.cpp" />
+    <ClCompile Include="GraphList.cpp" />
     <ClCompile Include="GraphMatrix.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Arc.h" />
     <ClInclude Include="Graph.h" />
-    <ClInclude Include="GraphList.cpp" />
     <ClInclude Include="Settings.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

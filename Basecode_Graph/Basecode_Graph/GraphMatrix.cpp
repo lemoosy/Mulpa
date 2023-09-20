@@ -95,7 +95,7 @@ void Graph::SetWeight(int u, int v, float w)
 			m_posValency[u]++;
 		}
 
-		/// Dans tous les cas, on met a jour le poids de l'arc.
+		/// Dans tous les cas, on met à jour le poids de l'arc.
 		m_matrix[u][v] = w;
 	}
 }
@@ -115,7 +115,7 @@ Arc* Graph::GetSuccessors(int u, int* size)
 
 	int _size = m_posValency[u];
 
-	Arc* arcs = new Arc[_size];
+	Arc* arcs = new Arc[_size]();
 	int arcsCursor = 0;
 
 	for (int v = 0; v < m_size; v++)
@@ -141,7 +141,7 @@ Arc* Graph::GetPredecessors(int v, int* size)
 
 	int _size = m_negValency[v];
 
-	Arc* arcs = new Arc[_size];
+	Arc* arcs = new Arc[_size]();
 	int arcsCursor = 0;
 
 	for (int u = 0; u < m_size; u++)
