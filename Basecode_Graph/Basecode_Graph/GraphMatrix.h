@@ -34,16 +34,25 @@ public:
 	/// @brief Affiche le graphe.
 	void Print() const;
 
-	/// @brief Modifie le poids d'un arc.
+	/// @brief Modifie le poids d'un arc dans le graphe.
 	/// @param u Identifiant du noeud de départ.
 	/// @param v Identifiant du noeud d'arrivée.
 	/// @param w Si w est négatif, l'arc est supprimé, sinon il est créé ou modifié.
 	void SetWeight(int u, int v, float w);
 
+	/// @brief Retourne le poids d'un arc dans le graphe.
 	float GetWeight(int u, int v);
 
+	/// @brief Retourne la liste des arcs sortants d'un noeud u.
+	/// @param u Identifiant du noeud.
+	/// @param size Pointeur vers un entier qui contiendra le nombre d'arcs sortants.
+	/// @return Un tableau d'arcs sortants.
 	Arc* GetSuccessors(int u, int* size);
 
+	/// @brief Retourne la liste des arcs entrants d'un noeud v.
+	/// @param v Identifiant du noeud.
+	/// @param size Pointeur vers un entier qui contiendra le nombre d'arcs entrants.
+	/// @return Un tableau d'arcs entrants.
 	Arc* GetPredecessors(int v, int* size);
 };
 
@@ -51,7 +60,7 @@ Graph::Graph(int size)
 {
 	assert(size > 0);
 
-	m_matrix = new float* [size];
+	m_matrix = new float*[size];
 
 	for (int u = 0; u < size; u++)
 	{
@@ -74,9 +83,9 @@ Graph::~Graph()
 	delete[] m_posValency;
 	delete[] m_negValency;
 
-	for (int i = 0; i < m_size; i++)
+	for (int u = 0; u < m_size; u++)
 	{
-		delete[] m_matrix[i];
+		delete[] m_matrix[u];
 	}
 
 	delete[] m_matrix;
