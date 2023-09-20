@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "Graph.h"
 
 int main()
@@ -10,8 +8,6 @@ int main()
     graph.SetWeight(3, 4, 10);
 
     graph.Print();
-
-
 
     return EXIT_SUCCESS;
 }

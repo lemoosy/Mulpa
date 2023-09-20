@@ -18,7 +18,7 @@ public:
 
 	Arc();
 
-	Arc(int u, int v, float w = 0.0f);
+	Arc(int u, int v, float w = -1.0f);
 };
 
 bool operator==(const Arc& a, const Arc& b);

@@ -1,64 +1,15 @@
-#pragma once
-
-#include "Arc.h"
-#include "Settings.h"
+#include "Graph.h"
 
 #ifdef GRAPH_MATRIX
-
-/// @brief Classe représentant un graphe.
-class Graph
-{
-private:
-
-	/// @brief Matrice qui stocke les poids du graphe.
-	float** m_matrix;
-
-	/// @brief Nombre de noeuds dans le graphe.
-	int m_size;
-
-	/// @brief Tableau qui stocke le nombre d'arcs entrants pour chaque noeud.
-	int* m_negValency;
-
-	/// @brief Tableau qui stocke le nombre d'arcs sortants pour chaque noeud.
-	int* m_posValency;
-
-public:
-
-	Graph(int size);
-
-	~Graph();
-
-	/// @brief Retourne le nombre de noeuds dans le graphe.
-	inline int GetSize() const { return m_size; }
-
-	/// @brief Affiche le graphe.
-	void Print() const;
-
-	/// @brief Modifie le poids d'un arc dans le graphe.
-	/// @param u Identifiant du noeud de départ.
-	/// @param v Identifiant du noeud d'arrivée.
-	/// @param w Si w est négatif, l'arc est supprimé, sinon il est créé ou modifié.
-	void SetWeight(int u, int v, float w);
-
-	/// @brief Retourne le poids d'un arc dans le graphe.
-	float GetWeight(int u, int v);
-
-	/// @brief Retourne la liste des arcs sortants d'un noeud u.
-	/// @param u Identifiant du noeud.
-	/// @param size Pointeur vers un entier qui contiendra le nombre d'arcs sortants.
-	/// @return Un tableau d'arcs sortants.
-	Arc* GetSuccessors(int u, int* size);
-
-	/// @brief Retourne la liste des arcs entrants d'un noeud v.
-	/// @param v Identifiant du noeud.
-	/// @param size Pointeur vers un entier qui contiendra le nombre d'arcs entrants.
-	/// @return Un tableau d'arcs entrants.
-	Arc* GetPredecessors(int v, int* size);
-};
 
 Graph::Graph(int size)
 {
 	assert(size > 0);
+
+	m_size = size;
+
+	m_negValency = new int[size]();
+	m_posValency = new int[size]();
 
 	m_matrix = new float*[size];
 
@@ -71,17 +22,12 @@ Graph::Graph(int size)
 			m_matrix[u][v] = -1.0f;
 		}
 	}
-
-	m_size = size;
-
-	m_negValency = new int[size];
-	m_posValency = new int[size];
 }
 
 Graph::~Graph()
 {
-	delete[] m_posValency;
 	delete[] m_negValency;
+	delete[] m_posValency;
 
 	for (int u = 0; u < m_size; u++)
 	{
@@ -93,7 +39,7 @@ Graph::~Graph()
 
 void Graph::Print() const
 {
-	cout << "Graph (size=" << m_size << ") :\n" << endl;
+	cout << "Graph (size=" << m_size << ") :\n\n";
 
 	for (int u = 0; u < m_size; u++)
 	{
@@ -102,10 +48,24 @@ void Graph::Print() const
 			cout << "[" << u << ", " << v << ", " << m_matrix[u][v] << "]\t";
 		}
 
-		cout << endl;
+		cout << '\n';
 	}
 
-	cout << endl;
+	cout << "\nnegValency : [";
+
+	for (int i = 0; i < m_size; i++)
+	{
+		cout << m_negValency[i] << ", ";
+	}
+
+	cout << "]\nposValency : [";
+
+	for (int i = 0; i < m_size; i++)
+	{
+		cout << m_posValency[i] << ", ";
+	}
+
+	cout << "]\n\n" << flush;
 }
 
 void Graph::SetWeight(int u, int v, float w)

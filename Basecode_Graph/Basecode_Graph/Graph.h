@@ -1,8 +1,101 @@
 #pragma once
 
-#include "GraphList.h"
-#include "GraphMatrix.h"
+#include "Arc.h"
 #include "List.h"
 #include "Settings.h"
+
+#ifdef GRAPH_MATRIX
+
+/// @brief Classe mère pour la classe Graph (matrice d'adjacence).
+class GraphMother
+{
+public:
+
+	/// @brief Tableau qui stocke le nombre d'arcs entrants pour chaque noeud.
+	int* m_negValency;
+
+	/// @brief Tableau qui stocke le nombre d'arcs sortants pour chaque noeud.
+	int* m_posValency;
+
+	/// @brief Matrice qui stocke les poids du graphe.
+	float** m_matrix;
+};
+
+#else
+
+/// @brief Classe représentant un noeud dans un graphe
+class GraphNode
+{
+public:
+
+	/// @brief Identifiant du noeud.
+	int m_id;
+
+	/// @brief Liste des arcs sortant du noeud.
+	List<Arc>* m_arcs;
+
+	/// @brief Nombre de noeuds entrant dans le noeud.
+	int m_negValency;
+
+	/// @brief Nombre de noeuds sortant dans le noeud.
+	int m_posValency;
+
+	GraphNode();
+};
+
+/// @brief Classe mère pour la classe Graph (liste d'adjacence).
+class GraphMother
+{
+	/// @brief Nombre de noeuds dans le graphe.
+	int m_size;
+
+	/// @brief Noeuds du graphe.
+	GraphNode* m_nodes;
+
+};
+
+#endif // GRAPH_MATRIX
+
+/// @brief Classe représentant un graphe.
+class Graph : public GraphMother
+{
+private:
+
+	/// @brief Nombre de noeuds dans le graphe.
+	int m_size;
+
+public:
+
+	Graph(int size);
+
+	~Graph();
+
+	/// @brief Retourne le nombre de noeuds dans le graphe.
+	inline int GetSize() const { return m_size; }
+
+	/// @brief Affiche le graphe.
+	void Print() const;
+
+	/// @brief Modifie le poids d'un arc dans le graphe.
+	/// @param u Identifiant du noeud de départ.
+	/// @param v Identifiant du noeud d'arrivée.
+	/// @param w Si w est négatif, l'arc est supprimé, sinon il est créé ou modifié.
+	void SetWeight(int u, int v, float w);
+
+	/// @brief Retourne le poids d'un arc dans le graphe.
+	float GetWeight(int u, int v);
+
+	/// @brief Retourne la liste des arcs sortants d'un noeud u.
+	/// @param u Identifiant du noeud.
+	/// @param size Pointeur vers un entier qui contiendra le nombre d'arcs sortants.
+	/// @return Un tableau d'arcs sortants.
+	Arc* GetSuccessors(int u, int* size);
+
+	/// @brief Retourne la liste des arcs entrants d'un noeud v.
+	/// @param v Identifiant du noeud.
+	/// @param size Pointeur vers un entier qui contiendra le nombre d'arcs entrants.
+	/// @return Un tableau d'arcs entrants.
+	Arc* GetPredecessors(int v, int* size);
+};
 
 List<int>* Dijkstra(Graph& graph, int u, int v);
