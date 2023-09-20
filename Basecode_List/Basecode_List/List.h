@@ -41,6 +41,12 @@ public:
 	/// @brief Retourne la taille de la liste.
 	inline int GetSize() const { return m_size; }
 
+	/// @brief Vérifie si la liste est vide.
+	inline bool IsEmpty() const { return m_size == 0; }
+
+	/// @brief Retourne le premier noeud de la liste.
+	inline ListNode<ListData>* GetFirst() const { return m_first; }
+
 	List();
 
 	~List();
@@ -142,7 +148,7 @@ ListData* List<ListData>::Remove(ListData* value)
 	{
 		if (*value == *(curr->m_value))
 		{
-			ListNode<ListData>* next = current->m_next;
+			ListNode<ListData>* next = curr->m_next;
 
 			if (prev)
 			{
