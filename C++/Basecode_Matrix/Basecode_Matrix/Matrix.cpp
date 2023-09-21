@@ -209,3 +209,22 @@ Matrix operator*(const Matrix& m1, const Matrix& m2)
 {
 	return m1.Multiply(m2);
 }
+
+void Mix(Matrix* m1, Matrix* m2)
+{
+	assert(m1->m_w == m2->m_w);
+	assert(m1->m_h == m2->m_h);
+
+	for (int j = 0; j < m1->m_w; j++)
+	{
+		for (int i = 0; i < m1->m_h; i++)
+		{
+			if (rand() % 2)
+			{
+				float tmp = m1->Get(i, j);
+				m1->Set(i, j, m2->Get(i, j));
+				m2->Set(i, j, tmp);
+			}
+		}
+	}
+}

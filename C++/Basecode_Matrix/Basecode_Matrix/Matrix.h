@@ -25,6 +25,12 @@ public:
 
 	~Matrix();
 
+	/// @brief Retourne la largeur de la matrice.
+	inline int GetWidth() const { return m_w; }
+	
+	/// @brief Retourne la hauteur de la matrice.
+	inline int GetHeight() const { return m_h; }
+
 	/// @brief Modifie la valeur d'une case de la matrice.
 	void Set(int i, int j, float value);
 
@@ -55,6 +61,9 @@ public:
 
 	/// @brief Compose chaque valeur de la matrice avec la fonction passée en paramètre.
 	void Compose(float (*function)(float));
+
+	/// @brief Mélange les valeurs de deux matrices aléatoirement.
+	friend void Mix(Matrix* m1, Matrix* m2);
 };
 
 void operator+=(Matrix& m1, const Matrix& m2);

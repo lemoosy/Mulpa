@@ -119,6 +119,22 @@ Matrix* NN::Forward(Matrix* X)
 
 void NN::Crossover(NN* other)
 {
+	assert(m_layers->GetSize() == other->m_layers->GetSize());
+
+	ListNode<Layer>* curr1 = m_layers->GetFirst();
+	ListNode<Layer>* curr2 = other->m_layers->GetFirst();
+
+	while (curr1)
+	{
+		Layer* layer1 = curr1->m_value;
+		Layer* layer2 = curr2->m_value;
+
+		Mix(layer1->m_W, layer2->m_W);
+		Mix(layer1->m_B, layer2->m_B);
+
+		curr1 = curr1->m_next;
+		curr2 = curr2->m_next;
+	}
 }
 
 void NN::Mutate() const
