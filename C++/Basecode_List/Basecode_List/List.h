@@ -63,6 +63,9 @@ public:
 	/// @brief Insère une valeur au début de la liste.
 	void InsertFirst(ListData* value);
 
+	/// @brief Insère une valeur à la fin de la liste.
+	void InsertLast(ListData* value);
+
 	///@brief Retire et retourne la première valeur de la liste.
 	ListData* PopFirst();
 
@@ -109,6 +112,24 @@ void List<ListData>::InsertFirst(ListData* value)
 	m_first = nodeInsert;
 
 	m_size++;
+}
+
+template<typename ListData>
+void List<ListData>::InsertLast(ListData* value)
+{
+	if (IsEmpty())
+	{
+		return InsertFirst(value);
+	}
+
+	ListNode<ListData>* curr = m_first;
+
+	while (curr->m_next)
+	{
+		curr = curr->m_next;
+	}
+
+	curr->m_next = new ListNode<ListData>(value);
 }
 
 template<typename ListData>
