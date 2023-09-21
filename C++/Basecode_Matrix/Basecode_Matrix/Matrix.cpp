@@ -152,6 +152,17 @@ void Matrix::Fill(float value)
 	}
 }
 
+void Matrix::Compose(Matrix& m, float (*func)(float))
+{
+	for (int j = 0; j < m_h; j++)
+	{
+		for (int i = 0; i < m_w; i++)
+		{
+			m.m_values[j][i] = func(m_values[j][i]);
+		}
+	}
+}
+
 void operator+=(Matrix& m1, const Matrix& m2)
 {
 	m1.Add(m2);
