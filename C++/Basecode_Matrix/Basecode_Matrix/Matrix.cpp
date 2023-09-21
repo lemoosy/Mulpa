@@ -100,7 +100,29 @@ void Matrix::Scale(float s)
 
 Matrix Matrix::Mul(const Matrix& m) const
 {
-	return Matrix(0, 0);
+	assert(m_w == m.m_h);
+
+	int w = m.m_w;
+	int h = m_h;
+
+	Matrix res = Matrix(w, h);
+
+	for (int j = 0; j < h; j++)
+	{
+		for (int i = 0; i < w; i++)
+		{
+			float sum = 0.0f;
+
+			for (int k = 0; k < w; k++)
+			{
+				sum += m_values[j][k] * m.m_values[k][i];
+			}
+
+			res.m_values[j][i] = sum;
+		}
+	}
+
+	return res;
 }
 
 void Matrix::Randomize(float a, float b)
