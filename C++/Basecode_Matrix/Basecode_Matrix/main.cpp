@@ -26,5 +26,10 @@ int main()
 	Matrix m3 = m1 * m2;
 	m3.Print();
 
+	Matrix* m4 = new Matrix(5, 5);
+	m4->Randomize(0, 9);
+	m4->Print();
+	delete m4;
+
 	return EXIT_SUCCESS;
 }

@@ -16,9 +16,22 @@ Matrix::Matrix(int w, int h)
 	}
 }
 
-Matrix::Matrix(const Matrix& copy)
+Matrix::Matrix(const Matrix& m)
 {
-	*this = copy;
+	m_w = m.m_w;
+	m_h = m.m_h;
+
+	m_values = new float*[m_h];
+
+	for (int j = 0; j < m_h; j++)
+	{
+		m_values[j] = new float[m_w];
+
+		for (int i = 0; i < m_w; i++)
+		{
+			m_values[j][i] = m.m_values[j][i];
+		}
+	}
 }
 
 Matrix::~Matrix()
@@ -39,7 +52,7 @@ void Matrix::Set(int i, int j, float value)
 	m_values[j][i] = value;
 }
 
-float Matrix::Get(int i, int j)
+float Matrix::Get(int i, int j) const
 {
 	assert((0 <= i) && (i < m_w));
 	assert((0 <= j) && (j < m_h));
@@ -55,7 +68,7 @@ void Matrix::Print() const
 	{
 		for (int i = 0; i < m_w; i++)
 		{
-			cout << m_values[j][i] << '\t';
+			cout << fixed << setprecision(2) << m_values[j][i] << '\t';
 		}
 
 		cout << '\n';
@@ -103,7 +116,7 @@ void Matrix::Scale(float s)
 	}
 }
 
-Matrix Matrix::Mul(const Matrix& m) const
+Matrix Matrix::Multiply(const Matrix& m) const
 {
 	assert(m_w == m.m_h);
 
@@ -152,13 +165,13 @@ void Matrix::Fill(float value)
 	}
 }
 
-void Matrix::Compose(float (*func)(float))
+void Matrix::Compose(float (*function)(float))
 {
 	for (int j = 0; j < m_h; j++)
 	{
 		for (int i = 0; i < m_w; i++)
 		{
-			m_values[j][i] = func(m_values[j][i]);
+			m_values[j][i] = function(m_values[j][i]);
 		}
 	}
 }
@@ -194,5 +207,5 @@ Matrix operator-(const Matrix& m1, const Matrix& m2)
 
 Matrix operator*(const Matrix& m1, const Matrix& m2)
 {
-	return m1.Mul(m2);
+	return m1.Multiply(m2);
 }

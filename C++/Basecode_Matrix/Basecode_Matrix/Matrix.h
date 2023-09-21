@@ -21,7 +21,7 @@ public:
 
 	Matrix(int w, int h);
 
-	Matrix(const Matrix& copy);
+	Matrix(const Matrix& m);
 
 	~Matrix();
 
@@ -29,7 +29,7 @@ public:
 	void Set(int i, int j, float value);
 
 	/// @brief Retourne la valeur d'une case de la matrice.
-	float Get(int i, int j);
+	float Get(int i, int j) const;
 
 	/// @brief Affiche la matrice.
 	void Print() const;
@@ -45,16 +45,16 @@ public:
 
 	/// @brief Multiplie deux matrices.
 	/// @return Le produit des deux matrices.
-	Matrix Mul(const Matrix& m) const;
+	Matrix Multiply(const Matrix& m) const;
 
-	/// @brief Modifie toutes les valeurs de la matrice aléatoirement.
+	/// @brief Modifie chaque case de la matrice par une valeur aléatoire comprise entre a et b.
 	void Randomize(float a, float b);
 
-	/// @brief Modifie toutes les valeurs de la matrice avec la valeur passée en paramètre.
+	/// @brief Remplie la matrice avec la valeur passée en paramètre.
 	void Fill(float value);
 
 	/// @brief Compose chaque valeur de la matrice avec la fonction passée en paramètre.
-	void Compose(float (*func)(float));
+	void Compose(float (*function)(float));
 };
 
 void operator+=(Matrix& m1, const Matrix& m2);
