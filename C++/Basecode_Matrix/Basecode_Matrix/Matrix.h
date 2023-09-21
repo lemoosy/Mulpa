@@ -54,7 +54,7 @@ public:
 	void Fill(float value);
 
 	/// @brief Compose chaque valeur de la matrice avec la fonction passée en paramètre.
-	void Compose(Matrix& m, float (*func)(float));
+	void Compose(float (*func)(float));
 };
 
 void operator+=(Matrix& m1, const Matrix& m2);
