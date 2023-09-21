@@ -42,7 +42,7 @@ float Matrix::Get(int i, int j)
 	return m_values[j][i];
 }
 
-void Matrix::Print()
+void Matrix::Print() const
 {
 	cout << "Matrix (" << m_w << "x" << m_h << ") :\n\n";
 
@@ -50,7 +50,7 @@ void Matrix::Print()
 	{
 		for (int i = 0; i < m_w; i++)
 		{
-			cout << m_values[j][i] << " ";
+			cout << m_values[j][i] << '\t';
 		}
 
 		cout << '\n';
@@ -59,7 +59,7 @@ void Matrix::Print()
 	cout << endl;
 }
 
-void Matrix::Add(Matrix& m)
+void Matrix::Add(const Matrix& m)
 {
 	assert(m_w == m.m_w);
 	assert(m_h == m.m_h);
@@ -73,7 +73,7 @@ void Matrix::Add(Matrix& m)
 	}
 }
 
-void Matrix::Sub(Matrix& m)
+void Matrix::Sub(const Matrix& m)
 {
 	assert(m_w == m.m_w);
 	assert(m_h == m.m_h);
@@ -94,6 +94,33 @@ void Matrix::Scale(float s)
 		for (int i = 0; i < m_w; i++)
 		{
 			m_values[j][i] *= s;
+		}
+	}
+}
+
+Matrix Matrix::Mul(const Matrix& m) const
+{
+	return Matrix(0, 0);
+}
+
+void Matrix::Randomize(float a, float b)
+{
+	for (int j = 0; j < m_h; j++)
+	{
+		for (int i = 0; i < m_w; i++)
+		{
+			m_values[j][i] = Float_Random(a, b);
+		}
+	}
+}
+
+void Matrix::Fill(float value)
+{
+	for (int j = 0; j < m_h; j++)
+	{
+		for (int i = 0; i < m_w; i++)
+		{
+			m_values[j][i] = value;
 		}
 	}
 }
