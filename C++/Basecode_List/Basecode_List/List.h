@@ -60,6 +60,8 @@ public:
 
 	~List();
 
+	ListNode<ListData>* GetLast() const;
+
 	/// @brief Insère une valeur au début de la liste.
 	void InsertFirst(ListData* value);
 
@@ -105,6 +107,24 @@ List<ListData>::~List()
 }
 
 template<typename ListData>
+inline ListNode<ListData>* List<ListData>::GetLast() const
+{
+	if (IsEmpty())
+	{
+		return nullptr;
+	}
+
+	ListNode<ListData>* curr = m_first;
+
+	while (curr->m_next)
+	{
+		curr = curr->m_next;
+	}
+
+	return curr;
+}
+
+template<typename ListData>
 void List<ListData>::InsertFirst(ListData* value)
 {
 	ListNode<ListData>* nodeInsert = new ListNode<ListData>(value, m_first);
@@ -117,19 +137,17 @@ void List<ListData>::InsertFirst(ListData* value)
 template<typename ListData>
 void List<ListData>::InsertLast(ListData* value)
 {
-	if (IsEmpty())
+	ListNode<ListData>* last = GetLast();
+
+	if (last)
 	{
-		return InsertFirst(value);
+		last->m_next = new ListNode<ListData>(value);
+		m_size++;
 	}
-
-	ListNode<ListData>* curr = m_first;
-
-	while (curr->m_next)
+	else
 	{
-		curr = curr->m_next;
+		InsertFirst(value);
 	}
-
-	curr->m_next = new ListNode<ListData>(value);
 }
 
 template<typename ListData>
