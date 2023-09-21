@@ -2,6 +2,8 @@
 
 List<int>* Graph::Dijkstra(int start, int end, float* distance)
 {
+	/// TODO: Fonction à optimiser avec un tas binaire.
+
 	assert((0 <= start) && (start < m_size));
 	assert((0 <= end) && (end < m_size));
 	assert(distance);

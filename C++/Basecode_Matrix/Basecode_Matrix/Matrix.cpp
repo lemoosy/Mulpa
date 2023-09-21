@@ -74,7 +74,7 @@ void Matrix::Print() const
 		cout << '\n';
 	}
 
-	cout << endl;
+	cout << flush;
 }
 
 void Matrix::Add(const Matrix& m)

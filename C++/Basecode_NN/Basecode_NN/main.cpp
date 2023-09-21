@@ -3,21 +3,19 @@
 
 int main()
 {
-	NN nn(3);
-
+	NN nn(2);
 	nn.AddLayer(2, sigmoid);
-	nn.AddLayer(3, sigmoid);
-	nn.AddLayer(4, sigmoid);
+	nn.AddLayer(2, sigmoid);
+	nn.Print(0);
+	nn.Print(1);
 
-	Matrix X = Matrix(3, 1);
-
-	X.Set(0, 0, 1.0f);
-	X.Set(1, 0, 2.0f);
-	X.Set(2, 0, 3.0f);
+	Matrix X = Matrix(2, 1);
+	X.Set(0, 0, 0.0f);
+	X.Set(1, 0, 1.0f);
 
 	Matrix* Y = nn.Forward(&X);
-
-	nn.Print(-1);
+	cout << "OUTPUTS:\n\n";
+	Y->Print();
 
 	return EXIT_SUCCESS;
 }

@@ -2,6 +2,10 @@
 
 Layer::Layer(int size, int sizePrev, float (*activationFunc)(float))
 {
+	assert(size > 0);
+	assert(sizePrev > 0);
+	assert(activationFunc);
+
 	m_size = size;
 
 	m_W = new Matrix(size, sizePrev);
@@ -21,6 +25,8 @@ Layer::~Layer()
 
 NN::NN(int inputSize)
 {
+	assert(inputSize > 0);
+
 	m_inputSize = inputSize;
 	m_layers = new List<Layer>();
 }
@@ -32,6 +38,8 @@ NN::~NN()
 
 void NN::AddLayer(int size, float (*activationFunc)(float))
 {
+	// TODO: Fonction à optimiser avec un DList.
+
 	Layer* layer = nullptr;
 
 	if (m_layers->IsEmpty())
@@ -40,12 +48,10 @@ void NN::AddLayer(int size, float (*activationFunc)(float))
 	}
 	else
 	{
-		// TODO: opti avec DList
 		Layer* last = m_layers->GetLast()->m_value;
 		layer = new Layer(size, last->m_size, activationFunc);
 	}
 
-	// TODO: opti avec DList
 	m_layers->InsertLast(layer);
 }
 
@@ -69,40 +75,46 @@ void NN::Print(int index) const
 	}
 	
 	cout << "# Weights :\n\n";
-	curr->m_value->m_weights->Print();
+	curr->m_value->m_W->Print();
 
 	cout << "# Bias :\n\n";
-	curr->m_value->m_bias->Print();
+	curr->m_value->m_B->Print();
 }
 
 Matrix* NN::Forward(Matrix* X)
 {
+	/// TODO: à optimiser.
+
+	Matrix* res = nullptr;
+
 	ListNode<Layer>* curr = m_layers->GetFirst();
 
-	Matrix* Y = new Matrix(*X);
+	Matrix* Xptr = new Matrix(*X);
 
 	while (curr)
 	{
-		Y->Print();
-
 		Layer* layer = curr->m_value;
 
-		Matrix sum = (*Y) * (*layer->m_W);
-		sum.Compose(layer->m_activationFunc);
+		Matrix X = *Xptr;						// Entrées.
+		Matrix W = *layer->m_W;					// Poids.
+		Matrix B = *layer->m_B;					// Biais.
+		Matrix Z = X * W + B;					// Sorties fonction somme.
+		Z.Compose(layer->m_activationFunc);		// Sorties fonction d'activation.
 
 		if (curr->m_next == nullptr)
 		{
-			Matrix* res = new Matrix(sum);
-			delete Y;
-			return res;
+			res = new Matrix(Z);
+			break;
 		}
 
-		delete Y;
-		Y = new Matrix(sum);
+		delete Xptr;
+		Xptr = new Matrix(Z);
 		curr = curr->m_next;
 	}
 
-	return nullptr;
+	delete Xptr;
+
+	return res;
 }
 
 void NN::Crossover(NN* other)

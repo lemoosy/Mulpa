@@ -7,5 +7,5 @@ float sigmoid(float x)
 
 float ReLU(float x)
 {
-	return 0.0f;
+	return max(0.0f, x);
 }
