@@ -14,8 +14,17 @@ public:
 	/// @brief Pointeur vers le noeud suivant.
 	ListNode<ListData>* m_next;
 
+	ListNode();
+
 	ListNode(ListData* value, ListNode* next = nullptr);
 };
+
+template<typename ListData>
+inline ListNode<ListData>::ListNode()
+{
+	m_value = nullptr;
+	m_next = nullptr;
+}
 
 template <typename ListData>
 ListNode<ListData>::ListNode(ListData* value, ListNode* next)

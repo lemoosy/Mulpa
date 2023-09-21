@@ -11,27 +11,35 @@ function player_update_velocity()
 	{
 		if (m_key_left)
 		{
-			phy_linear_velocity_x = -m_speed[0];
+			phy_speed_x = -m_speed[0] * global.time_step;
+			//physics_apply_force(phy_position_x, phy_linear_velocity_y, -m_speed[0], 0);
+			//phy_linear_velocity_x = -m_speed[0];
 		}
 		else
 		{
-			phy_linear_velocity_x = +m_speed[0];
+			phy_speed_x = +m_speed[0] * global.time_step;
+			//physics_apply_force(phy_position_x, phy_linear_velocity_y, +m_speed[0], 0);
+			//phy_linear_velocity_x = +m_speed[0];
 		}
 	}
 	else
 	{
-		phy_linear_velocity_x = 0;
+		phy_speed_x = 0;
 	}
 	
 	if (m_key_jump and m_on_ground)
 	{
-		phy_linear_velocity_y = -m_speed[1];
+		phy_speed_y = -m_speed[1] * global.time_step;
+		//physics_apply_impulse(phy_position_x, phy_position_y, 0, -m_speed[1]);
+		//phy_linear_velocity_y = -m_speed[1];
 	}
 	
 	if ((bbox_left < 0) or (bbox_right > room_width))
 	{
-		phy_linear_velocity_x = 0;
+		phy_speed_x = 0;
 	}
+	
+	show_debug_message(phy_linear_velocity_y);
 }
 
 function player_update_position()
