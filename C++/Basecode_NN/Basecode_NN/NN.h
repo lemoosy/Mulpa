@@ -13,12 +13,12 @@ public:
 	int m_size;
 
 	/// @brief Poids de la couche.
-	Matrix* m_weights;
+	Matrix* m_W;
 
-	/// @brief Biais de la couche.
-	Matrix* m_bias;
+	///// @brief Biais de la couche.
+	Matrix* m_B;
 
-	/// @brief Fonction d'activation de la couche.
+	///// @brief Fonction d'activation de la couche.
 	float (*m_activationFunc)(float);
 
 	/// @brief Constructeur par défaut.
@@ -36,19 +36,22 @@ class NN
 private:
 
 	/// @brief Nombre d'entrées du réseau de neurones.
-	int m_sizeInput;
+	int m_inputSize;
 
+	/// @brief Liste des couches du réseau de neurones.
 	List<Layer>* m_layers;
 
 public:
 
-	NN(int sizeInput);
+	NN(int inputSize);
 
 	~NN();
 
 	void AddLayer(int size, float (*activationFunc)(float));
 
-	Matrix Forward(Matrix X);
+	void Print(int index) const;
+
+	Matrix* Forward(Matrix* X);
 
 	void Crossover(NN* other);
 

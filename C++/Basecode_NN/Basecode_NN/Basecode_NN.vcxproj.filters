@@ -18,10 +18,10 @@
     <ClCompile Include="main.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="NN.cpp">
+    <ClCompile Include="Functions.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="Functions.cpp">
+    <ClCompile Include="NN.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>

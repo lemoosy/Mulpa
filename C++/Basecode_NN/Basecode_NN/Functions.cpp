@@ -2,12 +2,7 @@
 
 float sigmoid(float x)
 {
-	return 0.0f;
-}
-
-float tanh(float x)
-{
-	return 0.0f;
+	return (1.0f / (1.0f + exp(-x)));
 }
 
 float ReLU(float x)
