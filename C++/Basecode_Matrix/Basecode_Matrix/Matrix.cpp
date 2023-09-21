@@ -113,7 +113,7 @@ Matrix Matrix::Mul(const Matrix& m) const
 		{
 			float sum = 0.0f;
 
-			for (int k = 0; k < w; k++)
+			for (int k = 0; k < m_w; k++)
 			{
 				sum += m_values[j][k] * m.m_values[k][i];
 			}
@@ -145,4 +145,38 @@ void Matrix::Fill(float value)
 			m_values[j][i] = value;
 		}
 	}
+}
+
+void operator+=(Matrix& m1, const Matrix& m2)
+{
+	m1.Add(m2);
+}
+
+void operator-=(Matrix& m1, const Matrix& m2)
+{
+	m1.Sub(m2);
+}
+
+void operator*=(Matrix& m, float s)
+{
+	m.Scale(s);
+}
+
+Matrix operator+(const Matrix& m1, const Matrix& m2)
+{
+	Matrix res = m1;
+	res.Add(m2);
+	return res;
+}
+
+Matrix operator-(const Matrix& m1, const Matrix& m2)
+{
+	Matrix res = m1;
+	res.Sub(m2);
+	return res;
+}
+
+Matrix operator*(const Matrix& m1, const Matrix& m2)
+{
+	return m1.Mul(m2);
 }

@@ -52,36 +52,14 @@ public:
 	void Fill(float value);
 };
 
-void operator+=(Matrix& m1, const Matrix& m2)
-{
-	m1.Add(m2);
-}
+void operator+=(Matrix& m1, const Matrix& m2);
 
-void operator-=(Matrix& m1, const Matrix& m2)
-{
-	m1.Sub(m2);
-}
+void operator-=(Matrix& m1, const Matrix& m2);
 
-void operator*=(Matrix& m, float s)
-{
-	m.Scale(s);
-}
+void operator*=(Matrix& m, float s);
 
-Matrix operator+(const Matrix& m1, const Matrix& m2)
-{
-	Matrix res = m1;
-	res.Add(m2);
-	return res;
-}
+Matrix operator+(const Matrix& m1, const Matrix& m2);
 
-Matrix operator-(const Matrix& m1, const Matrix& m2)
-{
-	Matrix res = m1;
-	res.Sub(m2);
-	return res;
-}
+Matrix operator-(const Matrix& m1, const Matrix& m2);
 
-Matrix operator*(const Matrix& m1, const Matrix& m2)
-{
-	return m1.Mul(m2);
-}
+Matrix operator*(const Matrix& m1, const Matrix& m2);
