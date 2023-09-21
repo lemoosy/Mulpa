@@ -23,7 +23,13 @@ int main()
 
     graph.Print();
 
-    graph.Dijkstra(0, 6);
+    float distance = 0.0f;
+    List<int>* res = graph.Dijkstra(0, 6, &distance);
+
+    if (res)
+    res->Print();
+
+    cout << distance << endl;
 
     return EXIT_SUCCESS;
 }

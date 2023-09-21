@@ -115,6 +115,12 @@ Arc* Graph::GetSuccessors(int u, int* size)
 
 	int _size = m_posValency[u];
 
+	if (_size == 0)
+	{
+		*size = 0;
+		return nullptr;
+	}
+
 	Arc* arcs = new Arc[_size]();
 	int arcsCursor = 0;
 

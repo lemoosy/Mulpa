@@ -1,9 +1,13 @@
-#include "Settings.h"
 #include "Graph.h"
 
-List<int>* Graph::Dijkstra(int startID, int endID)
+List<int>* Graph::Dijkstra(int start, int end, float* distance)
 {
-	/// Liste qui donne la distance de chaque noeud par rapport au noeud de départ.
+	assert((0 <= start) && (start < m_size));
+	assert((0 <= end) && (end < m_size));
+	assert(distance);
+
+	/// Liste qui stocke les distances entre
+	/// le noeud de départ et un noeud donné.
 
 	float* distances = new float[m_size];
 
@@ -12,16 +16,17 @@ List<int>* Graph::Dijkstra(int startID, int endID)
 		distances[i] = +1000.0f;
 	}
 
-	distances[startID] = 0.0f;
+	distances[start] = 0.0f;
 
-	/// Liste qui permet d'obtenir le plus court chemin
-	/// entre le noeud de départ et un noeud donné.
+	/// Liste qui stocke les Plus Court Chemin entre
+	/// le noeud de départ et un noeud donné (méthode successor).
+	/// Toutes les valeurs sont des identifiants de noeuds.
 
-	int* path = new int[m_size];
+	int* PCC = new int[m_size];
 
 	for (int i = 0; i < m_size; i++)
 	{
-		path[i] = -1;
+		PCC[i] = -1;
 	}
 
 	/// Liste des noeuds marqués.
@@ -32,7 +37,8 @@ List<int>* Graph::Dijkstra(int startID, int endID)
 	
 	while (1)
 	{
-		/// Recherche du noeud non marqué ayant la plus petite distance.
+		/// Recherche du noeud non marqué ET
+		/// ayant la plus petite distance.
 
 		int indexMinimum = -1;
 
@@ -49,9 +55,20 @@ List<int>* Graph::Dijkstra(int startID, int endID)
 
 		int u = indexMinimum;
 
-		if (u == -1) break;
+		/// Si tout est marqué OU
+		/// les autres noeuds sont inaccessibles, on quitte la boucle.
+
+		if ((u == -1) || (distances[u] == 1000.0f))
+		{
+			break;
+		}
+
+		/// On marque le noeud u.
 
 		marked[u] = true;
+
+		/// On récupère les successeurs du noeud u
+		/// puis on actualise les distances et les PCC.
 
 		int size = 0;
 		Arc* arcs = GetSuccessors(u, &size);
@@ -63,20 +80,48 @@ List<int>* Graph::Dijkstra(int startID, int endID)
 
 			if (!marked[v] && (distances[u] + w < distances[v]))
 			{
+				PCC[v] = u;
 				distances[v] = distances[u] + w;
-				path[v] = u;
 			}
 		}
 		
-		delete arcs;
+		if (arcs)
+		{
+			delete arcs;
+		}
 	}
 
-	for (int i = 0; i < m_size; i++)
+	/// Création du chemin à partir des PCC.
+
+	List<int>* res = nullptr;
+	
+	if (PCC[end] != -1)
 	{
-		cout << path[i] << ", ";
+		res = new List<int>();
+
+		int index = end;
+
+		while (index != -1)
+		{
+			res->InsertFirst(new int(index));
+			index = PCC[index];
+		}
 	}
 
-	cout << flush;
+	/// Récupération de la distance.
 
-	return nullptr;
+	*distance = -1.0f;
+
+	if (res)
+	{
+		*distance = distances[end];
+	}
+
+	/// Libération de la mémoire.
+
+	delete distances;
+	delete PCC;
+	delete marked;
+
+	return res;
 }

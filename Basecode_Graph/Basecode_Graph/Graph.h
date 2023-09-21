@@ -100,6 +100,10 @@ public:
 	/// @return Un tableau d'arcs entrants.
 	Arc* GetPredecessors(int v, int* size);
 
-	/// @brief Retourne une liste d'entiers (identifiants des noeuds) correspondant au plus court chemin entre deux noeuds.
-	List<int>* Dijkstra(int startID, int endID);
+	/// @brief Calcule le Plus Court Chemin (PCC) entre deux noeuds.
+	/// @param start Identifiant du noeud de départ.
+	/// @param end Identifiant du noeud d'arrivée.
+	/// @param distance Pointeur vers un float qui contiendra la distance totale du chemin.
+	/// @return Liste d'entiers (identifiants des noeuds) correspondant au PCC.
+	List<int>* Dijkstra(int start, int end, float* distance);
 };
