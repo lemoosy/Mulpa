@@ -16,6 +16,11 @@ Matrix::Matrix(int w, int h)
 	}
 }
 
+Matrix::Matrix(const Matrix& copy)
+{
+	*this = copy;
+}
+
 Matrix::~Matrix()
 {
 	for (int j = 0; j < m_h; j++)

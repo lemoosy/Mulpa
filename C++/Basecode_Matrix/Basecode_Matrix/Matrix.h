@@ -21,6 +21,8 @@ public:
 
 	Matrix(int w, int h);
 
+	Matrix(const Matrix& copy);
+
 	~Matrix();
 
 	/// @brief Modifie la valeur d'une case de la matrice.
