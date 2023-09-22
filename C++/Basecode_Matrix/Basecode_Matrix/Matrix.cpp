@@ -189,6 +189,11 @@ void Matrix::Copy(const Matrix& m)
 	}
 }
 
+bool Matrix::OutOfDimension(int i, int j)
+{
+	return ((i < 0) || (i >= m_w) || (j < 0) || (j >= m_h));
+}
+
 void operator+=(Matrix& m1, const Matrix& m2)
 {
 	m1.Add(m2);

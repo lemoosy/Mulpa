@@ -66,6 +66,8 @@ public:
 	friend void Mix(Matrix* m1, Matrix* m2);
 
 	void Copy(const Matrix& m);
+
+	bool OutOfDimension(int i, int j);
 };
 
 void operator+=(Matrix& m1, const Matrix& m2);
