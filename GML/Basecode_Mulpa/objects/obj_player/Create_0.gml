@@ -21,7 +21,9 @@ m_on_ground = false;
 m_coin = 0;
 m_distance_exit = 0;
 
-m_ai = false;
+m_ai = true;
+
+m_nn = -1;
 
 if (m_ai)
 {

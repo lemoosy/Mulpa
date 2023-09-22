@@ -2,7 +2,9 @@ function player_update_input()
 {
 	var _res = 0;
 	
-	world_to_string();
+	m_key_left = false;
+	m_key_right = false;
+	m_key_jump = false;
 	
 	if (m_ai)
 	{
@@ -18,15 +20,20 @@ function player_update_input()
 		switch (_res)
 		{
 			case 0:
-				m_key_left = keyboard_check(vk_left);
+			show_debug_message("LEFT");
+				m_key_left = true;
 			break;
 			
 			case 1:
-				m_key_right = keyboard_check(vk_right);
+						show_debug_message("RIGHT");
+
+				m_key_right = true;
 			break;
 			
 			case 2:
-				m_key_jump = keyboard_check(vk_up);
+						show_debug_message("JUMP");
+
+				m_key_jump = true;
 			break;
 			
 			default:

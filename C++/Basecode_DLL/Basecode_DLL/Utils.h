@@ -6,10 +6,10 @@
 typedef enum eCaseID
 {
 	CASE_VOID = ' ',
-	CASE_WALL = 'O',
+	CASE_WALL = 'W',
 	CASE_PLAYER = 'P',
 	CASE_END = 'E',
-	CASE_TRAP = '!'
+	CASE_MONSTER = 'M'
 }CaseID;
 
 Matrix* World_To_Matrix(char* p_world)
@@ -22,7 +22,7 @@ Matrix* World_To_Matrix(char* p_world)
 	int w = stoi(world.substr(0, posX));
 	int h = stoi(world.substr(posX + 1, posF - posX - 1));
 
-	Matrix* res = new Matrix(w, h);
+	Matrix* matrixWorld = new Matrix(w, h);
 
 	int index = posF + 1;
 
@@ -30,10 +30,49 @@ Matrix* World_To_Matrix(char* p_world)
 	{
 		for (int i = 0; i < w; i++)
 		{
-			res->Set(i, j, world[index]);
+			matrixWorld->Set(i, j, (float)world[index]);
 			index++;
 		}
 	}
+
+	Matrix* res = new Matrix(NN_NB_NEURAL_INPUT, 1);
+
+	int block = 16 * 8;
+
+	for (int j = 0; j < h; j++)
+	{
+		for (int i = 0; i < w; i++)
+		{
+			int idCase = w * j + i;
+
+			switch ((int)matrixWorld->Get(i, j))
+			{
+			case CASE_VOID:
+				break;
+
+			case CASE_PLAYER:
+				res->Set(idCase, 0, 1.0f);
+				break;
+
+			case CASE_END:
+				res->Set(idCase + idCase * 2, 0, 1.0f);
+				break;
+
+			case CASE_WALL:
+				res->Set(idCase + idCase * 3, 0, 1.0f);
+				break;
+
+			case CASE_MONSTER:
+				res->Set(idCase + idCase * 4, 0, 1.0f);
+			break;
+
+			default:
+				break;
+			}
+		}
+	}
+
+	delete matrixWorld;
 
 	return res;
 }

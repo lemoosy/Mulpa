@@ -2,18 +2,21 @@
 #include "Variables.h"
 #include "Graph.h"
 #include "Utils.h"
+#include "Functions.h"
 
 // DLL
 
-GameMakerDLL int DLL_Init()
+GameMakerDLL double DLL_Init()
 {
+	srand(time(nullptr));
+
 	g_nn = new NN * [NN_CAPACITY];
 	g_size = 0;
 
-	return EXIT_SUCCESS;
+	return (double)EXIT_SUCCESS;
 }
 
-GameMakerDLL int DLL_Free()
+GameMakerDLL double DLL_Free()
 {
 	for (int i = 0; i < g_size; i++)
 	{
@@ -22,12 +25,12 @@ GameMakerDLL int DLL_Free()
 
 	delete[] g_nn;
 
-	return EXIT_SUCCESS;
+	return (double)EXIT_SUCCESS;
 }
 
 // NN
 
-GameMakerDLL int NN_Create()
+GameMakerDLL double NN_Create()
 {
 	if (g_size >= NN_CAPACITY)
 	{
@@ -36,10 +39,20 @@ GameMakerDLL int NN_Create()
 
 	int res = g_size;
 
-	g_nn[g_size] = new NN(NN_SIZE_INPUT);
+	NN* nn = new NN(NN_NB_NEURAL_INPUT);
+
+	for (int i = 0; i < NN_NB_LAYER_HIDDEN; i++)
+	{
+		nn->AddLayer(NN_NB_NEURAL_HIDDEN, &sigmoid);
+	}
+
+	nn->AddLayer(NN_NB_NEURAL_OUTPUT, &sigmoid);
+
+	g_nn[g_size] = nn;
+
 	g_size++;
 
-	return g_size;
+	return (double)res;
 }
 
 GameMakerDLL double NN_Destroy()
@@ -47,11 +60,13 @@ GameMakerDLL double NN_Destroy()
 	return EXIT_SUCCESS;
 }
 
-GameMakerDLL int NN_Forward(int nnID, char* world)
+GameMakerDLL double NN_Forward(double p_nnID, char* world)
 {
-	if ((nnID < 0) || (nnID >= NN_CAPACITY) || !world)
+	int nnID = (int)p_nnID;
+
+	if ((nnID < 0) || (nnID >= g_size) || !world)
 	{
-		return EXIT_FAILURE;
+		return (double)EXIT_FAILURE;
 	}
 
 	NN* nn = g_nn[nnID];
@@ -67,12 +82,14 @@ GameMakerDLL int NN_Forward(int nnID, char* world)
 
 	delete X;
 
-	return EXIT_SUCCESS;
+	return (double)EXIT_SUCCESS;
 }
 
-GameMakerDLL int NN_GetOutput(int nnID)
+GameMakerDLL double NN_GetOutput(double p_nnID)
 {
-	if ((nnID < 0) || (nnID >= NN_CAPACITY))
+	int nnID = (int)p_nnID;
+
+	if ((nnID < 0) || (nnID >= g_size))
 	{
 		return -1;
 	}
@@ -98,7 +115,7 @@ GameMakerDLL int NN_GetOutput(int nnID)
 		}
 	}
 
-	return minimum;
+	return (double)minimum;
 }
 
 // ShortestPath
@@ -108,7 +125,7 @@ int Coord_To_ID(int i, int j, int w)
 	return j * w + i;
 }
 
-GameMakerDLL double ShortestPath_Get(int nnID, char* world)
+GameMakerDLL double ShortestPath_Get(double nnID, char* world)
 {
 	Matrix* matrix = World_To_Matrix(world);
 
