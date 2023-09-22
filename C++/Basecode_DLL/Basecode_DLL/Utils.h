@@ -6,7 +6,7 @@
 typedef enum eCaseID
 {
 	CASE_VOID = ' ',
-	CASE_BLOC = 'O',
+	CASE_WALL = 'O',
 	CASE_PLAYER = 'P',
 	CASE_END = 'E',
 	CASE_TRAP = '!'

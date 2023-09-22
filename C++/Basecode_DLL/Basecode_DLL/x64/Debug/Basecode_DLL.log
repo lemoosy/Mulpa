@@ -2,5 +2,4 @@
   Export.cpp
 C:\Users\PC Lemoosy\OneDrive\Bureau\Basecode\3A\Mulpa\C++\Basecode_DLL\Basecode_DLL\Utils.h(19,11): warning C4267: 'initialisation' : conversion de 'size_t' en 'int', perte possible de données
 C:\Users\PC Lemoosy\OneDrive\Bureau\Basecode\3A\Mulpa\C++\Basecode_DLL\Basecode_DLL\Utils.h(20,11): warning C4267: 'initialisation' : conversion de 'size_t' en 'int', perte possible de données
-     Création de la bibliothèque ../../../GML/Basecode_Mulpa/extensions/Basecode_DLL\Basecode_DLL.lib et de l'objet ../../../GML/Basecode_Mulpa/extensions/Basecode_DLL\Basecode_DLL.exp
   Basecode_DLL.vcxproj -> C:\Users\PC Lemoosy\OneDrive\Bureau\Basecode\3A\Mulpa\GML\Basecode_Mulpa\extensions\Basecode_DLL\Basecode_DLL.dll

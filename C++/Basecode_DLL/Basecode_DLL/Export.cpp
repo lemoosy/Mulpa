@@ -125,7 +125,7 @@ GameMakerDLL double ShortestPath_Get(int nnID, char* world)
 	{
 		for (int i = 0; i < w; i++)
 		{
-			if (matrix->OutOfDimension(i + 1, j) == false)
+			if (matrix->OutOfDimension(i + 1, j) == false && matrix->Get(i + 1, j) != CASE_WALL)
 			{
 				graph->SetWeight(
 					Coord_To_ID(i, j, w),
@@ -134,7 +134,7 @@ GameMakerDLL double ShortestPath_Get(int nnID, char* world)
 				);
 			}
 
-			if (matrix->OutOfDimension(i - 1, j) == false)
+			if (matrix->OutOfDimension(i - 1, j) == false && matrix->Get(i - 1, j) != CASE_WALL)
 			{
 				graph->SetWeight(
 					Coord_To_ID(i, j, w),
@@ -143,7 +143,7 @@ GameMakerDLL double ShortestPath_Get(int nnID, char* world)
 				);
 			}
 
-			if (matrix->OutOfDimension(i, j + 1) == false)
+			if (matrix->OutOfDimension(i, j + 1) == false && matrix->Get(i, j + 1) != CASE_WALL)
 			{
 				graph->SetWeight(
 					Coord_To_ID(i, j, w),
@@ -152,7 +152,7 @@ GameMakerDLL double ShortestPath_Get(int nnID, char* world)
 				);
 			}
 
-			if (matrix->OutOfDimension(i, j - 1) == false)
+			if (matrix->OutOfDimension(i, j - 1) == false && matrix->Get(i, j - 1) != CASE_WALL)
 			{
 				graph->SetWeight(
 					Coord_To_ID(i, j, w),
