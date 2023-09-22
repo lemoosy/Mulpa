@@ -27,7 +27,9 @@
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Sprites","folderPath":"folders/Sprites.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Tile sets","folderPath":"folders/Tile sets.yy",},
   ],
-  "IncludedFiles": [],
+  "IncludedFiles": [
+    {"resourceType":"GMIncludedFile","resourceVersion":"1.0","name":"Basecode_Linker.dll","CopyToMask":-1,"filePath":"datafiles",},
+  ],
   "isEcma": false,
   "LibraryEmitters": [],
   "MetaData": {
@@ -39,6 +41,7 @@
     {"id":{"name":"obj_exit","path":"objects/obj_exit/obj_exit.yy",},},
     {"id":{"name":"spr_monster","path":"sprites/spr_monster/spr_monster.yy",},},
     {"id":{"name":"spr_coin","path":"sprites/spr_coin/spr_coin.yy",},},
+    {"id":{"name":"Extension1","path":"extensions/Extension1/Extension1.yy",},},
     {"id":{"name":"obj_monster","path":"objects/obj_monster/obj_monster.yy",},},
     {"id":{"name":"obj_player","path":"objects/obj_player/obj_player.yy",},},
     {"id":{"name":"scr_player","path":"scripts/scr_player/scr_player.yy",},},
