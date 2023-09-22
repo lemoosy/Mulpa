@@ -40,7 +40,6 @@
     {"id":{"name":"scr_utils","path":"scripts/scr_utils/scr_utils.yy",},},
     {"id":{"name":"spr_player","path":"sprites/spr_player/spr_player.yy",},},
     {"id":{"name":"obj_exit","path":"objects/obj_exit/obj_exit.yy",},},
-    {"id":{"name":"scr_world","path":"scripts/scr_world/scr_world.yy",},},
     {"id":{"name":"spr_monster","path":"sprites/spr_monster/spr_monster.yy",},},
     {"id":{"name":"spr_coin","path":"sprites/spr_coin/spr_coin.yy",},},
     {"id":{"name":"Basecode_DLL","path":"extensions/Basecode_DLL/Basecode_DLL.yy",},},

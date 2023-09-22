@@ -21,11 +21,14 @@ m_on_ground = false;
 m_coin = 0;
 m_distance_exit = 0;
 
-m_ai = true;
+m_ai = false;
 
-m_nn = NN_Create();
-
-if (m_nn < 0)
+if (m_ai)
 {
-	assert("ERROR - NN_Create()");
+	m_nn = NN_Create();
+	
+	if (m_nn < 0)
+	{
+		assert("ERROR - NN_Create()");
+	}
 }

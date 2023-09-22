@@ -21,7 +21,6 @@
     {"name":"scr_utils","order":3,"path":"scripts/scr_utils/scr_utils.yy",},
     {"name":"spr_player","order":1,"path":"sprites/spr_player/spr_player.yy",},
     {"name":"obj_exit","order":4,"path":"objects/obj_exit/obj_exit.yy",},
-    {"name":"scr_world","order":2,"path":"scripts/scr_world/scr_world.yy",},
     {"name":"spr_coin","order":3,"path":"sprites/spr_coin/spr_coin.yy",},
     {"name":"obj_monster","order":1,"path":"objects/obj_monster/obj_monster.yy",},
     {"name":"scr_vec2","order":1,"path":"scripts/scr_vec2/scr_vec2.yy",},

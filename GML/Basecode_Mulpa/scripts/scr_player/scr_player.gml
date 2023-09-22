@@ -2,6 +2,8 @@ function player_update_input()
 {
 	var _res = 0;
 	
+	world_to_string();
+	
 	if (m_ai)
 	{
 		_res = NN_Forward(m_nn, world_to_string());
