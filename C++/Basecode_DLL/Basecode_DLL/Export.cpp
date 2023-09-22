@@ -1,5 +1,6 @@
 #include "Settings.h"
 #include "Variables.h"
+#include "Graph.h"
 #include "Utils.h"
 
 // DLL
@@ -102,7 +103,95 @@ GameMakerDLL int NN_GetOutput(int nnID)
 
 // ShortestPath
 
+int Coord_To_ID(int i, int j, int w)
+{
+	return j * w + i;
+}
+
 GameMakerDLL double ShortestPath_Get(int nnID, char* world)
 {
+	Matrix* matrix = World_To_Matrix(world);
 
+	int w = matrix->GetWidth();
+	int h = matrix->GetHeight();
+
+	/// Création du graphe.
+
+	Graph* graph = new Graph(w * h);
+
+	/// Création des chemins.
+
+	for (int j = 0; j < h; j++)
+	{
+		for (int i = 0; i < w; i++)
+		{
+			if (matrix->OutOfDimension(i + 1, j) == false)
+			{
+				graph->SetWeight(
+					Coord_To_ID(i, j, w),
+					Coord_To_ID(i + 1, j, w),
+					1.0f
+				);
+			}
+
+			if (matrix->OutOfDimension(i - 1, j) == false)
+			{
+				graph->SetWeight(
+					Coord_To_ID(i, j, w),
+					Coord_To_ID(i - 1, j, w),
+					1.0f
+				);
+			}
+
+			if (matrix->OutOfDimension(i, j + 1) == false)
+			{
+				graph->SetWeight(
+					Coord_To_ID(i, j, w),
+					Coord_To_ID(i, j + 1, w),
+					1.0f
+				);
+			}
+
+			if (matrix->OutOfDimension(i, j - 1) == false)
+			{
+				graph->SetWeight(
+					Coord_To_ID(i, j, w),
+					Coord_To_ID(i, j - 1, w),
+					1.0f
+				);
+			}
+		}
+	}
+
+	/// Recherche du joueur et de la sortie.
+
+	int startID = -1;
+	int endID = -1;
+
+	for (int j = 0; j < h; j++)
+	{
+		for (int i = 0; i < w; i++)
+		{
+			if (matrix->Get(i, j) == CASE_PLAYER)
+			{
+				startID = Coord_To_ID(i, j, w);
+			}
+
+			if (matrix->Get(i, j) == CASE_END)
+			{
+				endID = Coord_To_ID(i, j, w);
+			}
+		}
+	}
+
+	/// Calcule du plus court chemin.
+
+	float distance = 0.0f;
+	List<int>* tab = graph->Dijkstra(startID, endID, &distance);
+
+	delete tab;
+	delete graph;
+	delete matrix;
+
+	return distance;
 }

@@ -110,7 +110,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../Basecode_List/Basecode_List;../../Basecode_Matrix/Basecode_Matrix;../../Basecode_NN/Basecode_NN;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../Basecode_Graph/Basecode_Graph;../../Basecode_List/Basecode_List;../../Basecode_Matrix/Basecode_Matrix;../../Basecode_NN/Basecode_NN;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -126,7 +126,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../Basecode_List/Basecode_List;../../Basecode_Matrix/Basecode_Matrix;../../Basecode_NN/Basecode_NN;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../Basecode_Graph/Basecode_Graph;../../Basecode_List/Basecode_List;../../Basecode_Matrix/Basecode_Matrix;../../Basecode_NN/Basecode_NN;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

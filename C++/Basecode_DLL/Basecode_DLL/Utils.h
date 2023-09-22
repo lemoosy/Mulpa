@@ -37,8 +37,3 @@ Matrix* World_To_Matrix(char* p_world)
 
 	return res;
 }
-
-double World_ShortestPath(char* p_world)
-{
-
-}
