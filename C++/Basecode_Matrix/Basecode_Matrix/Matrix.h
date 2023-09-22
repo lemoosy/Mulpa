@@ -64,6 +64,8 @@ public:
 
 	/// @brief Mélange les valeurs de deux matrices aléatoirement.
 	friend void Mix(Matrix* m1, Matrix* m2);
+
+	void Copy(const Matrix& m);
 };
 
 void operator+=(Matrix& m1, const Matrix& m2);

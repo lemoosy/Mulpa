@@ -21,6 +21,8 @@ public:
 	///// @brief Fonction d'activation de la couche.
 	float (*m_activationFunc)(float);
 
+	Matrix* m_Y;
+
 	/// @brief Constructeur par défaut.
 	/// @param size Nombre de noeuds dans la couche.
 	/// @param sizePrev Nombre de noeuds dans la couche précédente.
@@ -61,7 +63,9 @@ public:
 	/// @brief Réalise la propagation avant du réseau de neurones.
 	/// @param X Matrice d'entrée.
 	/// @return Matrice de sortie.
-	Matrix* Forward(Matrix* X);
+	void Forward(Matrix* X);
+
+	Layer* GetLayer(int index);
 
 	void Crossover(NN* other);
 

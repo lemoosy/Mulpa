@@ -176,6 +176,19 @@ void Matrix::Compose(float (*function)(float))
 	}
 }
 
+void Matrix::Copy(const Matrix& m)
+{
+	assert(true);
+
+	for (int j = 0; j < m_h; j++)
+	{
+		for (int i = 0; i < m_w; i++)
+		{
+			m_values[j][i] = m.m_values[j][i];
+		}
+	}
+}
+
 void operator+=(Matrix& m1, const Matrix& m2)
 {
 	m1.Add(m2);

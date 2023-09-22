@@ -14,6 +14,8 @@ Layer::Layer(int size, int sizePrev, float (*activationFunc)(float))
 	m_B = new Matrix(size, 1);
 	m_B->Randomize(-1.0f, +1.0f);
 
+	m_Y = new Matrix(size, 1);
+
 	m_activationFunc = activationFunc;
 }
 
@@ -21,6 +23,7 @@ Layer::~Layer()
 {
 	delete m_W;
 	delete m_B;
+	delete m_Y;
 }
 
 NN::NN(int inputSize)
@@ -81,40 +84,49 @@ void NN::Print(int index) const
 	curr->m_value->m_B->Print();
 }
 
-Matrix* NN::Forward(Matrix* X)
+void NN::Forward(Matrix* X)
 {
 	/// TODO: à optimiser.
 
-	Matrix* res = nullptr;
-
 	ListNode<Layer>* curr = m_layers->GetFirst();
 
-	Matrix* Xptr = new Matrix(*X);
+	Matrix* Xptr = X;
 
 	while (curr)
 	{
 		Layer* layer = curr->m_value;
 
-		Matrix X = *Xptr;						// Entrées.
 		Matrix W = *layer->m_W;					// Poids.
 		Matrix B = *layer->m_B;					// Biais.
-		Matrix Z = X * W + B;					// Sorties fonction somme.
+		Matrix Z = (*Xptr) * W + B;				// Sorties fonction somme.
 		Z.Compose(layer->m_activationFunc);		// Sorties fonction d'activation.
 
-		if (curr->m_next == nullptr)
-		{
-			res = new Matrix(Z);
-			break;
-		}
+		layer->m_Y->Copy(Z);
 
-		delete Xptr;
-		Xptr = new Matrix(Z);
+		Xptr = layer->m_Y;
+
+		curr = curr->m_next;
+	}
+}
+
+Layer* NN::GetLayer(int index)
+{
+	ListNode<Layer>* curr = m_layers->GetFirst();
+
+	if (index < 0)
+	{
+		index += m_layers->GetSize();
+	}
+
+	assert((0 <= index) && (index < m_layers->GetSize()));
+
+	while (index > 0)
+	{
+		index--;
 		curr = curr->m_next;
 	}
 
-	delete Xptr;
-
-	return res;
+	return curr->m_value;
 }
 
 void NN::Crossover(NN* other)

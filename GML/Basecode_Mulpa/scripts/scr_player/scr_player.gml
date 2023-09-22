@@ -1,8 +1,44 @@
 function player_update_input()
 {
-	m_key_left = keyboard_check(vk_left);
-	m_key_right = keyboard_check(vk_right);
-	m_key_jump = keyboard_check(vk_up);
+	var _res = 0;
+	
+	if (m_ai)
+	{
+		_res = NN_Forward(m_nn, world_to_string());
+		
+		if (_res)
+		{
+			assert("ERROR - NN_Forward()");
+		}
+		
+		_res = NN_GetOutput(m_nn);
+		
+		switch (_res)
+		{
+			case 0:
+				m_key_left = keyboard_check(vk_left);
+			break;
+			
+			case 1:
+				m_key_right = keyboard_check(vk_right);
+			break;
+			
+			case 2:
+				m_key_jump = keyboard_check(vk_up);
+			break;
+			
+			default:
+				assert("ERROR - NN_GetOutput()");
+			break;
+		}
+	}
+	else
+	{
+		m_key_left = keyboard_check(vk_left);
+		m_key_right = keyboard_check(vk_right);
+		m_key_jump = keyboard_check(vk_up);
+	}
+
 }
 
 function player_update_velocity()

@@ -3,5 +3,8 @@
 #include "NN.h"
 #include "Settings.h"
 
-int* g_a = nullptr;
-int* g_b = nullptr;
+/// @brief Liste des réseaux de neurones.
+NN** g_nn = nullptr;
+
+/// @brief Curseur de la liste des réseaux de neurones.
+int g_size;

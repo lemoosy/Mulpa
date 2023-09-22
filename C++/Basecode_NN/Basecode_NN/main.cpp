@@ -13,9 +13,7 @@ int main()
 	X.Set(0, 0, 0.0f);
 	X.Set(1, 0, 1.0f);
 
-	Matrix* Y = nn.Forward(&X);
-	cout << "OUTPUTS:\n\n";
-	Y->Print();
+	nn.Forward(&X);
 
 	return EXIT_SUCCESS;
 }
