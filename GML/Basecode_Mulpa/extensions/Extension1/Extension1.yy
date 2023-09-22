@@ -19,14 +19,12 @@
   "extensionVersion": "0.0.1",
   "files": [
     {"resourceType":"GMExtensionFile","resourceVersion":"1.0","name":"","constants":[],"copyToTargets":-1,"filename":"Basecode_DLL.dll","final":"","functions":[
-        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"add_integers","argCount":0,"args":[
-            2,
-            2,
-          ],"documentation":"","externalName":"add_integers","help":"","hidden":false,"kind":1,"returnType":2,},
+        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"GML_Init","argCount":0,"args":[],"documentation":"","externalName":"GML_Init","help":"","hidden":false,"kind":1,"returnType":2,},
+        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"GML_GetA","argCount":0,"args":[],"documentation":"","externalName":"GML_GetA","help":"","hidden":false,"kind":1,"returnType":2,},
       ],"init":"","kind":1,"order":[],"origname":"","ProxyFiles":[],"uncompress":false,"usesRunnerInterface":false,},
   ],
   "gradleinject": "",
-  "hasConvertedCodeInjection": false,
+  "hasConvertedCodeInjection": true,
   "helpfile": "",
   "HTML5CodeInjection": "",
   "html5Props": false,

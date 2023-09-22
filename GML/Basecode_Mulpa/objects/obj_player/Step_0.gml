@@ -4,8 +4,6 @@ player_update_position();
 player_update_state();
 player_update_distance_exit();
 
-
-show_debug_message("WOOOOW");
-_res = add_integers(5, 50);
-show_debug_message(string(_res));
+var _res = GML_GetA();
+show_debug_message("WOW")
 show_debug_message(_res);

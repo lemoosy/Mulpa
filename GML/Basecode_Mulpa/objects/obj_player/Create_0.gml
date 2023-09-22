@@ -20,3 +20,5 @@ m_on_ground = false;
 /// Items.
 m_coin = 0;
 m_distance_exit = 0;
+
+GML_Init()
