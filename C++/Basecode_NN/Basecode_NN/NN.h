@@ -41,6 +41,9 @@ private:
 	/// @brief Liste des couches du réseau de neurones.
 	List<Layer>* m_layers;
 
+	/// @brief Score du réseau de neurones (PG).
+	float m_score;
+
 public:
 
 	NN(int inputSize);
