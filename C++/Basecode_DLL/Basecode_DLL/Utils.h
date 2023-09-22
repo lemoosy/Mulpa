@@ -22,7 +22,7 @@ Matrix* World_To_Matrix(char* p_world)
 	int w = stoi(world.substr(0, posX));
 	int h = stoi(world.substr(posX + 1, posF - posX - 1));
 
-	Matrix* matrixWorld = new Matrix(w, h);
+	Matrix* res = new Matrix(w, h);
 
 	int index = posF + 1;
 
@@ -30,10 +30,20 @@ Matrix* World_To_Matrix(char* p_world)
 	{
 		for (int i = 0; i < w; i++)
 		{
-			matrixWorld->Set(i, j, (float)world[index]);
+			res->Set(i, j, (float)world[index]);
 			index++;
 		}
 	}
+	
+	return res;
+}
+
+Matrix* World_To_NN(char* world)
+{
+	Matrix* worldMatrix = World_To_Matrix(world);
+
+	int w = worldMatrix->GetWidth();
+	int h = worldMatrix->GetHeight();
 
 	Matrix* res = new Matrix(NN_NB_NEURAL_INPUT, 1);
 
@@ -45,7 +55,7 @@ Matrix* World_To_Matrix(char* p_world)
 		{
 			int idCase = w * j + i;
 
-			switch ((int)matrixWorld->Get(i, j))
+			switch ((int)worldMatrix->Get(i, j))
 			{
 			case CASE_VOID:
 				break;
@@ -64,7 +74,7 @@ Matrix* World_To_Matrix(char* p_world)
 
 			case CASE_MONSTER:
 				res->Set(idCase + idCase * 4, 0, 1.0f);
-			break;
+				break;
 
 			default:
 				break;
@@ -72,7 +82,7 @@ Matrix* World_To_Matrix(char* p_world)
 		}
 	}
 
-	delete matrixWorld;
+	delete worldMatrix;
 
 	return res;
 }

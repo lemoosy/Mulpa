@@ -1,5 +1,8 @@
 function player_update_input()
 {
+	show_debug_message("PCC:");
+	show_debug_message(ShortestPath_Get(world_to_string()))
+	
 	var _res = 0;
 	
 	m_key_left = false;
@@ -20,19 +23,14 @@ function player_update_input()
 		switch (_res)
 		{
 			case 0:
-			show_debug_message("LEFT");
 				m_key_left = true;
 			break;
 			
 			case 1:
-						show_debug_message("RIGHT");
-
 				m_key_right = true;
 			break;
 			
 			case 2:
-						show_debug_message("JUMP");
-
 				m_key_jump = true;
 			break;
 			
@@ -98,7 +96,6 @@ function player_update_position()
 	{
 		phy_position_x -= (bbox_right - room_width);
 	}
-	
 }
 
 function player_update_state()

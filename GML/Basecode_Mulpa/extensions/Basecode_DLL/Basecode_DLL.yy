@@ -22,7 +22,9 @@
         {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"DLL_Init","argCount":0,"args":[],"documentation":"","externalName":"DLL_Init","help":"","hidden":false,"kind":1,"returnType":2,},
         {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"NN_Create","argCount":0,"args":[],"documentation":"","externalName":"NN_Create","help":"","hidden":false,"kind":1,"returnType":2,},
         {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"DLL_Free","argCount":0,"args":[],"documentation":"","externalName":"\t\t}","help":"","hidden":false,"kind":1,"returnType":1,},
-        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"NN_Destroy","argCount":0,"args":[],"documentation":"","externalName":"NN_Destroy","help":"","hidden":false,"kind":1,"returnType":1,},
+        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"NN_Destroy","argCount":0,"args":[
+            2,
+          ],"documentation":"","externalName":"NN_Destroy","help":"","hidden":false,"kind":1,"returnType":2,},
         {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"NN_Forward","argCount":0,"args":[
             2,
             1,
@@ -30,6 +32,12 @@
         {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"NN_GetOutput","argCount":0,"args":[
             2,
           ],"documentation":"","externalName":"","help":"","hidden":false,"kind":1,"returnType":2,},
+        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"NN_GetScore","argCount":0,"args":[
+            2,
+          ],"documentation":"","externalName":"NN_GetScore","help":"","hidden":false,"kind":1,"returnType":2,},
+        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"ShortestPath_Get","argCount":0,"args":[
+            1,
+          ],"documentation":"","externalName":"ShortestPath_Get","help":"","hidden":false,"kind":1,"returnType":2,},
       ],"init":"","kind":1,"order":[
         {"name":"DLL_Init","path":"extensions/Basecode_DLL/Basecode_DLL.yy",},
         {"name":"DLL_Free","path":"extensions/Basecode_DLL/Basecode_DLL.yy",},

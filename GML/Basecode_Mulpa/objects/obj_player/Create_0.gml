@@ -34,3 +34,5 @@ if (m_ai)
 		assert("ERROR - NN_Create()");
 	}
 }
+
+m_is_dead = false;

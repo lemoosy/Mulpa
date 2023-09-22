@@ -4,23 +4,25 @@
 #include "Utils.h"
 #include "Functions.h"
 
-// DLL
+// ------------------------------ DLL ------------------------------
 
 GameMakerDLL double DLL_Init()
 {
 	srand(time(nullptr));
 
-	g_nn = new NN * [NN_CAPACITY];
-	g_size = 0;
+	g_nn = new NN * [NN_CAPACITY]();
 
 	return (double)EXIT_SUCCESS;
 }
 
 GameMakerDLL double DLL_Free()
 {
-	for (int i = 0; i < g_size; i++)
+	for (int i = 0; i < NN_CAPACITY; i++)
 	{
-		delete g_nn[i];
+		if (g_nn[i])
+		{
+			delete g_nn[i];
+		}
 	}
 
 	delete[] g_nn;
@@ -28,16 +30,31 @@ GameMakerDLL double DLL_Free()
 	return (double)EXIT_SUCCESS;
 }
 
-// NN
+// ------------------------------ NN ------------------------------
 
+/// @return -1 si erreur, sinon ID.
+int NN_GetEmptyID(void)
+{
+	for (int i = 0; i < NN_CAPACITY; i++)
+	{
+		if (g_nn[i] == nullptr)
+		{
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+/// @return -1 si erreur, sinon ID.
 GameMakerDLL double NN_Create()
 {
-	if (g_size >= NN_CAPACITY)
+	int nnID = NN_GetEmptyID();
+
+	if (nnID == -1)
 	{
 		return -1;
 	}
-
-	int res = g_size;
 
 	NN* nn = new NN(NN_NB_NEURAL_INPUT);
 
@@ -48,48 +65,51 @@ GameMakerDLL double NN_Create()
 
 	nn->AddLayer(NN_NB_NEURAL_OUTPUT, &sigmoid);
 
-	g_nn[g_size] = nn;
+	g_nn[nnID] = nn;
 
-	g_size++;
-
-	return (double)res;
+	return (double)nnID;
 }
 
-GameMakerDLL double NN_Destroy()
-{
-	return EXIT_SUCCESS;
-}
-
-GameMakerDLL double NN_Forward(double p_nnID, char* world)
+/// @return EXIT_FAILURE si erreur, sinon EXIT_SUCCESS.
+GameMakerDLL double NN_Destroy(double p_nnID)
 {
 	int nnID = (int)p_nnID;
 
-	if ((nnID < 0) || (nnID >= g_size) || !world)
+	if ((nnID < 0) || (nnID >= NN_CAPACITY) || (g_nn[nnID] == nullptr))
 	{
 		return (double)EXIT_FAILURE;
 	}
 
-	NN* nn = g_nn[nnID];
+	delete g_nn[nnID];
 
-	if (!nn)
+	return (double)EXIT_SUCCESS;
+}
+
+/// @return EXIT_FAILURE si erreur, sinon EXIT_SUCCESS.
+GameMakerDLL double NN_Forward(double p_nnID, char* world)
+{
+	int nnID = (int)p_nnID;
+
+	if ((nnID < 0) || (nnID >= NN_CAPACITY) || (g_nn[nnID] == nullptr) || !world)
 	{
-		return EXIT_FAILURE;
+		return (double)EXIT_FAILURE;
 	}
 
-	Matrix* X = World_To_Matrix(world);
+	Matrix* X = World_To_NN(world);
 
-	nn->Forward(X);
+	g_nn[nnID]->Forward(X);
 
 	delete X;
 
 	return (double)EXIT_SUCCESS;
 }
 
+/// @return -1 si erreur, sinon une valeur dans [0, 1, 2].
 GameMakerDLL double NN_GetOutput(double p_nnID)
 {
 	int nnID = (int)p_nnID;
 
-	if ((nnID < 0) || (nnID >= g_size))
+	if ((nnID < 0) || (nnID >= NN_CAPACITY))
 	{
 		return -1;
 	}
@@ -118,14 +138,27 @@ GameMakerDLL double NN_GetOutput(double p_nnID)
 	return (double)minimum;
 }
 
-// ShortestPath
-
-int Coord_To_ID(int i, int j, int w)
+/// @return -1 si erreur.
+GameMakerDLL double NN_GetScore(double p_nnID)
 {
-	return j * w + i;
+	int nnID = (int)p_nnID;
+
+	if (g_nn[nnID] == nullptr)
+	{
+		return -1.0;
+	}
+
+	return (double)g_nn[nnID]->m_score;
 }
 
-GameMakerDLL double ShortestPath_Get(double nnID, char* world)
+// ------------------------------ ShortestPath ------------------------------
+
+int Coord_ToID(int i, int j, int w)
+{
+	return (j * w + i);
+}
+
+GameMakerDLL double ShortestPath_Get(char* world)
 {
 	Matrix* matrix = World_To_Matrix(world);
 
@@ -145,8 +178,8 @@ GameMakerDLL double ShortestPath_Get(double nnID, char* world)
 			if (matrix->OutOfDimension(i + 1, j) == false && matrix->Get(i + 1, j) != CASE_WALL)
 			{
 				graph->SetWeight(
-					Coord_To_ID(i, j, w),
-					Coord_To_ID(i + 1, j, w),
+					Coord_ToID(i, j, w),
+					Coord_ToID(i + 1, j, w),
 					1.0f
 				);
 			}
@@ -154,8 +187,8 @@ GameMakerDLL double ShortestPath_Get(double nnID, char* world)
 			if (matrix->OutOfDimension(i - 1, j) == false && matrix->Get(i - 1, j) != CASE_WALL)
 			{
 				graph->SetWeight(
-					Coord_To_ID(i, j, w),
-					Coord_To_ID(i - 1, j, w),
+					Coord_ToID(i, j, w),
+					Coord_ToID(i - 1, j, w),
 					1.0f
 				);
 			}
@@ -163,8 +196,8 @@ GameMakerDLL double ShortestPath_Get(double nnID, char* world)
 			if (matrix->OutOfDimension(i, j + 1) == false && matrix->Get(i, j + 1) != CASE_WALL)
 			{
 				graph->SetWeight(
-					Coord_To_ID(i, j, w),
-					Coord_To_ID(i, j + 1, w),
+					Coord_ToID(i, j, w),
+					Coord_ToID(i, j + 1, w),
 					1.0f
 				);
 			}
@@ -172,8 +205,8 @@ GameMakerDLL double ShortestPath_Get(double nnID, char* world)
 			if (matrix->OutOfDimension(i, j - 1) == false && matrix->Get(i, j - 1) != CASE_WALL)
 			{
 				graph->SetWeight(
-					Coord_To_ID(i, j, w),
-					Coord_To_ID(i, j - 1, w),
+					Coord_ToID(i, j, w),
+					Coord_ToID(i, j - 1, w),
 					1.0f
 				);
 			}
@@ -191,15 +224,18 @@ GameMakerDLL double ShortestPath_Get(double nnID, char* world)
 		{
 			if (matrix->Get(i, j) == CASE_PLAYER)
 			{
-				startID = Coord_To_ID(i, j, w);
+				startID = Coord_ToID(i, j, w);
 			}
 
 			if (matrix->Get(i, j) == CASE_END)
 			{
-				endID = Coord_To_ID(i, j, w);
+				endID = Coord_ToID(i, j, w);
 			}
 		}
 	}
+
+	assert(startID != -1);
+	assert(endID != -1);
 
 	/// Calcule du plus court chemin.
 
