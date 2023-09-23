@@ -1,8 +1,10 @@
+randomize();
+
 /// Initialise les DLL depuis le basecode 'Basecode_DLL'.
 DLL_Init();
 
 /// Active le mode IA ou le mode Solo.
-global.ai = true;
+global.ai = false;
 
 global.time_step = (1 / room_speed);
 

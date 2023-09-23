@@ -1,18 +1,16 @@
 /// Population.
-m_population_size = 10;
+m_population_size = 100;
 m_population = array_create(m_population_size, -1);
 m_population_cursor = 0;
 
-/// Individus.
-m_selection_size = 5;
+/// Individus (+enfants x1/2).
+m_selection_size = 20;
 m_selection = array_create(m_selection_size, -1);
-
-/// Enfants.
-m_children_size = 3;
-m_children = array_create(m_children_size, -1);
 
 /// Joueur (IA) actuel qui joue.
 m_player = noone;
+
+m_gen = 0;
 
 if (global.ai == false)
 {
@@ -22,10 +20,21 @@ if (global.ai == false)
 
 function population_get_min_index()
 {
-	var _index_min = 0;
+	var _index_min = -1;
 	
-	for (var _i = 1; _i < m_population_size; _i++)
+	for (var _i = 0; _i < m_population_size; _i++)
 	{
+		if (m_population[_i] == -1)
+		{
+			continue;
+		}
+		
+		if (_index_min == -1)
+		{
+			_index_min = _i;;
+			continue;
+		}
+		
 		var _nn_current = m_population[_i];
 		var _nn_minimum = m_population[_index_min];
 		

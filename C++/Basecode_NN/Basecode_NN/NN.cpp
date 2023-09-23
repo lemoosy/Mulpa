@@ -164,7 +164,7 @@ NN* NN::Crossover(NN* other)
 	NN* res = new NN(other);
 
 	ListNode<Layer>* curr1 = res->m_layers->GetFirst();
-	ListNode<Layer>* curr2 = other->m_layers->GetFirst();
+	ListNode<Layer>* curr2 = this->m_layers->GetFirst();
 
 	while (curr1)
 	{

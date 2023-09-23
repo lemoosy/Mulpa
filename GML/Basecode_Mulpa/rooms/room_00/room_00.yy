@@ -81,7 +81,7 @@
     "inheritPhysicsSettings": false,
     "PhysicsWorld": true,
     "PhysicsWorldGravityX": 0.0,
-    "PhysicsWorldGravityY": 300.0,
+    "PhysicsWorldGravityY": 500.0,
     "PhysicsWorldPixToMetres": 0.1,
   },
   "roomSettings": {

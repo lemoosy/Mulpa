@@ -8,7 +8,7 @@ m_key_right = false;
 m_key_jump = false;
 
 /// Variables pour la physique de l'objet.
-m_speed = vec2_set(500, 500);
+m_speed = vec2_set(1000, 500);
 //m_speed = vec2_scale(m_speed, 1);
 m_mass = 50;
 m_gravity = 100;
@@ -27,4 +27,4 @@ m_is_dead = false;
 
 m_is_time_out = false;
 
-alarm[0] = room_speed * 3;
+alarm[0] = room_speed * 1.5;

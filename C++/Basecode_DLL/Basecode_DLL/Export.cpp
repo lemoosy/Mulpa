@@ -144,7 +144,7 @@ GameMakerDLL double NN_GetOutput(double p_nnID)
 GameMakerDLL double NN_GetScore(double p_nnID)
 {
 	int nnID = (int)p_nnID;
-
+	assert(g_nn[nnID]);
 	if (g_nn[nnID] == nullptr)
 	{
 		return -1.0;

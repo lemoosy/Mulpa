@@ -180,6 +180,9 @@ void Matrix::Copy(const Matrix& m)
 {
 	assert(true);
 
+	m_w = m.m_w;
+	m_h = m.m_h;
+
 	for (int j = 0; j < m_h; j++)
 	{
 		for (int i = 0; i < m_w; i++)
@@ -233,9 +236,9 @@ void Mix(Matrix* m1, Matrix* m2)
 	assert(m1->m_w == m2->m_w);
 	assert(m1->m_h == m2->m_h);
 
-	for (int j = 0; j < m1->m_w; j++)
+	for (int j = 0; j < m1->m_h; j++)
 	{
-		for (int i = 0; i < m1->m_h; i++)
+		for (int i = 0; i < m1->m_w; i++)
 		{
 			if (rand() % 2)
 			{

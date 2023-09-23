@@ -1,7 +1,7 @@
 function player_update_input()
 {
-	show_debug_message("PCC:");
-	show_debug_message(ShortestPath_Get(world_to_string()))
+	//show_debug_message("PCC:");
+	//show_debug_message(ShortestPath_Get(world_to_string()))
 	
 	var _res = 0;
 	
@@ -81,8 +81,6 @@ function player_update_velocity()
 	{
 		phy_speed_x = 0;
 	}
-	
-	show_debug_message(phy_linear_velocity_y);
 }
 
 function player_update_position()
