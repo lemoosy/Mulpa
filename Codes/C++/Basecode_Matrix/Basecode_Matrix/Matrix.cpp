@@ -44,7 +44,7 @@ Matrix::~Matrix()
 	delete[] m_values;
 }
 
-void Matrix::Set(int i, int j, float value)
+void Matrix::SetValue(int i, int j, float value)
 {
 	assert((0 <= i) && (i < m_w));
 	assert((0 <= j) && (j < m_h));
@@ -52,7 +52,7 @@ void Matrix::Set(int i, int j, float value)
 	m_values[j][i] = value;
 }
 
-float Matrix::Get(int i, int j) const
+float Matrix::GetValue(int i, int j) const
 {
 	assert((0 <= i) && (i < m_w));
 	assert((0 <= j) && (j < m_h));
@@ -74,7 +74,21 @@ void Matrix::Print() const
 		cout << '\n';
 	}
 
-	cout << flush;
+	cout << endl;
+}
+
+void Matrix::Copy(const Matrix& m)
+{
+	assert(m_w == m.m_w);
+	assert(m_h == m.m_h);
+
+	for (int j = 0; j < m_h; j++)
+	{
+		for (int i = 0; i < m_w; i++)
+		{
+			m_values[j][i] = m.m_values[j][i];
+		}
+	}
 }
 
 void Matrix::Add(const Matrix& m)
@@ -143,18 +157,7 @@ Matrix Matrix::Multiply(const Matrix& m) const
 	return res;
 }
 
-void Matrix::Randomize(float a, float b)
-{
-	for (int j = 0; j < m_h; j++)
-	{
-		for (int i = 0; i < m_w; i++)
-		{
-			m_values[j][i] = Float_Random(a, b);
-		}
-	}
-}
-
-void Matrix::Fill(float value)
+void Matrix::FillValue(float value)
 {
 	for (int j = 0; j < m_h; j++)
 	{
@@ -165,7 +168,18 @@ void Matrix::Fill(float value)
 	}
 }
 
-void Matrix::Compose(float (*function)(float))
+void Matrix::FillValueRandom(float a, float b)
+{
+	for (int j = 0; j < m_h; j++)
+	{
+		for (int i = 0; i < m_w; i++)
+		{
+			m_values[j][i] = Float_Random(a, b);
+		}
+	}
+}
+
+void Matrix::Composition(float (*function)(float))
 {
 	for (int j = 0; j < m_h; j++)
 	{
@@ -176,25 +190,26 @@ void Matrix::Compose(float (*function)(float))
 	}
 }
 
-void Matrix::Copy(const Matrix& m)
+bool Matrix::OutOfDimension(int i, int j) const
 {
-	assert(true);
+	return ((i < 0) || (i >= m_w) || (j < 0) || (j >= m_h));
+}
 
-	m_w = m.m_w;
-	m_h = m.m_h;
+void Matrix::Crossover(const Matrix& m)
+{
+	assert(m_w == m.m_w);
+	assert(m_h == m.m_h);
 
 	for (int j = 0; j < m_h; j++)
 	{
 		for (int i = 0; i < m_w; i++)
 		{
-			m_values[j][i] = m.m_values[j][i];
+			if (rand() % 2)
+			{
+				m_values[j][i] = m.m_values[j][i];
+			}
 		}
 	}
-}
-
-bool Matrix::OutOfDimension(int i, int j)
-{
-	return ((i < 0) || (i >= m_w) || (j < 0) || (j >= m_h));
 }
 
 void operator+=(Matrix& m1, const Matrix& m2)
@@ -214,14 +229,14 @@ void operator*=(Matrix& m, float s)
 
 Matrix operator+(const Matrix& m1, const Matrix& m2)
 {
-	Matrix res = m1;
+	Matrix res(m1);
 	res.Add(m2);
 	return res;
 }
 
 Matrix operator-(const Matrix& m1, const Matrix& m2)
 {
-	Matrix res = m1;
+	Matrix res(m1);
 	res.Sub(m2);
 	return res;
 }
@@ -229,23 +244,4 @@ Matrix operator-(const Matrix& m1, const Matrix& m2)
 Matrix operator*(const Matrix& m1, const Matrix& m2)
 {
 	return m1.Multiply(m2);
-}
-
-void Mix(Matrix* m1, Matrix* m2)
-{
-	assert(m1->m_w == m2->m_w);
-	assert(m1->m_h == m2->m_h);
-
-	for (int j = 0; j < m1->m_h; j++)
-	{
-		for (int i = 0; i < m1->m_w; i++)
-		{
-			if (rand() % 2)
-			{
-				float tmp = m1->Get(i, j);
-				m1->Set(i, j, m2->Get(i, j));
-				m2->Set(i, j, tmp);
-			}
-		}
-	}
 }

@@ -19,8 +19,10 @@ private:
 
 public:
 
+	/// @brief Construit une matrice w x h (toutes les valeurs sont initialisées à 0).
 	Matrix(int w, int h);
 
+	/// @brief Construit une matrice à partir d'une matrice (copie la matrice passée en paramètre).
 	Matrix(const Matrix& m);
 
 	~Matrix();
@@ -32,13 +34,16 @@ public:
 	inline int GetHeight() const { return m_h; }
 
 	/// @brief Modifie la valeur d'une case de la matrice.
-	void Set(int i, int j, float value);
+	void SetValue(int i, int j, float value);
 
 	/// @brief Retourne la valeur d'une case de la matrice.
-	float Get(int i, int j) const;
+	float GetValue(int i, int j) const;
 
 	/// @brief Affiche la matrice.
 	void Print() const;
+
+	/// @brief Copie les valeurs de la matrice passée en paramètre.
+	void Copy(const Matrix& m);
 
 	/// @brief Additionne deux matrices.
 	void Add(const Matrix& m);
@@ -53,21 +58,20 @@ public:
 	/// @return Le produit des deux matrices.
 	Matrix Multiply(const Matrix& m) const;
 
-	/// @brief Modifie chaque case de la matrice par une valeur aléatoire comprise entre a et b.
-	void Randomize(float a, float b);
+	/// @brief Remplit la matrice avec la valeur passée en paramètre.
+	void FillValue(float value);
 
-	/// @brief Remplie la matrice avec la valeur passée en paramètre.
-	void Fill(float value);
+	/// @brief Remplit la matrice avec des valeurs aléatoires entre a et b.
+	void FillValueRandom(float a, float b);
 
-	/// @brief Compose chaque valeur de la matrice avec la fonction passée en paramètre.
-	void Compose(float (*function)(float));
+	/// @brief Compose la matrice avec la fonction passée en paramètre.
+	void Composition(float (*function)(float));
 
-	/// @brief Mélange les valeurs de deux matrices aléatoirement.
-	friend void Mix(Matrix* m1, Matrix* m2);
-
-	void Copy(const Matrix& m);
-
-	bool OutOfDimension(int i, int j);
+	/// @brief Vérifie si les coordonnées passées en paramètre sont en dehors de la matrice.
+	bool OutOfDimension(int i, int j) const;
+	
+	/// @brief Attribue aléatoirement des valeurs de la matrice passée en paramètre à la matrice courante (50%).
+	void Crossover(const Matrix& m);
 };
 
 void operator+=(Matrix& m1, const Matrix& m2);
