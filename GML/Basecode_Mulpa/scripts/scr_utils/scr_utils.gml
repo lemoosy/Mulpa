@@ -27,50 +27,49 @@ function world_to_string()
 	
 	with (all)
 	{
-		if (x < room_width && y < room_height)
-		{
 		var _i = (x + (bbox_right - bbox_left) / 2) / global.tile_size_x;
 		var _j = (y + (bbox_bottom - bbox_top) / 2) / global.tile_size_y;
 		
 		_i = floor(_i);
 		_j = floor(_j);
 		
-		if (_i < _w && _j < _h)
-		switch (object_index)
+		if ((0 <= _i && _i < _w) && (0 <= _j && _j < _h))
 		{
-			case obj_player:
-			
-				_matrix[_j][_i] = "P";
-			
-			break;
-			
-			case obj_exit:
-			
-				if (_matrix[_j][_i] != "P")
-				{
-					_matrix[_j][_i] = "E";
-				}
-			
-			break;
-			
-			case obj_monster:
-			
-				if (_matrix[_j][_i] != "P" && _matrix[_j][_i] != "E")
-				{
-					_matrix[_j][_i] = "M";
-				}
-			
-			break;
-			
-			case obj_wall:
-			
-				if (_matrix[_j][_i] != "P" && _matrix[_j][_i] != "E" && _matrix[_j][_i] != "M")
-				{
-					_matrix[_j][_i] = "W";
-				}
+			switch (object_index)
+			{
+				case obj_player:
 				
-			break;
-		}
+					_matrix[_j][_i] = "P";
+				
+				break;
+				
+				case obj_exit:
+				
+					if (_matrix[_j][_i] != "P")
+					{
+						_matrix[_j][_i] = "E";
+					}
+				
+				break;
+				
+				case obj_monster:
+				
+					if (_matrix[_j][_i] != "P" && _matrix[_j][_i] != "E")
+					{
+						_matrix[_j][_i] = "M";
+					}
+				
+				break;
+				
+				case obj_wall:
+				
+					if (_matrix[_j][_i] != "P" && _matrix[_j][_i] != "E" && _matrix[_j][_i] != "M")
+					{
+						_matrix[_j][_i] = "W";
+					}
+					
+				break;
+			}
 		}
 	}
 	

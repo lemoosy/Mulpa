@@ -38,6 +38,10 @@
         {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"ShortestPath_Get","argCount":0,"args":[
             1,
           ],"documentation":"","externalName":"ShortestPath_Get","help":"","hidden":false,"kind":1,"returnType":2,},
+        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"NN_Crossover","argCount":0,"args":[
+            2,
+            2,
+          ],"documentation":"","externalName":"NN_Crossover","help":"","hidden":false,"kind":1,"returnType":2,},
       ],"init":"","kind":1,"order":[
         {"name":"DLL_Init","path":"extensions/Basecode_DLL/Basecode_DLL.yy",},
         {"name":"DLL_Free","path":"extensions/Basecode_DLL/Basecode_DLL.yy",},

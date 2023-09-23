@@ -50,6 +50,8 @@ public:
 
 	NN(int inputSize);
 
+	NN(const NN* nn);
+
 	~NN();
 
 	/// @brief Ajoute une couche au réseau de neurones.
@@ -67,7 +69,7 @@ public:
 
 	Layer* GetLayer(int index);
 
-	void Crossover(NN* other);
+	NN* Crossover(NN* other);
 
 	void Mutate() const;
 };

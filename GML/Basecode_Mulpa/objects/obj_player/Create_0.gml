@@ -8,7 +8,7 @@ m_key_right = false;
 m_key_jump = false;
 
 /// Variables pour la physique de l'objet.
-m_speed = vec2_set(100, 200);
+m_speed = vec2_set(500, 500);
 //m_speed = vec2_scale(m_speed, 1);
 m_mass = 50;
 m_gravity = 100;
@@ -21,18 +21,10 @@ m_on_ground = false;
 m_coin = 0;
 m_distance_exit = 0;
 
-m_ai = true;
-
 m_nn = -1;
 
-if (m_ai)
-{
-	m_nn = NN_Create();
-	
-	if (m_nn < 0)
-	{
-		assert("ERROR - NN_Create()");
-	}
-}
-
 m_is_dead = false;
+
+m_is_time_out = false;
+
+alarm[0] = room_speed * 3;

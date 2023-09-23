@@ -9,7 +9,7 @@ function player_update_input()
 	m_key_right = false;
 	m_key_jump = false;
 	
-	if (m_ai)
+	if (m_nn != -1)
 	{
 		_res = NN_Forward(m_nn, world_to_string());
 		
@@ -96,6 +96,8 @@ function player_update_position()
 	{
 		phy_position_x -= (bbox_right - room_width);
 	}
+	
+	if (bbox_top > room_height) m_is_dead = true;
 }
 
 function player_update_state()

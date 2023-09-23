@@ -75,7 +75,7 @@ GameMakerDLL double NN_Destroy(double p_nnID)
 {
 	int nnID = (int)p_nnID;
 
-	if ((nnID < 0) || (nnID >= NN_CAPACITY) || (g_nn[nnID] == nullptr))
+	if ((nnID < 0) || (nnID >= NN_CAPACITY)/* || (g_nn[nnID] == nullptr)*/)
 	{
 		return (double)EXIT_FAILURE;
 	}
@@ -89,6 +89,8 @@ GameMakerDLL double NN_Destroy(double p_nnID)
 GameMakerDLL double NN_Forward(double p_nnID, char* world)
 {
 	int nnID = (int)p_nnID;
+
+	assert(nnID != -1);
 
 	if ((nnID < 0) || (nnID >= NN_CAPACITY) || (g_nn[nnID] == nullptr) || !world)
 	{
@@ -149,6 +151,25 @@ GameMakerDLL double NN_GetScore(double p_nnID)
 	}
 
 	return (double)g_nn[nnID]->m_score;
+}
+
+GameMakerDLL double NN_Crossover(double p_nnID_1, double p_nnID_2)
+{
+	int nnID_1 = (int)p_nnID_1;
+	int nnID_2 = (int)p_nnID_2;
+
+	NN* nn_1 = g_nn[nnID_1];
+	NN* nn_2 = g_nn[nnID_2];
+
+	assert(nn_1);
+	assert(nn_2);
+
+	int nnID = NN_GetEmptyID();
+	assert(nnID != -1);
+
+	g_nn[nnID] = nn_1->Crossover(nn_2);
+
+	return nnID;
 }
 
 // ------------------------------ ShortestPath ------------------------------
@@ -234,8 +255,15 @@ GameMakerDLL double ShortestPath_Get(char* world)
 		}
 	}
 
-	assert(startID != -1);
 	assert(endID != -1);
+
+	if (startID == -1)
+	{
+		delete graph;
+		delete matrix;
+
+		return 1000.0;
+	}
 
 	/// Calcule du plus court chemin.
 

@@ -34,6 +34,34 @@ NN::NN(int inputSize)
 	m_layers = new List<Layer>();
 }
 
+NN::NN(const NN* other)
+{
+	assert(other);
+
+	m_inputSize = other->m_inputSize;
+	m_layers = new List<Layer>();
+
+	ListNode<Layer>* curr = other->m_layers->GetFirst();
+
+	while (curr)
+	{
+		Layer* layer = curr->m_value;
+
+		Layer* newLayer = new Layer(
+			layer->m_size,
+			layer->m_W->GetHeight(),
+			layer->m_activationFunc
+		);
+
+		newLayer->m_W->Copy(*layer->m_W);
+		newLayer->m_B->Copy(*layer->m_B);
+
+		m_layers->InsertLast(newLayer);
+
+		curr = curr->m_next;
+	}
+}
+
 NN::~NN()
 {
 	delete m_layers;
@@ -129,11 +157,13 @@ Layer* NN::GetLayer(int index)
 	return curr->m_value;
 }
 
-void NN::Crossover(NN* other)
+NN* NN::Crossover(NN* other)
 {
 	assert(m_layers->GetSize() == other->m_layers->GetSize());
 
-	ListNode<Layer>* curr1 = m_layers->GetFirst();
+	NN* res = new NN(other);
+
+	ListNode<Layer>* curr1 = res->m_layers->GetFirst();
 	ListNode<Layer>* curr2 = other->m_layers->GetFirst();
 
 	while (curr1)
@@ -147,6 +177,8 @@ void NN::Crossover(NN* other)
 		curr1 = curr1->m_next;
 		curr2 = curr2->m_next;
 	}
+
+	return res;
 }
 
 void NN::Mutate() const
