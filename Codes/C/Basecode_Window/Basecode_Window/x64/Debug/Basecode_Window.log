@@ -1,0 +1,16 @@
+﻿  Color.c
+  main.c
+C:\Users\PC Lemoosy\OneDrive\Bureau\Basecode\3A\Mulpa\Codes\C\Basecode_Window\Basecode_Window\main.c(4,1): warning C4026: fonction déclarée avec une liste de paramètres formels
+  Settings.c
+  Window.c
+C:\Users\PC Lemoosy\OneDrive\Bureau\Basecode\3A\Mulpa\Codes\C\Basecode_Window\Basecode_Window\Window.c(78,3): warning C4244: 'fonction' : conversion de 'int' en 'float', perte possible de données
+C:\Users\PC Lemoosy\OneDrive\Bureau\Basecode\3A\Mulpa\Codes\C\Basecode_Window\Basecode_Window\Window.c(79,3): warning C4244: 'fonction' : conversion de 'int' en 'float', perte possible de données
+C:\Users\PC Lemoosy\OneDrive\Bureau\Basecode\3A\Mulpa\Codes\C\Basecode_Window\Basecode_Window\Window.c(80,3): warning C4244: 'fonction' : conversion de 'int' en 'float', perte possible de données
+C:\Users\PC Lemoosy\OneDrive\Bureau\Basecode\3A\Mulpa\Codes\C\Basecode_Window\Basecode_Window\Window.c(81,3): warning C4244: 'fonction' : conversion de 'int' en 'float', perte possible de données
+C:\Users\PC Lemoosy\OneDrive\Bureau\Basecode\3A\Mulpa\Codes\C\Basecode_Window\Basecode_Window\Window.c(96,8): warning C4244: 'initialisation' : conversion de 'int' en 'float', perte possible de données
+C:\Users\PC Lemoosy\OneDrive\Bureau\Basecode\3A\Mulpa\Codes\C\Basecode_Window\Basecode_Window\Window.c(97,8): warning C4244: 'initialisation' : conversion de 'int' en 'float', perte possible de données
+C:\Users\PC Lemoosy\OneDrive\Bureau\Basecode\3A\Mulpa\Codes\C\Basecode_Window\Basecode_Window\Window.c(98,8): warning C4244: 'initialisation' : conversion de 'int' en 'float', perte possible de données
+C:\Users\PC Lemoosy\OneDrive\Bureau\Basecode\3A\Mulpa\Codes\C\Basecode_Window\Basecode_Window\Window.c(99,8): warning C4244: 'initialisation' : conversion de 'int' en 'float', perte possible de données
+  Génération de code en cours...
+C:\Users\PC Lemoosy\OneDrive\Bureau\Basecode\3A\Mulpa\Codes\C\Basecode_Window\Basecode_Window\Window.c(40): warning C4715: 'Window_Create' : les chemins de contrôle ne retournent pas tous une valeur
+  Basecode_Window.vcxproj -> C:\Users\PC Lemoosy\OneDrive\Bureau\Basecode\3A\Mulpa\Codes\C\Basecode_Window\x64\Debug\Basecode_Window.lib
