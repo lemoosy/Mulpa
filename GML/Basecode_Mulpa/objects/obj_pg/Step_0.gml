@@ -1,11 +1,11 @@
 if (m_player == noone)
 {
-	m_player = instance_create_layer(80, 38, "Objects", obj_player);
+	m_player = instance_create_layer(16, 96, "Objects", obj_player);
 	
 	with (m_player)
 	{
 		m_nn = NN_Create();
-		
+
 		if (m_nn < 0)
 		{
 			assert("ERROR - NN_Create()");
@@ -21,6 +21,7 @@ else
 		if (m_is_dead)
 		{
 			nnID = m_nn;
+			NN_SetScore(m_nn, ShortestPath_Get(world_to_string()));
 			instance_destroy();
 		}
 	}

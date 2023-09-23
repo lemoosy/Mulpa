@@ -65,15 +65,15 @@ Matrix* World_To_NN(char* world)
 				break;
 
 			case CASE_END:
-				res->Set(idCase + idCase * 2, 0, 1.0f);
+				res->Set(idCase + block * 1, 0, 1.0f);
 				break;
 
 			case CASE_WALL:
-				res->Set(idCase + idCase * 3, 0, 1.0f);
+				res->Set(idCase + block * 2, 0, 1.0f);
 				break;
 
 			case CASE_MONSTER:
-				res->Set(idCase + idCase * 4, 0, 1.0f);
+				res->Set(idCase + block * 3, 0, 1.0f);
 				break;
 
 			default:

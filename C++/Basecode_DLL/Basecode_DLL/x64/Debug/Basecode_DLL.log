@@ -1,2 +1,6 @@
 ﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(517,5): warning MSB8004: Le répertoire Output ne se termine pas par une barre oblique finale. Cette instance de build ajoutera une barre oblique, comme requis, pour permettre l'évaluation correcte du répertoire Output.
+  Export.cpp
+C:\Users\PC Lemoosy\OneDrive\Bureau\Basecode\3A\Mulpa\C++\Basecode_DLL\Basecode_DLL\Utils.h(19,11): warning C4267: 'initialisation' : conversion de 'size_t' en 'int', perte possible de données
+C:\Users\PC Lemoosy\OneDrive\Bureau\Basecode\3A\Mulpa\C++\Basecode_DLL\Basecode_DLL\Utils.h(20,11): warning C4267: 'initialisation' : conversion de 'size_t' en 'int', perte possible de données
+C:\Users\PC Lemoosy\OneDrive\Bureau\Basecode\3A\Mulpa\C++\Basecode_DLL\Basecode_DLL\Export.cpp(11,12): warning C4244: 'argument' : conversion de 'time_t' en 'unsigned int', perte possible de données
   Basecode_DLL.vcxproj -> C:\Users\PC Lemoosy\OneDrive\Bureau\Basecode\3A\Mulpa\GML\Basecode_Mulpa\extensions\Basecode_DLL\Basecode_DLL.dll

@@ -153,6 +153,20 @@ GameMakerDLL double NN_GetScore(double p_nnID)
 	return (double)g_nn[nnID]->m_score;
 }
 
+GameMakerDLL double NN_SetScore(double p_nnID, double score)
+{
+	int nnID = (int)p_nnID;
+	assert(g_nn[nnID]);
+	if (g_nn[nnID] == nullptr)
+	{
+		return -1.0;
+	}
+
+	g_nn[nnID]->m_score = score;
+
+	return 1.0;
+}
+
 GameMakerDLL double NN_Crossover(double p_nnID_1, double p_nnID_2)
 {
 	int nnID_1 = (int)p_nnID_1;

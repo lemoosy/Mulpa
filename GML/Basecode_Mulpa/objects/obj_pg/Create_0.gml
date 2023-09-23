@@ -14,7 +14,7 @@ m_gen = 0;
 
 if (global.ai == false)
 {
-	instance_create_layer(80, 38, "Objects", obj_player);
+	instance_create_layer(16, 96, "Objects", obj_player);
 	instance_destroy();
 }
 

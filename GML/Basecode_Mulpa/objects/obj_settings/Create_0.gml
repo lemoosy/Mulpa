@@ -4,7 +4,7 @@ randomize();
 DLL_Init();
 
 /// Active le mode IA ou le mode Solo.
-global.ai = false;
+global.ai = true;
 
 global.time_step = (1 / room_speed);
 
