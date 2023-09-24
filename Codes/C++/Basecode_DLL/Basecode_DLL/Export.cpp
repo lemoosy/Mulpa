@@ -1,127 +1,49 @@
-#include "Settings.h"
-#include "Variables.h"
-#include "Graph.h"
-#include "Utils.h"
-#include "Functions.h"
+#include "Export.h"
 
-// ------------------------------ DLL ------------------------------
-
-GameMakerDLL double DLL_Init()
-{
-	srand(time(nullptr));
-
-	g_nn = new NN * [NN_CAPACITY]();
-
-	return (double)EXIT_SUCCESS;
-}
-
-GameMakerDLL double DLL_Free()
-{
-	for (int i = 0; i < NN_CAPACITY; i++)
-	{
-		if (g_nn[i])
-		{
-			delete g_nn[i];
-		}
-	}
-
-	delete[] g_nn;
-
-	return (double)EXIT_SUCCESS;
-}
-
-// ------------------------------ NN ------------------------------
-
-/// @return -1 si erreur, sinon ID.
-int NN_GetEmptyID(void)
-{
-	for (int i = 0; i < NN_CAPACITY; i++)
-	{
-		if (g_nn[i] == nullptr)
-		{
-			return i;
-		}
-	}
-
-	return -1;
-}
-
-/// @return -1 si erreur, sinon ID.
 GameMakerDLL double NN_Create()
 {
-	int nnID = NN_GetEmptyID();
+	int id = gNN_GetEmptyID();
 
-	if (nnID == -1)
-	{
-		return -1;
-	}
+	assert(id != -1);
 
-	NN* nn = new NN(NN_NB_NEURAL_INPUT);
+	NN* nn = new NN(512);
+	nn->AddLayer(512, &sigmoid);
+	nn->AddLayer(512, &sigmoid);
+	nn->AddLayer(512, &sigmoid);
+	nn->AddLayer(3, &sigmoid);
 
-	for (int i = 0; i < NN_NB_LAYER_HIDDEN; i++)
-	{
-		nn->AddLayer(NN_NB_NEURAL_HIDDEN, &sigmoid);
-	}
+	gNN_SetNN(id, nn);
 
-	nn->AddLayer(NN_NB_NEURAL_OUTPUT, &sigmoid);
-
-	g_nn[nnID] = nn;
-
-	return (double)nnID;
+	return (double)id;
 }
 
-/// @return EXIT_FAILURE si erreur, sinon EXIT_SUCCESS.
-GameMakerDLL double NN_Destroy(double p_nnID)
+GameMakerDLL double NN_Destroy(double p_id)
 {
-	int nnID = (int)p_nnID;
+	gNN_Destroy(p_id);
 
-	if ((nnID < 0) || (nnID >= NN_CAPACITY)/* || (g_nn[nnID] == nullptr)*/)
-	{
-		return (double)EXIT_FAILURE;
-	}
-
-	delete g_nn[nnID];
-
-	return (double)EXIT_SUCCESS;
+	return 0.0;
 }
 
-/// @return EXIT_FAILURE si erreur, sinon EXIT_SUCCESS.
-GameMakerDLL double NN_Forward(double p_nnID, char* world)
+GameMakerDLL double NN_Forward(double p_id, char* p_world)
 {
-	int nnID = (int)p_nnID;
+	NN* nn = gNN_GetNN(p_id);
 
-	assert(nnID != -1);
+	Matrix* world = World_Load(p_world);
 
-	if ((nnID < 0) || (nnID >= NN_CAPACITY) || (g_nn[nnID] == nullptr) || !world)
-	{
-		return (double)EXIT_FAILURE;
-	}
+	Matrix* X = World_ToNN(world);
 
-	Matrix* X = World_To_NN(world);
-
-	g_nn[nnID]->Forward(X);
+	nn->Forward(X);
 
 	delete X;
+	
+	delete world;
 
-	return (double)EXIT_SUCCESS;
+	return 0.0;
 }
 
-/// @return -1 si erreur, sinon une valeur dans [0, 1, 2].
-GameMakerDLL double NN_GetOutput(double p_nnID)
+GameMakerDLL double NN_GetOutput(double p_id)
 {
-	int nnID = (int)p_nnID;
-
-	if ((nnID < 0) || (nnID >= NN_CAPACITY))
-	{
-		return -1;
-	}
-
-	NN* nn = g_nn[nnID];
-
-	if (!nn)
-	{
-		return -1;
-	}
+	NN* nn = gNN_GetNN(p_id);
 
 	Layer* output = nn->GetLayer(-1);
 
@@ -131,7 +53,7 @@ GameMakerDLL double NN_GetOutput(double p_nnID)
 
 	for (int i = 1; i < Y->GetWidth(); i++)
 	{
-		if (Y->Get(i, 0) > Y->Get(minimum, 0))
+		if (Y->GetValue(i, 0) > Y->GetValue(minimum, 0))
 		{
 			minimum = i;
 		}
@@ -140,153 +62,42 @@ GameMakerDLL double NN_GetOutput(double p_nnID)
 	return (double)minimum;
 }
 
-/// @return -1 si erreur.
-GameMakerDLL double NN_GetScore(double p_nnID)
+GameMakerDLL double NN_GetScore(double p_id)
 {
-	int nnID = (int)p_nnID;
-	assert(g_nn[nnID]);
-	if (g_nn[nnID] == nullptr)
-	{
-		return -1.0;
-	}
+	NN* nn = gNN_GetNN(p_id);
 
-	return (double)g_nn[nnID]->m_score;
+	return (double)nn->GetScore();
 }
 
-GameMakerDLL double NN_SetScore(double p_nnID, double score)
+GameMakerDLL double NN_SetScore(double p_id, double p_score)
 {
-	int nnID = (int)p_nnID;
-	assert(g_nn[nnID]);
-	if (g_nn[nnID] == nullptr)
-	{
-		return -1.0;
-	}
+	NN* nn = gNN_GetNN(p_id);
 
-	g_nn[nnID]->m_score = score;
+	nn->SetScore(p_score);
 
-	return 1.0;
+	return 0.0;
 }
 
-GameMakerDLL double NN_Crossover(double p_nnID_1, double p_nnID_2)
+GameMakerDLL double NN_Crossover(double p_id_1, double p_id_2)
 {
-	int nnID_1 = (int)p_nnID_1;
-	int nnID_2 = (int)p_nnID_2;
+	NN* nn_1 = gNN_GetNN(p_id_1);
+	NN* nn_2 = gNN_GetNN(p_id_2);
+	NN* nn_3 = nn_1->Crossover(nn_2);
 
-	NN* nn_1 = g_nn[nnID_1];
-	NN* nn_2 = g_nn[nnID_2];
+	int id_3 = gNN_GetEmptyID();
 
-	assert(nn_1);
-	assert(nn_2);
+	assert(id_3 != -1);
 
-	int nnID = NN_GetEmptyID();
-	assert(nnID != -1);
+	gNN_SetNN(id_3, nn_3);
 
-	g_nn[nnID] = nn_1->Crossover(nn_2);
-
-	return nnID;
+	return (double)id_3;
 }
 
-// ------------------------------ ShortestPath ------------------------------
-
-int Coord_ToID(int i, int j, int w)
+GameMakerDLL double NN_UpdateScore(double p_id)
 {
-	return (j * w + i);
-}
+	NN* nn = gNN_GetNN(p_id);
+	
 
-GameMakerDLL double ShortestPath_Get(char* world)
-{
-	Matrix* matrix = World_To_Matrix(world);
 
-	int w = matrix->GetWidth();
-	int h = matrix->GetHeight();
-
-	/// Création du graphe.
-
-	Graph* graph = new Graph(w * h);
-
-	/// Création des chemins.
-
-	for (int j = 0; j < h; j++)
-	{
-		for (int i = 0; i < w; i++)
-		{
-			if (matrix->OutOfDimension(i + 1, j) == false && matrix->Get(i + 1, j) != CASE_WALL)
-			{
-				graph->SetWeight(
-					Coord_ToID(i, j, w),
-					Coord_ToID(i + 1, j, w),
-					1.0f
-				);
-			}
-
-			if (matrix->OutOfDimension(i - 1, j) == false && matrix->Get(i - 1, j) != CASE_WALL)
-			{
-				graph->SetWeight(
-					Coord_ToID(i, j, w),
-					Coord_ToID(i - 1, j, w),
-					1.0f
-				);
-			}
-
-			if (matrix->OutOfDimension(i, j + 1) == false && matrix->Get(i, j + 1) != CASE_WALL)
-			{
-				graph->SetWeight(
-					Coord_ToID(i, j, w),
-					Coord_ToID(i, j + 1, w),
-					1.0f
-				);
-			}
-
-			if (matrix->OutOfDimension(i, j - 1) == false && matrix->Get(i, j - 1) != CASE_WALL)
-			{
-				graph->SetWeight(
-					Coord_ToID(i, j, w),
-					Coord_ToID(i, j - 1, w),
-					1.0f
-				);
-			}
-		}
-	}
-
-	/// Recherche du joueur et de la sortie.
-
-	int startID = -1;
-	int endID = -1;
-
-	for (int j = 0; j < h; j++)
-	{
-		for (int i = 0; i < w; i++)
-		{
-			if (matrix->Get(i, j) == CASE_PLAYER)
-			{
-				startID = Coord_ToID(i, j, w);
-			}
-
-			if (matrix->Get(i, j) == CASE_END)
-			{
-				endID = Coord_ToID(i, j, w);
-			}
-		}
-	}
-
-	assert(endID != -1);
-
-	if (startID == -1)
-	{
-		delete graph;
-		delete matrix;
-
-		return 1000.0;
-	}
-
-	/// Calcule du plus court chemin.
-
-	float distance = 0.0f;
-	List<int>* tab = graph->Dijkstra(startID, endID, &distance);
-
-	delete tab;
-	delete graph;
-	delete matrix;
-
-	return distance;
+	return 0.0;
 }
