@@ -9,10 +9,10 @@ Layer::Layer(int size, int sizePrev, float (*activationFunc)(float))
 	m_size = size;
 
 	m_W = new Matrix(size, sizePrev);
-	m_W->Randomize(-1.0f, +1.0f);
+	m_W->FillValueRandom(-1.0f, +1.0f);
 
 	m_B = new Matrix(size, 1);
-	m_B->Randomize(-1.0f, +1.0f);
+	m_B->FillValueRandom(-1.0f, +1.0f);
 
 	m_Y = new Matrix(size, 1);
 
@@ -31,34 +31,36 @@ NN::NN(int inputSize)
 	assert(inputSize > 0);
 
 	m_inputSize = inputSize;
-	m_layers = new List<Layer>();
+	m_layers = new DList<Layer>();
+	m_score = 0.0f;
 }
 
-NN::NN(const NN* other)
+NN::NN(const NN& nnCopy)
 {
-	assert(other);
+	m_inputSize = nnCopy.m_inputSize;
+	m_layers = new DList<Layer>();
+	m_score = nnCopy.m_score;
 
-	m_inputSize = other->m_inputSize;
-	m_layers = new List<Layer>();
+	DListNode<Layer>* nnCopySent = nnCopy.m_layers->GetSentinel();
+	DListNode<Layer>* nnCopyCurr = nnCopySent->m_next;
 
-	ListNode<Layer>* curr = other->m_layers->GetFirst();
-
-	while (curr)
+	while (nnCopyCurr != nnCopySent)
 	{
-		Layer* layer = curr->m_value;
+		Layer* nnCopyLayer = nnCopyCurr->m_value;
 
-		Layer* newLayer = new Layer(
-			layer->m_size,
-			layer->m_W->GetHeight(),
-			layer->m_activationFunc
+		Layer* insertLayer = new Layer(
+			nnCopyLayer->m_size,
+			nnCopyLayer->m_W->GetHeight(),
+			nnCopyLayer->m_activationFunc
 		);
 
-		newLayer->m_W->Copy(*layer->m_W);
-		newLayer->m_B->Copy(*layer->m_B);
+		insertLayer->m_W->Copy(*nnCopyLayer->m_W);
+		insertLayer->m_B->Copy(*nnCopyLayer->m_B);
+		insertLayer->m_Y->Copy(*nnCopyLayer->m_Y);
 
-		m_layers->InsertLast(newLayer);
+		m_layers->InsertLast(insertLayer);
 
-		curr = curr->m_next;
+		nnCopyCurr = nnCopyCurr->m_next;
 	}
 }
 
@@ -69,65 +71,49 @@ NN::~NN()
 
 void NN::AddLayer(int size, float (*activationFunc)(float))
 {
-	// TODO: Fonction à optimiser avec un DList.
-
-	Layer* layer = nullptr;
+	Layer* insertLayer = nullptr;
 
 	if (m_layers->IsEmpty())
 	{
-		layer = new Layer(size, m_inputSize, activationFunc);
+		insertLayer = new Layer(size, m_inputSize, activationFunc);
 	}
 	else
 	{
-		Layer* last = m_layers->GetLast()->m_value;
-		layer = new Layer(size, last->m_size, activationFunc);
+		Layer* lastLayer = m_layers->GetValue(-1);
+		insertLayer = new Layer(size, lastLayer->m_size, activationFunc);
 	}
 
-	m_layers->InsertLast(layer);
+	m_layers->InsertLast(insertLayer);
 }
 
 void NN::Print(int index) const
 {
-	if (index < 0)
-	{
-		index += m_layers->GetSize();
-	}
-
-	assert((0 <= index) && (index < m_layers->GetSize()));
-
 	cout << "---------- Neural Network (index=" << index << ") ----------\n\n";
 
-	ListNode<Layer>* curr = m_layers->GetFirst();
+	Layer* layer = m_layers->GetValue(index);
 
-	while (index > 0)
-	{
-		curr = curr->m_next;
-		index--;
-	}
-	
 	cout << "# Weights :\n\n";
-	curr->m_value->m_W->Print();
+	layer->m_W->Print();
 
 	cout << "# Bias :\n\n";
-	curr->m_value->m_B->Print();
+	layer->m_B->Print();
 }
 
 void NN::Forward(Matrix* X)
 {
-	/// TODO: à optimiser.
-
-	ListNode<Layer>* curr = m_layers->GetFirst();
+	DListNode<Layer>* sent = m_layers->GetSentinel();
+	DListNode<Layer>* curr = sent->m_next;
 
 	Matrix* Xptr = X;
 
-	while (curr)
+	while (curr != sent)
 	{
 		Layer* layer = curr->m_value;
 
-		Matrix W = *layer->m_W;					// Poids.
-		Matrix B = *layer->m_B;					// Biais.
-		Matrix Z = (*Xptr) * W + B;				// Sorties fonction somme.
-		Z.Compose(layer->m_activationFunc);		// Sorties fonction d'activation.
+		Matrix W = *layer->m_W;						// Poids.
+		Matrix B = *layer->m_B;						// Biais.
+		Matrix Z = (*Xptr) * W + B;					// Sorties fonction somme.
+		Z.Composition(layer->m_activationFunc);		// Sorties fonction d'activation.
 
 		layer->m_Y->Copy(Z);
 
@@ -137,50 +123,67 @@ void NN::Forward(Matrix* X)
 	}
 }
 
-Layer* NN::GetLayer(int index)
+Matrix* NN::GetOutput(void) const
 {
-	ListNode<Layer>* curr = m_layers->GetFirst();
-
-	if (index < 0)
-	{
-		index += m_layers->GetSize();
-	}
-
-	assert((0 <= index) && (index < m_layers->GetSize()));
-
-	while (index > 0)
-	{
-		index--;
-		curr = curr->m_next;
-	}
-
-	return curr->m_value;
+	return m_layers->GetValue(-1)->m_Y;
 }
 
-NN* NN::Crossover(NN* other)
+Layer* NN::GetLayer(int index) const
 {
-	assert(m_layers->GetSize() == other->m_layers->GetSize());
+	return m_layers->GetValue(index);
+}
 
-	NN* res = new NN(other);
+NN* NN::Crossover(NN* nn2) const
+{
+	const NN* nn1 = this;
 
-	ListNode<Layer>* curr1 = res->m_layers->GetFirst();
-	ListNode<Layer>* curr2 = this->m_layers->GetFirst();
+	assert(nn1->m_layers->GetSize() == nn2->m_layers->GetSize());
 
-	while (curr1)
+	NN* res = new NN(*nn1);
+
+	DListNode<Layer>* resSent = res->m_layers->GetSentinel();
+	DListNode<Layer>* resCurr = resSent->m_next;
+
+	DListNode<Layer>* nn2Curr = nn2->m_layers->GetSentinel()->m_next;
+
+	while (resCurr != resSent)
 	{
-		Layer* layer1 = curr1->m_value;
-		Layer* layer2 = curr2->m_value;
+		Layer* resLayer = resCurr->m_value;
+		Layer* nn2Layer = nn2Curr->m_value;
 
-		Mix(layer1->m_W, layer2->m_W);
-		Mix(layer1->m_B, layer2->m_B);
+		resLayer->m_W->Mix(*nn2Layer->m_W);
+		resLayer->m_B->Mix(*nn2Layer->m_B);
 
-		curr1 = curr1->m_next;
-		curr2 = curr2->m_next;
+		resCurr = resCurr->m_next;
+		nn2Curr = nn2Curr->m_next;
 	}
+
+	res->m_score = 0.0f;
 
 	return res;
 }
 
-void NN::Mutate() const
+void NN::Mutation(void)
 {
+	int index = Int_Random(0, m_layers->GetSize() - 1);
+
+	Layer* layer = m_layers->GetValue(index);
+
+	Matrix* matrix = nullptr;
+
+	if (Int_Random(0, 1) == 0)
+	{
+		matrix = layer->m_W;
+	}
+	else
+	{
+		matrix = layer->m_B;
+	}
+
+	int i = rand() % matrix->GetWidth();
+	int j = rand() % matrix->GetHeight();
+
+	float value = Float_Random(-1.0f, +1.0f);
+
+	matrix->SetValue(i, j, value);
 }

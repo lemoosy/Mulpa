@@ -1,6 +1,6 @@
 #pragma once
 
-#include "List.h"
+#include "DList.h"
 #include "Matrix.h"
 #include "Settings.h"
 
@@ -15,12 +15,13 @@ public:
 	/// @brief Matrice qui stocke les poids de la couche.
 	Matrix* m_W;
 
-	///// @brief Matrice qui stocke les biais de la couche.
+	/// @brief Matrice qui stocke les biais de la couche.
 	Matrix* m_B;
 
-	///// @brief Fonction d'activation de la couche.
+	/// @brief Fonction d'activation de la couche.
 	float (*m_activationFunc)(float);
 
+	/// @brief Sortie de la couche.
 	Matrix* m_Y;
 
 	/// @brief Constructeur par défaut.
@@ -41,17 +42,28 @@ private:
 	int m_inputSize;
 
 	/// @brief Liste des couches du réseau de neurones.
-	List<Layer>* m_layers;
-
-public:
+	DList<Layer>* m_layers;
 
 	/// @brief Score du réseau de neurones (PG).
 	float m_score;
 
+public:
+
+	/// @brief Retourne le score du réseau de neurones.
+	inline int GetScore(void) const { return m_score; }
+
+	/// @brief Modifie le score du réseau de neurones.
+	inline void SetScore(float score) { m_score = score; }
+
+	/// @brief Crée un réseau de neurones avec 'inputSize' entrées.
+	/// @brief Le score est initialisé à 0.
 	NN(int inputSize);
 
-	NN(const NN* nn);
+	/// @brief Crée un réseau de neurones à partir d'un autre réseau de neurones.
+	/// @brief Copie toutes les couches (même le score).
+	NN(const NN& nnCopy);
 
+	/// @brief Détruit le réseau de neurones ainsi que toutes ses couches.
 	~NN();
 
 	/// @brief Ajoute une couche au réseau de neurones.
@@ -64,12 +76,19 @@ public:
 
 	/// @brief Réalise la propagation avant du réseau de neurones.
 	/// @param X Matrice d'entrée.
-	/// @return Matrice de sortie.
 	void Forward(Matrix* X);
 
-	Layer* GetLayer(int index);
+	/// @brief Renvoie la sortie du réseau de neurones.
+	Matrix* GetOutput(void) const;
 
-	NN* Crossover(NN* other);
+	/// @brief Renvoie la couche d'index 'index'.
+	Layer* GetLayer(int index) const;
 
-	void Mutate() const;
+	/// @brief Réalise un croisement entre deux réseaux de neurones ('this' et 'nn2').
+	/// @brief Le score de l'enfant est initialisé à 0.
+	/// @return Un nouveau réseau de neurones (l'enfant).
+	NN* Crossover(NN* nn2) const;
+
+	/// @brief Modifie un poids ou un biais aléatoirement.
+	void Mutation(void);
 };
