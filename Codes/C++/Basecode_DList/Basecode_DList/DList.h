@@ -2,178 +2,231 @@
 
 #include "Settings.h"
 
-/// @brief Classe repr�sentant un noeud dans une liste simplement cha�n�e.
-template <typename ListData>
-class ListNode
+/// @brief Classe représentant un noeud dans une liste doublement chaînée.
+template <typename T>
+class DListNode
 {
 public:
 
 	/// @brief Pointeur vers la valeur du noeud.
-	ListData* m_value;
+	T* m_value;
+
+	/// @brief Pointeur vers le noeud précédent.
+	DListNode<T>* m_prev;
 
 	/// @brief Pointeur vers le noeud suivant.
-	ListNode<ListData>* m_next;
+	DListNode<T>* m_next;
 
-	ListNode();
-
-	ListNode(ListData* value, ListNode* next = nullptr);
+	DListNode(T* p_value, DListNode* p_prev = nullptr, DListNode* p_next = nullptr);
 };
 
-template<typename ListData>
-inline ListNode<ListData>::ListNode()
+template <typename T>
+DListNode<T>::DListNode(T* p_value, DListNode* p_prev, DListNode* p_next)
 {
-	m_value = nullptr;
-	m_next = nullptr;
+	m_value = p_value;
+	m_prev = p_prev;
+	m_next = p_next;
 }
 
-template <typename ListData>
-ListNode<ListData>::ListNode(ListData* value, ListNode* next)
-{
-	m_value = value;
-	m_next = next;
-}
-
-/// @brief Classe repr�sentant une liste simplement cha�n�e.
-template <typename ListData>
-class List
+/// @brief Classe représentant une liste doublement chaînée.
+template <typename T>
+class DList
 {
 private:
 
-	/// @brief Nombre de noeuds dans la liste.
+	/// @brief Taille de la liste.
 	int m_size;
 
-	/// @brief Pointeur vers le premier noeud de la liste.
-	ListNode<ListData>* m_first;
+	/// @brief Sentinelle de la liste.
+	DListNode<T>* m_sentinel;
 
 public:
 
 	/// @brief Retourne la taille de la liste.
 	inline int GetSize() const { return m_size; }
 
-	/// @brief V�rifie si la liste est vide.
+	/// @brief Retourne la sentinelle de la liste.
+	inline DListNode<T>* GetSentinel() const { return m_sentinel; }
+
+	/// @brief Vérifie si la liste est vide.
 	inline bool IsEmpty() const { return m_size == 0; }
 
-	/// @brief Retourne le premier noeud de la liste.
-	inline ListNode<ListData>* GetFirst() const { return m_first; }
+	/// @brief Construit une liste vide.
+	DList();
 
-	List();
-
-	~List();
-
-	ListNode<ListData>* GetLast() const;
-
-	/// @brief Ins�re une valeur au d�but de la liste.
-	void InsertFirst(ListData* value);
-
-	/// @brief Ins�re une valeur � la fin de la liste.
-	void InsertLast(ListData* value);
-
-	///@brief Retire et retourne la premi�re valeur de la liste.
-	ListData* PopFirst();
-
-	/// @brief V�rifie si une valeur est dans la liste.
-	/// @return Pointeur vers la valeur si elle est dans la liste, nullptr sinon.
-	ListData* IsIn(ListData* value) const;
-
-	/// @brief Retire une valeur de la liste.
-	/// @return Pointeur vers la valeur retir�e si elle est dans la liste, nullptr sinon.
-	ListData* Remove(ListData* value);
+	/// @brief Détruit la liste (les valeurs sont aussi détruites).
+	~DList();
 
 	/// @brief Affiche la liste.
 	void Print() const;
+
+	/// @brief Insère une valeur au début de la liste.
+	void InsertFirst(T* p_value);
+
+	/// @brief Insère une valeur à la fin de la liste.
+	void InsertLast(T* p_value);
+
+	///@brief Retire et retourne la première valeur de la liste.
+	T* PopFirst();
+
+	///@brief Retire et retourne la dernière valeur de la liste.
+	T* PopLast();
+
+	/// @brief Retourne la valeur à l'index donné.
+	T* GetValue(int index) const;
+
+	/// @brief Vérifie si une valeur est dans la liste.
+	/// @return Pointeur vers la valeur si elle est dans la liste, nullptr sinon.
+	T* IsIn(T* p_value) const;
+
+	/// @brief Retire une valeur de la liste.
+	/// @return Pointeur vers la valeur retirée si elle est dans la liste, nullptr sinon.
+	T* Remove(T* p_value);
 };
 
-template<typename ListData>
-List<ListData>::List()
+template<typename T>
+DList<T>::DList()
 {
 	m_size = 0;
-	m_first = nullptr;
+	m_sentinel = new DListNode<T>(nullptr);
+	m_sentinel->m_prev = m_sentinel;
+	m_sentinel->m_next = m_sentinel;
 }
 
-template<typename ListData>
-List<ListData>::~List()
+template<typename T>
+DList<T>::~DList()
 {
-	ListNode<ListData>* curr = m_first;
+	DListNode<T>* curr = m_sentinel->m_next;
 
-	while (curr)
+	while (curr != m_sentinel)
 	{
-		ListNode<ListData>* next = curr->m_next;
+		DListNode<T>* next = curr->m_next;
 
 		delete curr->m_value;
 		delete curr;
 
 		curr = next;
 	}
+
+	delete m_sentinel;
 }
 
-template<typename ListData>
-inline ListNode<ListData>* List<ListData>::GetLast() const
+template<typename T>
+void DList<T>::Print() const
 {
-	if (IsEmpty())
-	{
-		return nullptr;
-	}
+	cout << "(size=" << m_size << ") : ";
 
-	ListNode<ListData>* curr = m_first;
+	DListNode<T>* curr = m_sentinel->m_next;
 
-	while (curr->m_next)
+	while (curr != m_sentinel)
 	{
+		T* value = curr->m_value;
+		cout << "[" << *value << "] -> ";
 		curr = curr->m_next;
 	}
 
-	return curr;
+	cout << "[nullptr]\n" << endl;
 }
 
-template<typename ListData>
-void List<ListData>::InsertFirst(ListData* value)
+template<typename T>
+void DList<T>::InsertFirst(T* value)
 {
-	ListNode<ListData>* nodeInsert = new ListNode<ListData>(value, m_first);
+	DListNode<T>* node = new DListNode<T>(value, m_sentinel, m_sentinel->m_next);
 
-	m_first = nodeInsert;
+	node->m_next->m_prev = node;
+	node->m_prev->m_next = node;
 
 	m_size++;
 }
 
-template<typename ListData>
-void List<ListData>::InsertLast(ListData* value)
+template<typename T>
+void DList<T>::InsertLast(T* value)
 {
-	ListNode<ListData>* last = GetLast();
+	DListNode<T>* node = new DListNode<T>(value, m_sentinel->m_prev, m_sentinel);
 
-	if (last)
-	{
-		last->m_next = new ListNode<ListData>(value);
-		m_size++;
-	}
-	else
-	{
-		InsertFirst(value);
-	}
+	node->m_next->m_prev = node;
+	node->m_prev->m_next = node;
+
+	m_size++;
 }
 
-template<typename ListData>
-ListData* List<ListData>::PopFirst()
+template<typename T>
+T* DList<T>::PopFirst()
 {
 	assert(m_size > 0);
 
-	ListNode<ListData>* nodePop = m_first;
+	DListNode<T>* node = m_sentinel->m_next;
 
-	m_first = m_first->m_next;
+	node->m_next->m_prev = node->m_prev;
+	node->m_prev->m_next = node->m_next;
 
-	ListData* valuePop = nodePop->m_value;
+	T* res = node->m_value;
 
-	delete nodePop;
+	delete node;
 
 	m_size--;
 
-	return valuePop;
+	return res;
 }
 
-template<typename ListData>
-ListData* List<ListData>::IsIn(ListData* value) const
+template<typename T>
+T* DList<T>::PopLast()
 {
-	ListNode<ListData>* curr = m_first;
+	assert(m_size > 0);
 
-	while (curr)
+	DListNode<T>* node = m_sentinel->m_prev;
+
+	node->m_next->m_prev = node->m_prev;
+	node->m_prev->m_next = node->m_next;
+
+	T* res = node->m_value;
+
+	delete node;
+
+	m_size--;
+
+	return res;
+}
+
+template<typename T>
+T* DList<T>::GetValue(int index) const
+{
+	if (index < 0)
+	{
+		assert(-m_size <= index);
+
+		DListNode<T>* curr = m_sentinel;
+
+		while (index < 0)
+		{
+			index++;
+			curr = curr->m_prev;
+		}
+
+		return curr->m_value;
+	}
+	else
+	{
+		assert(index < m_size);
+
+		DListNode<T>* curr = m_sentinel->m_next;
+
+		while (index > 0)
+		{
+			index--;
+			curr = curr->m_next;
+		}
+
+		return curr->m_value;
+	}
+}
+
+template<typename T>
+T* DList<T>::IsIn(T* value) const
+{
+	DListNode<T>* curr = m_sentinel->m_next;
+
+	while (curr != m_sentinel)
 	{
 		if (*value == *(curr->m_value))
 		{
@@ -186,28 +239,19 @@ ListData* List<ListData>::IsIn(ListData* value) const
 	return nullptr;
 }
 
-template<typename ListData>
-ListData* List<ListData>::Remove(ListData* value)
+template<typename T>
+T* DList<T>::Remove(T* value)
 {
-	ListNode<ListData>* prev = nullptr;
-	ListNode<ListData>* curr = m_first;
+	DListNode<T>* curr = m_sentinel->m_next;
 
-	while (curr)
+	while (curr != m_sentinel)
 	{
 		if (*value == *(curr->m_value))
 		{
-			ListNode<ListData>* next = curr->m_next;
+			T* res = curr->m_value;
 
-			if (prev)
-			{
-				prev->m_next = next;
-			}
-			else
-			{
-				m_first = next;
-			}
-
-			ListData* res = curr->m_value;
+			curr->m_next->m_prev = curr->m_prev;
+			curr->m_prev->m_next = curr->m_next;
 
 			delete curr;
 
@@ -215,29 +259,9 @@ ListData* List<ListData>::Remove(ListData* value)
 
 			return res;
 		}
-		else
-		{
-			prev = curr;
-			curr = curr->m_next;
-		}
-	}
-
-	return nullptr;
-}
-
-template<typename ListData>
-void List<ListData>::Print() const
-{
-	cout << "(size=" << m_size << ") : ";
-
-	ListNode<ListData>* curr = m_first;
-
-	while (curr)
-	{
-		ListData* value = curr->m_value;
-		cout << "[" << *value << "] -> ";
+		
 		curr = curr->m_next;
 	}
 
-	cout << "[nullptr]" << endl;
+	return nullptr;
 }

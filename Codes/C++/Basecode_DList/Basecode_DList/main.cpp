@@ -1,6 +1,16 @@
-#include <iostream>
+#include "DList.h"
 
-int main()
+int main(void)
 {
-    std::cout << "Hello World!\n";
+    DList<int> list;
+
+    list.InsertLast(new int(0));
+    list.InsertLast(new int(5));
+    list.InsertLast(new int(9));
+    list.InsertLast(new int(3));
+    list.InsertLast(new int(1));
+
+    list.Print();
+
+    return EXIT_SUCCESS;
 }
