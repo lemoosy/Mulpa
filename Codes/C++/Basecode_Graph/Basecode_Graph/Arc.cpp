@@ -9,6 +9,10 @@ Arc::Arc()
 
 Arc::Arc(int u, int v, float w)
 {
+	assert(u >= 0);
+	assert(v >= 0);
+	assert(w >= 0.0f);
+
 	m_u = u;
 	m_v = v;
 	m_w = w;

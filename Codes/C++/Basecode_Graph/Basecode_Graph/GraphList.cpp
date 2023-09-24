@@ -6,7 +6,7 @@ GraphNode::GraphNode()
 {
 	m_id = -1;
 
-	m_arcs = new List<Arc>();
+	m_arcs = new DList<Arc>();
 
 	m_negValency = 0;
 	m_posValency = 0;
@@ -57,7 +57,7 @@ void Graph::SetWeight(int u, int v, float w)
 	GraphNode* node_u = &(m_nodes[u]);
 	GraphNode* node_v = &(m_nodes[v]);
 	
-	List<Arc>* arcs = node_u->m_arcs;
+	DList<Arc>* arcs = node_u->m_arcs;
 
 	Arc* arc = new Arc(u, v, w);
 
@@ -71,8 +71,8 @@ void Graph::SetWeight(int u, int v, float w)
 		{
 			delete res;
 
-			node_u->m_posValency--;
 			node_v->m_negValency--;
+			node_u->m_posValency--;
 		}
 
 		delete arc;
@@ -91,13 +91,13 @@ void Graph::SetWeight(int u, int v, float w)
 			res->m_w = w;
 		}
 
-		/// Si l'arc n'existe pas, on crée un arc et on met à jour les valences.
+		/// Si l'arc n'existe pas, on insère l'arc et on met à jour les valences.
 		else
 		{
-			arcs->InsertFirst(arc);
+			arcs->InsertLast(arc);
 
-			node_u->m_posValency++;
 			node_v->m_negValency++;
+			node_u->m_posValency++;
 		}
 	}
 }
@@ -107,9 +107,9 @@ float Graph::GetWeight(int u, int v)
 	assert((0 <= u) && (u < m_size));
 	assert((0 <= v) && (v < m_size));
 
-	List<Arc>* arcs = m_nodes[u].m_arcs;
+	DList<Arc>* arcs = m_nodes[u].m_arcs;
 
-	Arc* arc = new Arc(u, v);
+	Arc* arc = new Arc(u, v, 0.0f);
 
 	Arc* res = arcs->IsIn(arc);
 
@@ -121,18 +121,27 @@ float Graph::GetWeight(int u, int v)
 Arc* Graph::GetSuccessors(int u, int* size)
 {
 	assert((0 <= u) && (u < m_size));
+	assert(size);
 
 	int _size = m_nodes[u].m_posValency;
+
+	if (_size == 0)
+	{
+		*size = 0;
+		return nullptr;
+	}
 
 	Arc* arcs = new Arc[_size];
 	int arcsCursor = 0;
 
-	ListNode<Arc>* curr = m_nodes[u].m_arcs->GetFirst();
+	DListNode<Arc>* sent = m_nodes[u].m_arcs->GetSentinel();
+	DListNode<Arc>* curr = sent->m_next;
 
-	while (curr)
+	while (curr != sent)
 	{
 		arcs[arcsCursor] = *(curr->m_value);
 		arcsCursor++;
+
 		curr = curr->m_next;
 	}
 
@@ -147,29 +156,29 @@ Arc* Graph::GetPredecessors(int v, int* size)
 
 	int _size = m_nodes[v].m_negValency;
 
+	if (_size == 0)
+	{
+		*size = 0;
+		return nullptr;
+	}
+
 	Arc* arcs = new Arc[_size];
 	int arcsCursor = 0;
 
+	Arc* arcSearch = new Arc(0, v, 0.0f);
+
 	for (int u = 0; u < m_size; u++)
 	{
-		if (u == v) continue;
+		Arc* res = m_nodes[u].m_arcs->IsIn(arcSearch);
 
-		ListNode<Arc>* curr = m_nodes[u].m_arcs->GetFirst();
-
-		while (curr)
+		if (res)
 		{
-			Arc* arc = curr->m_value;
-
-			if (arc->m_v == v)
-			{
-				arcs[arcsCursor] = *arc;
-				arcsCursor++;
-				break;
-			}
-			
-			curr = curr->m_next;
+			arcs[arcsCursor] = *res;
+			arcsCursor++;
 		}
 	}
+
+	delete arcSearch;
 
 	*size = _size;
 

@@ -1,8 +1,7 @@
-﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(517,5): warning MSB8004: Le répertoire Output ne se termine pas par une barre oblique finale. Cette instance de build ajoutera une barre oblique, comme requis, pour permettre l'évaluation correcte du répertoire Output.
-  Arc.cpp
+﻿  Arc.cpp
   Graph.cpp
   GraphList.cpp
   GraphMatrix.cpp
   main.cpp
   Génération de code en cours...
-  Basecode_Graph.vcxproj -> C:\Users\PC Lemoosy\OneDrive\Bureau\Basecode\3A\Mulpa\Linker\lib\Basecode_Graph.lib
+  Basecode_Graph.vcxproj -> C:\Users\PC Lemoosy\OneDrive\Bureau\Mulpa\Codes\C++\Basecode_Graph\x64\Debug\Basecode_Graph.lib

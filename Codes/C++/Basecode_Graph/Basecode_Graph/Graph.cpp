@@ -1,9 +1,8 @@
 #include "Graph.h"
 
-List<int>* Graph::Dijkstra(int start, int end, float* distance)
+DList<int>* Graph::Dijkstra(int start, int end, float* distance)
 {
-	/// TODO: Fonction à optimiser avec un tas binaire.
-
+	assert(start != end);
 	assert((0 <= start) && (start < m_size));
 	assert((0 <= end) && (end < m_size));
 	assert(distance);
@@ -95,11 +94,11 @@ List<int>* Graph::Dijkstra(int start, int end, float* distance)
 
 	/// Création du chemin à partir des PCC.
 
-	List<int>* res = nullptr;
+	DList<int>* res = nullptr;
 	
 	if (PCC[end] != -1)
 	{
-		res = new List<int>();
+		res = new DList<int>();
 
 		int index = end;
 

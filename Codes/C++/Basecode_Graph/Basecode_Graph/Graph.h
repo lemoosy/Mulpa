@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Arc.h"
-#include "List.h"
+#include "DList.h"
 #include "Settings.h"
 
 #ifdef GRAPH_MATRIX
@@ -32,7 +32,7 @@ public:
 	int m_id;
 
 	/// @brief Liste des arcs sortant du noeud.
-	List<Arc>* m_arcs;
+	DList<Arc>* m_arcs;
 
 	/// @brief Nombre de noeuds entrant dans le noeud.
 	int m_negValency;
@@ -60,7 +60,7 @@ public:
 #endif // GRAPH_MATRIX
 
 /// @brief Classe représentant un graphe.
-class Graph : public GraphMother
+class Graph : private GraphMother
 {
 private:
 
@@ -69,6 +69,7 @@ private:
 
 public:
 
+	/// @brief Crée un graphe avec 'size' noeuds.
 	Graph(int size);
 
 	~Graph();
@@ -82,28 +83,28 @@ public:
 	/// @brief Modifie le poids d'un arc dans le graphe.
 	/// @param u Identifiant du noeud de départ.
 	/// @param v Identifiant du noeud d'arrivée.
-	/// @param w Si w est négatif, l'arc est supprimé, sinon il est créé ou modifié.
+	/// @param w Si 'w' est négatif, l'arc est supprimé, sinon il est créé ou modifié.
 	void SetWeight(int u, int v, float w);
 
 	/// @brief Retourne le poids d'un arc dans le graphe.
 	float GetWeight(int u, int v);
 
-	/// @brief Retourne la liste des arcs sortants d'un noeud u.
+	/// @brief Retourne la liste des arcs sortant du noeud 'u'.
 	/// @param u Identifiant du noeud.
-	/// @param size Pointeur vers un entier qui contiendra le nombre d'arcs sortants.
-	/// @return Un tableau d'arcs sortants.
+	/// @param size Pointeur vers un entier qui contiendra le nombre d'arcs sortant.
+	/// @return Un tableau d'arcs sortant.
 	Arc* GetSuccessors(int u, int* size);
 
-	/// @brief Retourne la liste des arcs entrants d'un noeud v.
+	/// @brief Retourne la liste des arcs entrant du noeud 'v'.
 	/// @param v Identifiant du noeud.
-	/// @param size Pointeur vers un entier qui contiendra le nombre d'arcs entrants.
-	/// @return Un tableau d'arcs entrants.
+	/// @param size Pointeur vers un entier qui contiendra le nombre d'arcs entrant.
+	/// @return Un tableau d'arcs entrant.
 	Arc* GetPredecessors(int v, int* size);
 
 	/// @brief Calcule le Plus Court Chemin (PCC) entre deux noeuds.
 	/// @param start Identifiant du noeud de départ.
 	/// @param end Identifiant du noeud d'arrivée.
-	/// @param distance Pointeur vers un float qui contiendra la distance totale du chemin.
+	/// @param distance Pointeur vers un float qui contiendra la distance totale du chemin (négatif si le chemin n'existe pas).
 	/// @return Liste d'entiers (identifiants des noeuds) correspondant au PCC.
-	List<int>* Dijkstra(int start, int end, float* distance);
+	DList<int>* Dijkstra(int start, int end, float* distance);
 };
