@@ -1,4 +1,38 @@
-#include "Export.h"
+#include "DLL.h"
+
+GameMakerDLL double DLL_Init(double p_window)
+{
+	srand(time(nullptr));
+
+	g_nn = new NN * [NN_CAPACITY]();
+
+	if (p_window == 1.0)
+	{
+		//g_window = Window_Create("DLL", WINDOW_WIDTH, WINDOW_HEIGHT);
+	}
+
+	return 0.0;
+}
+
+GameMakerDLL double DLL_Free()
+{
+	for (int i = 0; i < NN_CAPACITY; i++)
+	{
+		if (g_nn[i])
+		{
+			delete g_nn[i];
+		}
+	}
+
+	delete[] g_nn;
+
+	if (g_window)
+	{
+
+	}
+
+	return 0.0;
+}
 
 GameMakerDLL double NN_Create()
 {
@@ -19,7 +53,7 @@ GameMakerDLL double NN_Create()
 
 GameMakerDLL double NN_Destroy(double p_id)
 {
-	gNN_Destroy(p_id);
+	gNN_DestroyNN(p_id);
 
 	return 0.0;
 }
@@ -78,6 +112,22 @@ GameMakerDLL double NN_SetScore(double p_id, double p_score)
 	return 0.0;
 }
 
+GameMakerDLL double NN_UpdateScore(double p_id, char* p_world)
+{
+	NN* nn = gNN_GetNN(p_id);
+
+	Matrix* world = World_Load(p_world);
+
+	float distance = 0.0f;
+	DList<int>* PCC = World_GetShortestPath(world, &distance);
+
+	delete PCC;
+
+	delete world;
+
+	return distance;
+}
+
 GameMakerDLL double NN_Crossover(double p_id_1, double p_id_2)
 {
 	NN* nn_1 = gNN_GetNN(p_id_1);
@@ -91,13 +141,4 @@ GameMakerDLL double NN_Crossover(double p_id_1, double p_id_2)
 	gNN_SetNN(id_3, nn_3);
 
 	return (double)id_3;
-}
-
-GameMakerDLL double NN_UpdateScore(double p_id)
-{
-	NN* nn = gNN_GetNN(p_id);
-	
-
-
-	return 0.0;
 }

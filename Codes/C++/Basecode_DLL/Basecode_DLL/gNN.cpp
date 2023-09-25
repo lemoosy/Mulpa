@@ -28,7 +28,7 @@ void gNN_SetNN(int p_id, NN* p_nn)
 	g_nn[p_id] = p_nn;
 }
 
-void gNN_Destroy(int p_id)
+void gNN_DestroyNN(int p_id)
 {
 	assert((0 <= p_id) && (p_id < NN_CAPACITY));
 
@@ -38,17 +38,4 @@ void gNN_Destroy(int p_id)
 
 		g_nn[p_id] = nullptr;
 	}
-}
-
-void gNN_DestroyALL(void)
-{
-	for (int i = 0; i < NN_CAPACITY; i++)
-	{
-		if (g_nn[i])
-		{
-			delete g_nn[i];
-		}
-	}
-
-	delete[] g_nn;
 }

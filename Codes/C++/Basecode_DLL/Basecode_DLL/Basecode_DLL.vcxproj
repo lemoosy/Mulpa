@@ -137,14 +137,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Export.cpp" />
-    <ClCompile Include="Settings.cpp" />
     <ClCompile Include="gNN.cpp" />
+    <ClCompile Include="DLL.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Export.h" />
     <ClInclude Include="gNN.h" />
+    <ClInclude Include="DLL.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="Variables.h" />
     <ClInclude Include="World.h" />

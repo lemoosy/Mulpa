@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _SETTINGS_H_
+#define _SETTINGS_H_
 
 #include <cassert>
 #include <iostream>
@@ -8,13 +9,14 @@
 #include "Matrix.h"
 #include "Graph.h"
 #include "NN.h"
+
 #include "Window.h"
 
 using namespace std;
 
 #define GameMakerDLL extern "C" __declspec (dllexport)	/// Pour la DLL.
 
-#define NN_CAPACITY				1024					/// Nombre de réseaux de neurones maximum (g_nn).
+#define NN_CAPACITY				1024					/// Nombre de réseaux de neurones maximum (Dashboard::nn).
 #define NN_INPUT_SIZE			512						/// Taille de l'entrée du réseau de neurones.
 
 #define WINDOW_DISPLAY			false
@@ -25,8 +27,5 @@ using namespace std;
 #define WORLD_MATRIX_WIDTH		16
 #define WORLD_MATRIX_HEIGHT		8
 
-/// @brief Initialise la DLL.
-GameMakerDLL double DLL_Init();
 
-/// @brief Quitte la DLL.
-GameMakerDLL double DLL_Free();
+#endif // _SETTINGS_H_
