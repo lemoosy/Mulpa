@@ -71,7 +71,7 @@ public:
 	bool OutOfDimension(int i, int j) const;
 	
 	/// @brief Attribue aléatoirement des valeurs de la matrice passée en paramètre à la matrice courante (50%).
-	void Crossover(const Matrix& m);
+	void Mix(const Matrix& m);
 };
 
 void operator+=(Matrix& m1, const Matrix& m2);

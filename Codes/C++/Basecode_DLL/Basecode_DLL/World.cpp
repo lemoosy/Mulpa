@@ -165,7 +165,6 @@ DList<int>* World_GetShortestPath(Matrix* p_world, float* p_distance)
 
 	DList<int>* PCC = graph->Dijkstra(start, end, p_distance);
 
-	delete PCC;
 	delete graph;
 
 	return PCC;

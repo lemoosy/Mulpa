@@ -195,7 +195,7 @@ bool Matrix::OutOfDimension(int i, int j) const
 	return ((i < 0) || (i >= m_w) || (j < 0) || (j >= m_h));
 }
 
-void Matrix::Crossover(const Matrix& m)
+void Matrix::Mix(const Matrix& m)
 {
 	assert(m_w == m.m_w);
 	assert(m_h == m.m_h);

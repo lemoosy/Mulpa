@@ -19,11 +19,13 @@ function world_to_string()
 		
 		for (var _i = 0; _i < _w; _i++)
 		{
-			_matrix[_j][_i] = "O";
+			_matrix[_j][_i] = " ";
 		}
 	}
 	
 	/// Initialisation des valeurs de la matrice.
+	
+	var _check = false;
 	
 	with (all)
 	{
@@ -33,11 +35,21 @@ function world_to_string()
 		_i = floor(_i);
 		_j = floor(_j);
 		
+		while (_i < 0)		_i++;
+		while (_j < 0)		_j++;
+		while (_i >= _w)	_i--;
+		while (_j >= _h)	_j--;
+		
+		if (_i < 0 || _i >= _w) assert("OutOfDimension!");
+		if (_j < 0 || _j >= _h) assert("OutOfDimension! 2");
+		
 		if ((0 <= _i && _i < _w) && (0 <= _j && _j < _h))
 		{
 			switch (object_index)
 			{
 				case obj_player:
+				
+					_check = true;
 				
 					_matrix[_j][_i] = "P";
 				
@@ -72,6 +84,8 @@ function world_to_string()
 			}
 		}
 	}
+	
+	if (_check == false) assert("NON");
 	
 	/// Conversion de la matrice en string.
 	

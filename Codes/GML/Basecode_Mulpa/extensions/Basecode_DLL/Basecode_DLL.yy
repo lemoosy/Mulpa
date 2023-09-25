@@ -19,9 +19,11 @@
   "extensionVersion": "0.0.1",
   "files": [
     {"resourceType":"GMExtensionFile","resourceVersion":"1.0","name":"","constants":[],"copyToTargets":-1,"filename":"Basecode_DLL.dll","final":"","functions":[
-        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"DLL_Init","argCount":0,"args":[],"documentation":"","externalName":"DLL_Init","help":"","hidden":false,"kind":1,"returnType":2,},
+        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"DLL_Init","argCount":0,"args":[
+            2,
+          ],"documentation":"","externalName":"DLL_Init","help":"","hidden":false,"kind":1,"returnType":2,},
         {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"NN_Create","argCount":0,"args":[],"documentation":"","externalName":"NN_Create","help":"","hidden":false,"kind":1,"returnType":2,},
-        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"DLL_Free","argCount":0,"args":[],"documentation":"","externalName":"\t\t}","help":"","hidden":false,"kind":1,"returnType":1,},
+        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"DLL_Free","argCount":0,"args":[],"documentation":"","externalName":"\t\t}","help":"","hidden":false,"kind":1,"returnType":2,},
         {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"NN_Destroy","argCount":0,"args":[
             2,
           ],"documentation":"","externalName":"NN_Destroy","help":"","hidden":false,"kind":1,"returnType":2,},
@@ -35,9 +37,10 @@
         {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"NN_GetScore","argCount":0,"args":[
             2,
           ],"documentation":"","externalName":"NN_GetScore","help":"","hidden":false,"kind":1,"returnType":2,},
-        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"ShortestPath_Get","argCount":0,"args":[
+        {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"NN_UpdateScore","argCount":0,"args":[
+            2,
             1,
-          ],"documentation":"","externalName":"ShortestPath_Get","help":"","hidden":false,"kind":1,"returnType":2,},
+          ],"documentation":"","externalName":"NN_UpdateScore","help":"","hidden":false,"kind":1,"returnType":2,},
         {"resourceType":"GMExtensionFunction","resourceVersion":"1.0","name":"NN_Crossover","argCount":0,"args":[
             2,
             2,
@@ -50,6 +53,13 @@
         {"name":"DLL_Init","path":"extensions/Basecode_DLL/Basecode_DLL.yy",},
         {"name":"DLL_Free","path":"extensions/Basecode_DLL/Basecode_DLL.yy",},
         {"name":"NN_Create","path":"extensions/Basecode_DLL/Basecode_DLL.yy",},
+        {"name":"NN_Destroy","path":"extensions/Basecode_DLL/Basecode_DLL.yy",},
+        {"name":"NN_Forward","path":"extensions/Basecode_DLL/Basecode_DLL.yy",},
+        {"name":"NN_GetOutput","path":"extensions/Basecode_DLL/Basecode_DLL.yy",},
+        {"name":"NN_GetScore","path":"extensions/Basecode_DLL/Basecode_DLL.yy",},
+        {"name":"NN_SetScore","path":"extensions/Basecode_DLL/Basecode_DLL.yy",},
+        {"name":"NN_UpdateScore","path":"extensions/Basecode_DLL/Basecode_DLL.yy",},
+        {"name":"NN_Crossover","path":"extensions/Basecode_DLL/Basecode_DLL.yy",},
       ],"origname":"","ProxyFiles":[],"uncompress":false,"usesRunnerInterface":false,},
   ],
   "gradleinject": "",

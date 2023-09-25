@@ -1,10 +1,23 @@
+
+/// Si aucune IA joue, on crée une IA.
 if (m_player == noone)
 {
 	m_player = instance_create_layer(16, 96, "Objects", obj_player);
 	
+	var _nn_id = -1;
+	
+	if (!children_is_empty())
+	{
+		_nn_id = children_pop();		
+	}
+	else
+	{
+		_nn_id = NN_Create();
+	}
+	
 	with (m_player)
 	{
-		m_nn = NN_Create();
+		m_nn = _nn_id;
 
 		if (m_nn < 0)
 		{
@@ -12,69 +25,63 @@ if (m_player == noone)
 		}
 	}
 }
+
+/// Si l'IA joue.
 else
 {
-	var nnID = -1;
+	var _nn_id = -1;
 	
 	with (m_player)
 	{
 		if (m_is_dead)
 		{
-			nnID = m_nn;
-			NN_SetScore(m_nn, ShortestPath_Get(world_to_string()));
+			_nn_id = m_nn;
+			NN_UpdateScore(_nn_id, world_to_string());
+			//show_debug_message("PCC : " + string(NN_GetScore(_nn_id)));
 			instance_destroy();
 		}
 	}
 	
-	if (nnID != -1)
+	/// Si le joueur est mort, on l'ajoute à la population.
+	if (_nn_id != -1)
 	{
-		m_population[m_population_cursor] = nnID;
-		m_population_cursor++;
+		population_insert(_nn_id);
 		m_player = noone;
 	}
 	
-	if (m_population_cursor == m_population_size)
+	/// Si la population est pleine.
+	if (population_is_full())
 	{
 		m_gen++;
-		show_debug_message("Generation : " + string(m_gen));
+		show_debug_message("Generation >> " + string(m_gen));
 		
-		for (var _i = 0; _i < m_selection_size / 2; _i++)
+		for (var _i = 0; _i < m_selection_size; _i++)
 		{
-			var _index_minimum = population_get_min_index();
-			m_selection[_i] = m_population[_index_minimum];
-			m_population[_index_minimum] = -1;
+			var _nn_id_minimum = population_remove_minimum();
+			if (_i < 10) show_debug_message(NN_GetScore(_nn_id_minimum));
+			selection_insert(_nn_id_minimum);
 		}
 		
+		population_destroy();
 		
-		for (var _i = 0; _i < m_population_size; _i++)
+		for (var _i = 0; _i < m_children_size; _i++)
 		{
-			NN_Destroy(m_population[_i]);
-		}
-		
-		for (var _i = m_selection_size / 2; _i < m_selection_size; _i++)
-		{
-			var r1 = random_range(0, (m_selection_size / 2) - 1);
-			var r2 = random_range(0, (m_selection_size / 2) - 1);
+			var _r1 = random_range(0, (m_selection_size - 1));
+			var _r2 = random_range(0, (m_selection_size - 1));
 			
-			if (r1 == r2)
+			if (_r1 == _r2)
 			{
 				continue;
 			}
 			
-			var nn1 = m_selection[r1];
-			var nn2 = m_selection[r2];
+			var _nn_id_1 = m_selection[_r1];
+			var _nn_id_2 = m_selection[_r2];
 			
-			var nnRes = NN_Crossover(nn1, nn2);
+			var _nn_id_res = NN_Crossover(_nn_id_1, _nn_id_2);
 			
-			m_selection[_i] = nnRes;
+			children_insert(_nn_id_res);
 		}
 		
-		for (var _i = 0; _i < m_selection_size; _i++)
-		{
-			m_population[_i] = m_selection[_i];
-			m_selection[_i] = -1;
-		}
-		
-		m_population_cursor = m_selection_size;
+		selection_to_population();
 	}
 }

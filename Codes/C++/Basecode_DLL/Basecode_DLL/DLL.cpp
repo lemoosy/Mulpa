@@ -121,6 +121,8 @@ GameMakerDLL double NN_UpdateScore(double p_id, char* p_world)
 	float distance = 0.0f;
 	DList<int>* PCC = World_GetShortestPath(world, &distance);
 
+	nn->SetScore(distance);
+
 	delete PCC;
 
 	delete world;

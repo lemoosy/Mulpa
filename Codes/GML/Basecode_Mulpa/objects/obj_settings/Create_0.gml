@@ -1,7 +1,7 @@
 randomize();
 
 /// Initialise les DLL depuis le basecode 'Basecode_DLL'.
-DLL_Init();
+DLL_Init(0.0);
 
 /// Active le mode IA ou le mode Solo.
 global.ai = true;
