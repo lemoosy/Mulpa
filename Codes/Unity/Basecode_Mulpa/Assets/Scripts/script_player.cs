@@ -7,8 +7,11 @@ public class player : MonoBehaviour
 {
     #region DLL
 
-    [DllImport("Basecode_Labo.dll")]
-    private static extern int Add(int a, int b);
+    [DllImport("Basecode_DLL.dll")]
+    private static extern void DLL_Init();
+
+    [DllImport("Basecode_DLL.dll")]
+    private static extern int NN_Create();
 
     #endregion
 
@@ -48,7 +51,13 @@ public class player : MonoBehaviour
 
     #endregion
 
+    #region Variables -> IA
+
+    private int m_nnID = -1;
+
     #endregion
+
+#endregion
 
     #region Fonctions
 
@@ -71,9 +80,14 @@ public class player : MonoBehaviour
         m_onGround = false;
         m_isDead = false;
 
-        double res = Add(1, 3);
-        print(res);
-        Debug.Log(res);
+        DLL_Init();
+        m_nnID = NN_Create();
+        m_nnID = NN_Create();
+
+        print(m_nnID);
+        print(m_nnID);
+        print(m_nnID);
+
     }
 
     void OnCollisionStay2D(Collision2D collision)
