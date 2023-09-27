@@ -71,10 +71,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>../../../GML/Basecode_Mulpa/extensions/Basecode_DLL</OutDir>
+    <OutDir>../../../Unity/Basecode_Mulpa/Assets/Plugins</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>../../../GML/Basecode_Mulpa/extensions/Basecode_DLL</OutDir>
+    <OutDir>../../../Unity/Basecode_Mulpa/Assets/Plugins</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -110,12 +110,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../Basecode_DList/Basecode_DList;../../Basecode_Graph/Basecode_Graph;../../Basecode_Matrix/Basecode_Matrix;../../Basecode_NN/Basecode_NN;../../../C/Basecode_Window/Basecode_Window;../SDL2-2.28.3/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../Basecode_DList/Basecode_DList;../../Basecode_Graph/Basecode_Graph;../../Basecode_Matrix/Basecode_Matrix;../../Basecode_NN/Basecode_NN;../../../C/Basecode_Window/Basecode_Window;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>../../Basecode_DList/x64/Debug/Basecode_DList.lib;../../Basecode_Graph/x64/Debug/Basecode_Graph.lib;../../Basecode_Matrix/x64/Debug/Basecode_Matrix.lib;../../Basecode_NN/x64/Debug/Basecode_NN.lib;../../../C/Basecode_Window/x64/Debug/Basecode_Window.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -126,7 +128,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../Basecode_DList/Basecode_DList;../../Basecode_Graph/Basecode_Graph;../../Basecode_Matrix/Basecode_Matrix;../../Basecode_NN/Basecode_NN;../../../C/Basecode_Window/Basecode_Window;../SDL2-2.28.3/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../Basecode_DList/Basecode_DList;../../Basecode_Graph/Basecode_Graph;../../Basecode_Matrix/Basecode_Matrix;../../Basecode_NN/Basecode_NN;../../../C/Basecode_Window/Basecode_Window;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -134,6 +136,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>../../Basecode_DList/x64/Debug/Basecode_DList.lib;../../Basecode_Graph/x64/Debug/Basecode_Graph.lib;../../Basecode_Matrix/x64/Debug/Basecode_Matrix.lib;../../Basecode_NN/x64/Debug/Basecode_NN.lib;../../../C/Basecode_Window/x64/Debug/Basecode_Window.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -1,6 +1,14 @@
 #include "DLL.h"
 
-GameMakerDLL double DLL_Init(double p_window)
+/// @brief Fenêtre d'affichage.
+//Window* g_window;
+
+UnityDLL int Add(int a, int b)
+{
+	return a + b;
+}
+
+UnityDLL double DLL_Init(double p_window)
 {
 	srand(time(nullptr));
 
@@ -8,13 +16,13 @@ GameMakerDLL double DLL_Init(double p_window)
 
 	if (p_window == 1.0)
 	{
-		//g_window = Window_Create("DLL", WINDOW_WIDTH, WINDOW_HEIGHT);
+		//g_window = new Window("DLL", WINDOW_WIDTH, WINDOW_HEIGHT);
 	}
 
-	return 0.0;
+	return 40.0;
 }
 
-GameMakerDLL double DLL_Free()
+UnityDLL double DLL_Free()
 {
 	for (int i = 0; i < NN_CAPACITY; i++)
 	{
@@ -26,24 +34,23 @@ GameMakerDLL double DLL_Free()
 
 	delete[] g_nn;
 
-	if (g_window)
-	{
+	//if (g_window)
+	//{
 
-	}
+	//}
 
 	return 0.0;
 }
 
-GameMakerDLL double NN_Create()
+UnityDLL double NN_Create()
 {
 	int id = gNN_GetEmptyID();
 
 	assert(id != -1);
 
 	NN* nn = new NN(512);
-	nn->AddLayer(512, &sigmoid);
-	nn->AddLayer(512, &sigmoid);
-	nn->AddLayer(512, &sigmoid);
+	nn->AddLayer(256, &ReLU);
+	nn->AddLayer(128, &ReLU);
 	nn->AddLayer(3, &sigmoid);
 
 	gNN_SetNN(id, nn);
@@ -51,14 +58,14 @@ GameMakerDLL double NN_Create()
 	return (double)id;
 }
 
-GameMakerDLL double NN_Destroy(double p_id)
+UnityDLL double NN_Destroy(double p_id)
 {
 	gNN_DestroyNN(p_id);
 
 	return 0.0;
 }
 
-GameMakerDLL double NN_Forward(double p_id, char* p_world)
+UnityDLL double NN_Forward(double p_id, char* p_world)
 {
 	NN* nn = gNN_GetNN(p_id);
 
@@ -75,7 +82,7 @@ GameMakerDLL double NN_Forward(double p_id, char* p_world)
 	return 0.0;
 }
 
-GameMakerDLL double NN_GetOutput(double p_id)
+UnityDLL double NN_GetOutput(double p_id)
 {
 	NN* nn = gNN_GetNN(p_id);
 
@@ -96,14 +103,14 @@ GameMakerDLL double NN_GetOutput(double p_id)
 	return (double)minimum;
 }
 
-GameMakerDLL double NN_GetScore(double p_id)
+UnityDLL double NN_GetScore(double p_id)
 {
 	NN* nn = gNN_GetNN(p_id);
 
 	return (double)nn->GetScore();
 }
 
-GameMakerDLL double NN_SetScore(double p_id, double p_score)
+UnityDLL double NN_SetScore(double p_id, double p_score)
 {
 	NN* nn = gNN_GetNN(p_id);
 
@@ -112,7 +119,7 @@ GameMakerDLL double NN_SetScore(double p_id, double p_score)
 	return 0.0;
 }
 
-GameMakerDLL double NN_UpdateScore(double p_id, char* p_world)
+UnityDLL double NN_UpdateScore(double p_id, char* p_world)
 {
 	NN* nn = gNN_GetNN(p_id);
 
@@ -130,7 +137,7 @@ GameMakerDLL double NN_UpdateScore(double p_id, char* p_world)
 	return distance;
 }
 
-GameMakerDLL double NN_Crossover(double p_id_1, double p_id_2)
+UnityDLL double NN_Crossover(double p_id_1, double p_id_2)
 {
 	NN* nn_1 = gNN_GetNN(p_id_1);
 	NN* nn_2 = gNN_GetNN(p_id_2);
@@ -143,4 +150,16 @@ GameMakerDLL double NN_Crossover(double p_id_1, double p_id_2)
 	gNN_SetNN(id_3, nn_3);
 
 	return (double)id_3;
+}
+
+UnityDLL double NN_Mutation(double p_id, double rate)
+{
+	NN* nn = gNN_GetNN(p_id);
+
+	for (int i = 0; i < rate; i++)
+	{
+		nn->Mutation();
+	}
+
+	return 0.0;
 }

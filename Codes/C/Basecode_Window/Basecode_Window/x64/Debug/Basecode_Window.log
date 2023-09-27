@@ -1,9 +1,0 @@
-﻿  Window.c
-C:\Users\PC Lemoosy\OneDrive\Bureau\Mulpa\Codes\C\Basecode_Window\Basecode_Window\Window.c(85,3): warning C4244: 'fonction' : conversion de 'int' en 'float', perte possible de données
-C:\Users\PC Lemoosy\OneDrive\Bureau\Mulpa\Codes\C\Basecode_Window\Basecode_Window\Window.c(86,3): warning C4244: 'fonction' : conversion de 'int' en 'float', perte possible de données
-C:\Users\PC Lemoosy\OneDrive\Bureau\Mulpa\Codes\C\Basecode_Window\Basecode_Window\Window.c(87,3): warning C4244: 'fonction' : conversion de 'int' en 'float', perte possible de données
-C:\Users\PC Lemoosy\OneDrive\Bureau\Mulpa\Codes\C\Basecode_Window\Basecode_Window\Window.c(88,3): warning C4244: 'fonction' : conversion de 'int' en 'float', perte possible de données
-  main.c
-C:\Users\PC Lemoosy\OneDrive\Bureau\Mulpa\Codes\C\Basecode_Window\Basecode_Window\main.c(4,1): warning C4026: fonction déclarée avec une liste de paramètres formels
-  Génération de code en cours...
-  Basecode_Window.vcxproj -> C:\Users\PC Lemoosy\OneDrive\Bureau\Mulpa\Codes\C\Basecode_Window\x64\Debug\Basecode_Window.lib
