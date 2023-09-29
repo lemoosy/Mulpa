@@ -52,7 +52,6 @@ public class script_pg : MonoBehaviour
 
                 player scr = m_population[i].GetComponent<player>();
                 scr.m_id = NN_Create();
-                scr.m_isINIT = false;
             }
         }
     }
@@ -115,7 +114,7 @@ public class script_pg : MonoBehaviour
             player scriptMinimum = m_population[indexMin].GetComponent<player>();
             player scriptCurrent = m_population[i].GetComponent<player>();
         
-            if (scriptCurrent.GetScore() < scriptMinimum.GetScore())
+            //if (scriptCurrent.GetScore() < scriptMinimum.GetScore())
             {
                 indexMin = i;
             }
