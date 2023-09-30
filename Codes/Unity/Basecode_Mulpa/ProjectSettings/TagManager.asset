@@ -4,8 +4,9 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - test
-  - BoxWall
+  - tag_coin
+  - tag_wall
+  - tag_attack
   layers:
   - Default
   - TransparentFX

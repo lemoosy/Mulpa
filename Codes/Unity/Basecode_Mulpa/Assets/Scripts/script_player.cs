@@ -36,6 +36,7 @@ public class player : MonoBehaviour
 
     public bool m_isIA;
     public int m_id;
+    public int m_coin;
 
     // Monde
 
@@ -80,6 +81,8 @@ public class player : MonoBehaviour
             Time.timeScale = 5;
         }
 
+        m_coin = 0;
+
         // Monde
 
         m_worldSizeTile = new Vector2(16.0f, 16.0f);
@@ -105,7 +108,7 @@ public class player : MonoBehaviour
 
     void OnCollisionStay2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("BoxWall"))
+        if (collision.gameObject.CompareTag("tag_wall"))
         {
             foreach (ContactPoint2D point in collision.contacts)
             {
@@ -114,6 +117,20 @@ public class player : MonoBehaviour
                     m_onGround = true;
                 }
             }
+        }
+
+        if (collision.gameObject.CompareTag("tag_attack"))
+        {
+            m_isDead = true;
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collider)
+    {
+        if (collider.gameObject.CompareTag("tag_coin"))
+        {
+            m_coin++;
+            Destroy(collider.gameObject); 
         }
     }
 
