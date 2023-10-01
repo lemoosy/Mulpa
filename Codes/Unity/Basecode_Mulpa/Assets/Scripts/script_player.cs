@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class player : MonoBehaviour
 {
@@ -29,20 +30,20 @@ public class player : MonoBehaviour
 
     // Unity
 
-    public GameObject m_object;
     public Rigidbody2D m_body;
+    public GameObject m_objectPlayerInit;
 
     // IA
 
     public bool m_isIA;
-    public int m_id;
+    public int m_nnID;
     public int m_coin;
 
     // Monde
 
     public Vector2 m_worldSizeTile;
     public Vector2 m_worldSizeMatrix;
-    public Vector2 m_worldSize;         
+    public Vector2 m_worldSize;
     public int[,] m_worldMatrix;
     public string m_worldString;
 
@@ -61,6 +62,10 @@ public class player : MonoBehaviour
 
     public bool m_onGround;
     public bool m_isDead;
+
+    // Pièce
+
+    public int m_scene;
 
     #endregion
 
@@ -104,6 +109,10 @@ public class player : MonoBehaviour
 
         m_onGround = false;
         m_isDead = false;
+
+        // Pièce
+
+        m_scene = SceneManager.GetActiveScene().buildIndex;
     }
 
     void OnCollisionStay2D(Collision2D collision)
@@ -132,17 +141,31 @@ public class player : MonoBehaviour
             m_coin++;
             Destroy(collider.gameObject); 
         }
+
+        if (collider.gameObject.CompareTag("tag_exit"))
+        {
+            SceneManager.LoadScene(m_scene + 1);
+        }
     }
 
     private void Update()
     {
+        UpdateScene();
         UpdateInput();
         UpdateVelocity();
         UpdatePosition();
         UpdateState();
     }
 
-    // Player
+    // Joueur
+
+    private void UpdateScene()
+    {
+        if (m_isDead)
+        {
+            SceneManager.LoadScene(m_scene);
+        }
+    }
 
     private void UpdateInput()
     {
@@ -202,13 +225,13 @@ public class player : MonoBehaviour
         m_onGround = false;
         m_isDead = false;
 
-        if (m_body.position.y <= -(m_worldSize.y / 2.0f))
+        if (m_body.position.y < -(m_worldSize.y / 2.0f))
         {
             m_isDead = true;
         }
     }
 
-    // World
+    // Monde
 
     public int[,] World_InitMatrix()
     {

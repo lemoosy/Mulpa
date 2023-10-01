@@ -7,6 +7,10 @@ TagManager:
   - tag_coin
   - tag_wall
   - tag_attack
+  - tag_exit
+  - tag_door
+  - tag_button
+  - tag_player
   layers:
   - Default
   - TransparentFX
