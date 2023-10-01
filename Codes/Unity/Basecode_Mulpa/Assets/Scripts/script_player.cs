@@ -31,13 +31,12 @@ public class player : MonoBehaviour
     // Unity
 
     public Rigidbody2D m_body;
-    public GameObject m_objectPlayerInit;
+    public GameObject m_objSpawn;
 
     // IA
 
     public bool m_isIA;
-    public int m_nnID;
-    public int m_coin;
+    public int m_nnIndex;
     public float m_score;
 
     // Monde
@@ -53,6 +52,10 @@ public class player : MonoBehaviour
     public bool m_left;
     public bool m_right;
     public bool m_jump;
+
+    // Objets
+
+    public int m_coin;
 
     // Physique
 
@@ -74,6 +77,11 @@ public class player : MonoBehaviour
 
     // Unity
 
+    void Awake()
+    {
+        DontDestroyOnLoad(this.gameObject);
+    }
+
     private void Start()
     {
         // Unity
@@ -87,7 +95,7 @@ public class player : MonoBehaviour
             Time.timeScale = 5;
         }
 
-        m_coin = 0;
+        m_score = 0.0f;
 
         // Monde
 
@@ -100,6 +108,10 @@ public class player : MonoBehaviour
         m_left = false;
         m_right = false;
         m_jump = false;
+
+        // Objets
+
+        m_coin = 0;
 
         // Physique
 
@@ -135,6 +147,7 @@ public class player : MonoBehaviour
         }
     }
 
+    // OK
     private void OnTriggerEnter2D(Collider2D collider)
     {
         if (collider.gameObject.CompareTag("tag_coin"))
@@ -145,10 +158,12 @@ public class player : MonoBehaviour
 
         if (collider.gameObject.CompareTag("tag_exit"))
         {
+            m_scene++;
             SceneManager.LoadScene(m_scene + 1);
         }
     }
 
+    // OK
     private void Update()
     {
         UpdateScene();
@@ -156,23 +171,56 @@ public class player : MonoBehaviour
         UpdateVelocity();
         UpdatePosition();
         UpdateState();
+        UpdateWorld();
     }
 
-    // Joueur
+    // ##################
+    // ##### Joueur #####
+    // ##################
 
     private void UpdateScene()
     {
         if (m_isDead)
         {
-            SceneManager.LoadScene(m_scene);
+            if (m_isIA)
+            {
+
+            }
+            else
+            {
+                SceneManager.LoadScene(m_scene);
+
+            }
         }
     }
 
+    // OK
     private void UpdateInput()
     {
         if (m_isIA)
         {
-            // ...
+            NN_Forward(m_nnID, m_worldString);
+
+            int res = NN_GetOutput(m_nnID);
+
+            switch (res)
+            {
+                case 0:
+                    m_left = true;
+                    break;
+
+                case 1:
+                    m_right = true;
+                    break;
+
+                case 2:
+                    m_jump = m_onGround;
+                    break;
+
+                default:
+                    Debug.Assert(false, "ERROR - UpdateInput()");
+                    break;
+            }
         }
         else
         {
@@ -182,6 +230,7 @@ public class player : MonoBehaviour
         }
     }
     
+    // OK
     private void UpdateVelocity()
     {
         Vector2 velocity = m_body.velocity;
@@ -215,6 +264,7 @@ public class player : MonoBehaviour
 
         if (m_isDead)
         {
+
             position = m_positionStart;
         }
 
@@ -232,16 +282,39 @@ public class player : MonoBehaviour
         }
     }
 
-    // Monde
-
-    public int[,] World_InitMatrix()
+    // OK
+    private void UpdateWorld()
     {
-        return new int[0, 0];
+        World_UpdateMatrix();
+        World_UpdateString();
     }
 
-    public string World_InitString()
+    // #################
+    // ##### Monde #####
+    // #################
+
+    public void World_UpdateMatrix()
     {
-        return "";
+        GameObject[] allGameObjects = GameObject.FindObjectsOfType<GameObject>();
+
+        foreach (GameObject obj in allGameObjects)
+        {
+
+        }
+    }
+
+    // OK
+    public void World_UpdateString()
+    {
+        m_worldString = m_worldSizeMatrix.x.ToString() + "x" + m_worldSizeMatrix.y.ToString() + ":";
+
+        for (int j = 0; j < m_worldSize.y; j++)
+        {
+            for (int i = 0; i < m_worldSize.x; i++)
+            {
+                m_worldString += m_worldMatrix[j,i].ToString();
+            }
+        }
     }
 
     #endregion
