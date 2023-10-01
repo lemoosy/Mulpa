@@ -67,6 +67,8 @@ UnityDLL int DLL_Population_Update()
 
 	NN** children = new NN*[g_childrenSize]();
 
+	int childrenSize = 0; // Nombre d'enfants créés.
+
 	for (int i = 0; i < g_childrenSize; i++)
 	{
 		NN* nn1 = selection[rand() % g_selectionSize];
@@ -75,6 +77,8 @@ UnityDLL int DLL_Population_Update()
 		if (nn1 == nn2) continue;
 
 		children[i] = nn1->Crossover(nn2);
+
+		childrenSize++;
 	}
 
 	// On transfère la sélection et les enfants dans la population.
@@ -84,7 +88,7 @@ UnityDLL int DLL_Population_Update()
 		g_population[i] = selection[i];
 	}
 
-	int size = g_selectionSize + g_childrenSize;
+	int size = g_selectionSize + childrenSize;
 
 	for (int i = g_selectionSize; i < size; i++)
 	{
