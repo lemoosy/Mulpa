@@ -38,6 +38,7 @@ public class player : MonoBehaviour
     public bool m_isIA;
     public int m_nnID;
     public int m_coin;
+    public float m_score;
 
     // Monde
 

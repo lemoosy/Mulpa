@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using UnityEditor;
+using System.Threading;
 using UnityEngine;
+using UnityEngine.Assertions;
+using UnityEngine.SceneManagement;
 
 public class script_AI : MonoBehaviour
 {
@@ -18,10 +20,19 @@ public class script_AI : MonoBehaviour
     private static extern int NN_Create();
 
     [DllImport("Basecode_DLL.dll")]
-    private static extern int NN_Crossover(int p_id_1, int p_id_2);
+    private static extern void NN_Destroy(int p_nnID);
 
     [DllImport("Basecode_DLL.dll")]
-    private static extern void NN_Mutation(int p_id, int rate);
+    private static extern float NN_GetScore(int p_nnID);
+
+    [DllImport("Basecode_DLL.dll")]
+    private static extern void NN_SetScore(int p_nnID, float p_score);
+
+    [DllImport("Basecode_DLL.dll")]
+    private static extern int NN_Crossover(int p_nnID_1, int p_nnID_2);
+
+    [DllImport("Basecode_DLL.dll")]
+    private static extern void NN_Mutation(int p_nnID, int p_rate);
 
     #endregion
 
@@ -38,6 +49,11 @@ public class script_AI : MonoBehaviour
     public int[] m_selection;
 
     public int m_childrenSize = 20;
+    public int[] m_children;
+
+    public int m_mutationRate = 3;
+
+    public int generation = 0;
 
     #endregion
 
@@ -57,32 +73,39 @@ public class script_AI : MonoBehaviour
         }
 
         m_selection = new int[m_selectionSize];
+
+        m_children = new int[m_childrenSize];
     }
 
     void Update()
     {
-        // Si le joueur est vivant, on vérifie qu'il n'est pas mort.
+        // Si le joueur est vivant, on vérifie s'il est mort.
         if (m_playerCurr)
         {
             player scr = m_playerCurr.GetComponent<player>();
 
             if (scr.m_isDead)
             {
+                NN_SetScore(scr.m_nnID, scr.m_score);
                 Destroy(m_playerCurr);
                 m_playerCurr = null;
             }
         }
 
-        // Si le joueur est mort, on en crée un autre OU on fait la PG.
+        // Si le joueur n'est pas vivant, on crée un autre joueur OU nouvelle génération.
         else
         {
-            // Si la population est pleine -> PG.
-            if (PopulationIsFull())
+            // Si la population est pleine, nouvelle génération.
+            if (Population_IsOver())
             {
-
+                Selection_Fill();
+                Population_Destroy();
+                Children_Fill();
+                Selection_ToPopulation();
+                Children_ToPopulation();
             }
 
-            // Sinon, on crée un nouveau joueur.
+            // Si la population n'est pas pleine, on crée un nouveau joueur.
             else
             {
                 int nnID = NN_Create();
@@ -96,120 +119,57 @@ public class script_AI : MonoBehaviour
                 m_populationCursor++;
             }
         }
-
-        if (PopulationIsFinished())
-        {
-            for (int i = 0; i < m_selectionSize; i++)
-            {
-                GameObject obj = PopulationPopMinimum();
-                SelectionInsert(obj);
-            }
-
-            PopulationDestroy();
-
-            for (int i = 0; i < m_childrenSize; i++)
-            {
-                int r1 = Random.Range(0, m_selectionSize);
-                int r2 = Random.Range(0, m_selectionSize);
-
-                if (r1 == r2) continue;
-
-                GameObject obj1 = m_selection[r1];
-                GameObject obj2 = m_selection[r2];
-
-                player scr1 = m_selection[r1].GetComponent<player>();
-                player scr2 = m_selection[r2].GetComponent<player>();
-
-                GameObject obj3 =
-
-                player scr3 = obj3.GetComponent<player>();
-
-                scr3.m_id = NN_Crossover(scr1.m_id, scr2.m_id);
-
-                m_children[i] = obj3;
-            }
-
-            Selection_ToPopulation();
-            Children_ToPopulation();
-
-            PopulationFill();
-        }
     }
 
     public void OnDestroy()
     {
-        if (m_activeAI)
-        {
-            DLL_Quit();
-        }
+        DLL_Quit();
     }
 
     #endregion
 
+    #region PG
 
-    #region Fonctions -> Population
+    // Population.
 
-    void PopulationFill()
+    void Population_Fill()
     {
         for (int i = 0; i < m_populationSize; i++)
         {
-            if (m_population[i] == null)
+            if (m_population[i] == -1)
             {
-                m_population[i] = Instantiate(m_playerINIT, m_playerINIT.transform.position, m_playerINIT.transform.rotation);
-
-                player scr = m_population[i].GetComponent<player>();
-                scr.m_id = NN_Create();
+                m_population[i] = NN_Create();
             }
         }
     }
 
-    void PopulationInsert(GameObject p_obj)
+    void Population_Insert(int p_nnID)
+    {
+        Debug.Assert(m_populationCursor < m_populationSize, "ERROR - Population_Insert()");
+
+        m_population[m_populationCursor] = p_nnID;
+        m_populationCursor++;
+    }
+
+    bool Population_IsOver()
+    {
+        return (m_populationSize == m_populationCursor);
+    }
+
+    void Population_Destroy()
     {
         for (int i = 0; i < m_populationSize; i++)
         {
-            if (m_population[i] == null)
+            if (m_population[i] != -1)
             {
-                m_population[i] = p_obj;
-                return;
-            }
-        }
-    }
-
-    void PopulationDestroy()
-    {
-        for (int i = 0; i < m_populationSize; i++)
-        {
-            if (m_population[i] != null)
-            {
-                Destroy(m_population[i]);
-            }
-        }
-    }
-
-    bool PopulationIsFinished()
-    {
-        for (int i = 0; i < m_populationSize; i++)
-        {
-            if (m_population[i] != null)
-            {
-                player scr = m_population[i].GetComponent<player>();
-
-                if (scr.m_isDead == false)
-                {
-                    return false;
-                }
+                NN_Destroy(m_population[i]);
             }
         }
 
-        return true;
+        m_populationCursor = 0;
     }
 
-    bool PopulationIsFull()
-    {
-        return false;
-    }
-
-    GameObject PopulationPopMinimum()
+    int Population_RemoveBest()
     {
         int indexMin = -1;
 
@@ -238,19 +198,14 @@ public class script_AI : MonoBehaviour
         return objectMin;
     }
 
-    #endregion
+    // Selection.
 
-    #region Fonctions -> Selection
-
-    void SelectionInsert(GameObject p_object)
+    void Selection_Fill()
     {
         for (int i = 0; i < m_selectionSize; i++)
         {
-            if (m_selection[i] == null) continue;
-
-            m_selection[i] = p_object;
-
-            return;
+            int nnID = Population_RemoveBest();
+            m_selection[i] = nnID;
         }
     }
 
@@ -258,27 +213,40 @@ public class script_AI : MonoBehaviour
     {
         for (int i = 0; i < m_selectionSize; i++)
         {
-            if (m_selection[i] == null) continue;
-            PopulationInsert(m_selection[i]);
-            m_selection[i] = null;
+            Population_Insert(m_selection[i]);
+            m_selection[i] = -1;
         }
     }
 
-    #endregion
+    // Children.
 
-    #region Fonctions -> Children
+    void Children_Fill()
+    {
+        for (int i = 0; i < m_childrenSize; i++)
+        {
+            int r1 = Random.Range(0, m_selectionSize - 1);
+            int r2 = Random.Range(0, m_selectionSize - 1);
+
+            if (r1 == r2) continue;
+
+            int nnID1 = m_selection[r1];
+            int nnID2 = m_selection[r2];
+
+            m_children[i] = NN_Crossover(nnID1, nnID2);
+            NN_Mutation(m_children[i], m_mutationRate);
+        }
+    }
 
     void Children_ToPopulation()
     {
         for (int i = 0; i < m_childrenSize; i++)
         {
-            if (m_children[i] == null) continue;
+            if (m_children[i] == -1) continue;
 
-            PopulationInsert(m_children[i]);
-            m_children[i] = null;
+            Population_Insert(m_children[i]);
+            m_children[i] = -1;
         }
     }
 
     #endregion
-
 }
