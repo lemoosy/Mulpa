@@ -14,12 +14,9 @@ typedef enum eCaseID
 inline int World_CoordToID(int i, int j, int w) { return (j * w + i); }
 
 /// @brief Initialise un monde à partir d'un string.
-Matrix* World_Load(char* p_world);
+Matrix* World_LoadMatrix(string p_world);
 
 /// @brief Initialise les entrées du réseau de neurones avec le monde.
-Matrix* World_ToNN(Matrix* p_world);
-
-/// @brief Dessine le monde avec le plus court chemin en temps réel.
-void World_Draw(Matrix* p_world);
+Matrix* World_ToInputsNN(Matrix* p_world);
 
 DList<int>* World_GetShortestPath(Matrix* p_world, float* distance);

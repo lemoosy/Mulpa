@@ -110,12 +110,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../Basecode_DList/Basecode_DList;../../Basecode_Graph/Basecode_Graph;../../Basecode_Matrix/Basecode_Matrix;../../Basecode_NN/Basecode_NN;../../../C/Basecode_Window/Basecode_Window;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../Basecode_DList/Basecode_DList;../../Basecode_Graph/Basecode_Graph;../../Basecode_Matrix/Basecode_Matrix;../../Basecode_NN/Basecode_NN;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>../../Basecode_DList/x64/Debug/Basecode_DList.lib;../../Basecode_Graph/x64/Debug/Basecode_Graph.lib;../../Basecode_Matrix/x64/Debug/Basecode_Matrix.lib;../../Basecode_NN/x64/Debug/Basecode_NN.lib;../../../C/Basecode_Window/x64/Debug/Basecode_Window.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>../../Basecode_DList/x64/Debug/Basecode_DList.lib;../../Basecode_Graph/x64/Debug/Basecode_Graph.lib;../../Basecode_Matrix/x64/Debug/Basecode_Matrix.lib;../../Basecode_NN/x64/Debug/Basecode_NN.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
     </Link>
@@ -128,14 +128,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../Basecode_DList/Basecode_DList;../../Basecode_Graph/Basecode_Graph;../../Basecode_Matrix/Basecode_Matrix;../../Basecode_NN/Basecode_NN;../../../C/Basecode_Window/Basecode_Window;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../Basecode_DList/Basecode_DList;../../Basecode_Graph/Basecode_Graph;../../Basecode_Matrix/Basecode_Matrix;../../Basecode_NN/Basecode_NN;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>../../Basecode_DList/x64/Debug/Basecode_DList.lib;../../Basecode_Graph/x64/Debug/Basecode_Graph.lib;../../Basecode_Matrix/x64/Debug/Basecode_Matrix.lib;../../Basecode_NN/x64/Debug/Basecode_NN.lib;../../../C/Basecode_Window/x64/Debug/Basecode_Window.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>../../Basecode_DList/x64/Debug/Basecode_DList.lib;../../Basecode_Graph/x64/Debug/Basecode_Graph.lib;../../Basecode_Matrix/x64/Debug/Basecode_Matrix.lib;../../Basecode_NN/x64/Debug/Basecode_NN.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
     </Link>
@@ -143,13 +143,13 @@
   <ItemGroup>
     <ClCompile Include="gNN.cpp" />
     <ClCompile Include="DLL.cpp" />
+    <ClCompile Include="Utils.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="gNN.h" />
+    <ClInclude Include="Utils.h" />
     <ClInclude Include="DLL.h" />
     <ClInclude Include="Settings.h" />
-    <ClInclude Include="Variables.h" />
     <ClInclude Include="World.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

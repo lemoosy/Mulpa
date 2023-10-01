@@ -1,88 +1,127 @@
 #include "DLL.h"
 
-/// @brief Fenêtre d'affichage.
-//Window* g_window;
-
-UnityDLL int Add(int a, int b)
-{
-	return a + b;
-}
-
-UnityDLL double DLL_Init(double p_window)
+UnityDLL void DLL_Init(int p_populationSize, int p_selectionSize, int p_childrenSize, int p_mutationRate)
 {
 	srand(time(nullptr));
 
-	g_nn = new NN * [NN_CAPACITY]();
+	g_populationSize = p_populationSize;
+	g_selectionSize = p_selectionSize;
+	g_childrenSize = p_childrenSize;
 
-	if (p_window == 1.0)
+	g_population = new NN*[p_populationSize]();
+
+	for (int i = 0; i < p_populationSize; i++)
 	{
-		//g_window = new Window("DLL", WINDOW_WIDTH, WINDOW_HEIGHT);
+		g_population[i] = NN_Create();
 	}
-
-	return 40.0;
 }
 
-UnityDLL double DLL_Free()
+UnityDLL void DLL_Quit(void)
 {
-	for (int i = 0; i < NN_CAPACITY; i++)
+	for (int i = 0; i < g_populationSize; i++)
 	{
-		if (g_nn[i])
+		delete g_population[i];
+	}
+
+	delete[] g_population;
+}
+
+UnityDLL void DLL_NN_SetScore(int p_nnIndex, float score)
+{
+	g_population[p_nnIndex]->SetScore(score);
+}
+
+UnityDLL float DLL_NN_GetScore(int p_nnIndex)
+{
+	return g_population[p_nnIndex]->GetScore();
+}
+
+UnityDLL int DLL_Population_Update()
+{
+	// On vérifie si tous les NN ont été évalués.
+
+	for (int i = 0; i < g_populationSize; i++)
+	{
+		NN* nn = g_population[i];
+
+		if ((nn == nullptr) || (nn->GetScore() == (float)INT_MAX))
 		{
-			delete g_nn[i];
+			return true;
 		}
 	}
 
-	delete[] g_nn;
+	// Création de la sélection.
 
-	//if (g_window)
-	//{
+	NN** selection = new NN*[g_selectionSize]();
 
-	//}
+	for (int i = 0; i < g_selectionSize; i++)
+	{
+		selection[i] = Population_RemoveMinimum();
+	}
 
-	return 0.0;
+	// Nettoyage de la population.
+
+	Population_Clear();
+
+	// Création des enfants.
+
+	NN** children = new NN*[g_childrenSize]();
+
+	for (int i = 0; i < g_childrenSize; i++)
+	{
+		NN* nn1 = selection[rand() % g_selectionSize];
+		NN* nn2 = selection[rand() % g_selectionSize];
+
+		if (nn1 == nn2) continue;
+
+		children[i] = nn1->Crossover(nn2);
+	}
+
+	// On transfère la sélection et les enfants dans la population.
+
+	for (int i = 0; i < g_selectionSize; i++)
+	{
+		g_population[i] = selection[i];
+	}
+
+	int size = g_selectionSize + g_childrenSize;
+
+	for (int i = g_selectionSize; i < size; i++)
+	{
+		g_population[i] = children[i];
+	}
+
+	// Remplissage de la population.
+
+	for (int i = size; i < g_populationSize; i++)
+	{
+		g_population[i] = NN_Create();
+	}
+
+	// Libération de la mémoire.
+
+	delete children;
+	delete selection;
+
+	return false;
 }
 
-UnityDLL double NN_Create()
-{
-	int id = gNN_GetEmptyID();
-
-	assert(id != -1);
-
-	NN* nn = new NN(512);
-	nn->AddLayer(256, &ReLU);
-	nn->AddLayer(128, &ReLU);
-	nn->AddLayer(3, &sigmoid);
-
-	gNN_SetNN(id, nn);
-
-	return (double)id;
-}
-
-UnityDLL double NN_Destroy(double p_id)
-{
-	gNN_DestroyNN(p_id);
-
-	return 0.0;
-}
-
-UnityDLL double NN_Forward(double p_id, char* p_world)
+UnityDLL void NN_Forward(int p_id, int* p_world, int w, int h)
 {
 	NN* nn = gNN_GetNN(p_id);
 
-	Matrix* world = World_Load(p_world);
+	Matrix* world = World_LoadMatrix(p_world);
 
-	Matrix* X = World_ToNN(world);
+	Matrix* X = World_ToInputsNN(world);
 
 	nn->Forward(X);
 
 	delete X;
 	
 	delete world;
-
-	return 0.0;
 }
 
-UnityDLL double NN_GetOutput(double p_id)
+UnityDLL int NN_GetOutput(int p_id)
 {
 	NN* nn = gNN_GetNN(p_id);
 
@@ -100,66 +139,5 @@ UnityDLL double NN_GetOutput(double p_id)
 		}
 	}
 
-	return (double)minimum;
-}
-
-UnityDLL double NN_GetScore(double p_id)
-{
-	NN* nn = gNN_GetNN(p_id);
-
-	return (double)nn->GetScore();
-}
-
-UnityDLL double NN_SetScore(double p_id, double p_score)
-{
-	NN* nn = gNN_GetNN(p_id);
-
-	nn->SetScore(p_score);
-
-	return 0.0;
-}
-
-UnityDLL double NN_UpdateScore(double p_id, char* p_world)
-{
-	NN* nn = gNN_GetNN(p_id);
-
-	Matrix* world = World_Load(p_world);
-
-	float distance = 0.0f;
-	DList<int>* PCC = World_GetShortestPath(world, &distance);
-
-	nn->SetScore(distance);
-
-	delete PCC;
-
-	delete world;
-
-	return distance;
-}
-
-UnityDLL double NN_Crossover(double p_id_1, double p_id_2)
-{
-	NN* nn_1 = gNN_GetNN(p_id_1);
-	NN* nn_2 = gNN_GetNN(p_id_2);
-	NN* nn_3 = nn_1->Crossover(nn_2);
-
-	int id_3 = gNN_GetEmptyID();
-
-	assert(id_3 != -1);
-
-	gNN_SetNN(id_3, nn_3);
-
-	return (double)id_3;
-}
-
-UnityDLL double NN_Mutation(double p_id, double rate)
-{
-	NN* nn = gNN_GetNN(p_id);
-
-	for (int i = 0; i < rate; i++)
-	{
-		nn->Mutation();
-	}
-
-	return 0.0;
+	return minimum;
 }

@@ -1,7 +1,19 @@
 #pragma once
 
 #include "Settings.h"
-#include "Variables.h"
+#include "Functions.h"
+
+NN* NN_Create(void);
+
+NN* Population_RemoveMinimum(void);
+
+NN* Population_RemoveMaximum(void);
+
+void Population_Clear(void);
+
+
+/// @brief Liste des réseaux de neurones.
+extern NN** g_nn;
 
 /// @brief Retourne un ID libre depuis la liste 'g_nn'.
 /// @return -1 si aucun ID libre, sinon un ID libre.

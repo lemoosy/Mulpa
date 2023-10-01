@@ -2,25 +2,32 @@
 
 #include "Settings.h"
 #include "World.h"
-#include "gNN.h"
+#include "Utils.h"
 #include "Functions.h"
  
-NN** g_nn = nullptr;
+
+
+// Fonctions pour le script scr_playerAI.cs
 
 /// @brief Initialise la DLL.
-UnityDLL double DLL_Init(double p_window);
+UnityDLL void DLL_Init(int p_populationSize, int p_selectionSize, int p_childrenSize, int p_mutationRate);
 
 /// @brief Quitte la DLL.
-UnityDLL double DLL_Free();
+UnityDLL void DLL_Quit(void);
 
-/// @brief Crée un réseau de neurones.
-/// @return L'ID du réseau de neurones ou -1 si erreur.
-UnityDLL double NN_Create();
+/// @brief Modifie le score d'un réseau de neurones.
+UnityDLL void DLL_NN_SetScore(int p_nnIndex, float score);
 
-/// @return Détruit un réseau de neurones.
-/// @return EXIT_FAILURE si erreur, sinon EXIT_SUCCESS.
-UnityDLL double NN_Destroy(double p_nnID);
+/// @brief Retourne le score d'un réseau de neurones.
+UnityDLL float DLL_NN_GetScore(int p_nnIndex);
 
-UnityDLL double NN_Forward(double p_nnID, char* p_world);
+/// @brief Met à jour la population (sélection, croisement, mutation).
+UnityDLL int DLL_Population_Update();
 
-UnityDLL double NN_GetOutput(double p_nnID);
+// Fonctions pour le script scr_playerAI.cs
+
+/// @brief Réalise la propagation avant d'un réseau de neurones.
+UnityDLL void NN_Forward(int p_id, string p_world);
+
+/// @brief Retourne la sortie d'un réseau de neurones (0 = left, 1 = right, 2 = jump).
+UnityDLL int NN_GetOutput(int p_id);
