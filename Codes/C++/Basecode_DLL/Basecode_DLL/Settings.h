@@ -11,15 +11,32 @@
 
 using namespace std;
 
-#define UnityDLL extern "C" __declspec (dllexport)
+typedef enum eCaseID
+{
+	CASE_WALL,
+	CASE_MONSTER,
+	CASE_COIN,
+	CASE_PLAYER,
+	CASE_EXIT,
+	CASE_BUTTON,
+	CASE_DOOR,
+	CASE_COUNT
+}CaseID;
+
+/// Macros.
+
+#define UnityDLL			extern "C" __declspec (dllexport)
 
 #define WORLD_MATRIX_W		18
 #define WORLD_MATRIX_H		10
-#define NN_INPUT_SIZE		(WORLD_MATRIX_W * WORLD_MATRIX_H)
 
-int g_populationSize = 0;
-int g_selectionSize = 0;
-int g_childrenSize = 0;
-int g_mutationRate = 0;
+#define NN_INPUT_SIZE		(WORLD_MATRIX_W * WORLD_MATRIX_H) * CASE_COUNT
 
-NN** g_population = nullptr;
+/// Variables globales.
+
+extern int g_populationSize;
+extern int g_selectionSize;
+extern int g_childrenSize;
+extern int g_mutationRate;
+
+extern NN** g_population;

@@ -15,17 +15,22 @@ NN* NN_Create(void)
 
 NN* Population_RemoveMinimum(void)
 {
-	int index = 0;
+	int index = -1;
 
-	for (int i = 1; i < g_populationSize; i++)
+	for (int i = 0; i < g_populationSize; i++)
 	{
 		if (g_population[i])
 		{
-			if (g_population[i]->GetScore() < g_population[index]->GetScore())
+			if ((index == -1) || (g_population[i]->GetScore() < g_population[index]->GetScore()))
 			{
 				index = i;
 			}
 		}
+	}
+
+	if (index == -1)
+	{
+		return nullptr;
 	}
 
 	NN* res = g_population[index];
@@ -37,17 +42,22 @@ NN* Population_RemoveMinimum(void)
 
 NN* Population_RemoveMaximum(void)
 {
-	int index = 0;
+	int index = -1;
 
-	for (int i = 1; i < g_populationSize; i++)
+	for (int i = 0; i < g_populationSize; i++)
 	{
 		if (g_population[i])
 		{
-			if (g_population[i]->GetScore() > g_population[index]->GetScore())
+			if ((index == -1) || (g_population[i]->GetScore() > g_population[index]->GetScore()))
 			{
 				index = i;
 			}
 		}
+	}
+
+	if (index == -1)
+	{
+		return nullptr;
 	}
 
 	NN* res = g_population[index];
@@ -69,23 +79,22 @@ void Population_Clear(void)
 	}
 }
 
-Matrix* World_ToInput(int* p_world, int w, int h)
+Matrix* World_ToInput(int* p_world, int p_w, int p_h)
 {
-	if ((w != WORLD_MATRIX_W) || (h != WORLD_MATRIX_H))
+	if ((p_w != WORLD_MATRIX_W) || (p_h != WORLD_MATRIX_H))
 	{
 		return nullptr;
 	}
 
 	Matrix* res = new Matrix(NN_INPUT_SIZE, 1);
 
-	int size = w * h;
+	int size = p_w * p_h;
 
-	for (int j = 0; j < h; j++)
+	for (int j = 0; j < p_h; j++)
 	{
-		for (int i = 0; i < w; i++)
+		for (int i = 0; i < p_w; i++)
 		{
-			int index = (j * w) + i;
-
+			int index = Coord_ToIndex(i, j, p_w);
 			int value = p_world[index];
 
 			res->SetValue(index + size * value, 0, 1.0f);
@@ -95,12 +104,12 @@ Matrix* World_ToInput(int* p_world, int w, int h)
 	return res;
 }
 
-bool Coord_OutOfDimension(int i, int j, int w, int h)
+bool Coord_OutOfDimension(int p_i, int p_j, int p_w, int p_h)
 {
-	return ((i < 0) || (j < 0) || (i >= w) || (j >= h));
+	return ((p_i < 0) || (p_j < 0) || (p_i >= p_w) || (p_j >= p_h));
 }
 
-int Coord_ToIndex(int i, int j, int w)
+int Coord_ToIndex(int p_i, int p_j, int p_w)
 {
-	return (j * w) + i;
+	return (p_j * p_w) + p_i;
 }

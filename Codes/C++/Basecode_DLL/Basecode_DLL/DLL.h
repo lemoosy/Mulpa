@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Functions.h"
 #include "Settings.h"
 #include "Utils.h"
 
@@ -18,16 +17,19 @@ UnityDLL void DLL_NN_SetScore(int p_nnIndex, float score);
 /// @brief Retourne le score d'un réseau de neurones.
 UnityDLL float DLL_NN_GetScore(int p_nnIndex);
 
-/// @brief Met à jour la population (sélection, croisement, mutation).
-UnityDLL int DLL_Population_Update();
+/// @brief MAJ de la population (selection, crossover, mutation).
+/// @return true si erreur, false sinon.
+UnityDLL bool DLL_Population_Update(void);
 
-// Fonctions pour le script scr_playerAI.cs
+// Fonctions pour le script scr_player.cs
 
-/// @brief Réalise la propagation avant d'un réseau de neurones.
-UnityDLL bool DLL_NN_Forward(int p_id, int* p_world, int w, int h);
+/// @brief Réalise la propagation avant d'un réseau de neurones à partir d'un monde.
+/// @return true si erreur, false sinon.
+UnityDLL bool DLL_NN_Forward(int p_nnIndex, int* p_world, int p_w, int p_h);
 
-/// @brief Retourne la sortie d'un réseau de neurones (0 = left, 1 = right, 2 = jump).
+/// @brief Retourne la sortie d'un réseau de neurones (-1 = erreur, 0 = left, 1 = right, 2 = jump).
 UnityDLL int DLL_NN_GetOutput(int p_nnIndex);
 
 /// @brief Retourne la distance entre le joueur et la sortie (PCC).
-UnityDLL float DLL_World_GetShortestPath(int* p_world, int w, int h);
+/// @brief -1 si erreur.
+UnityDLL float DLL_World_GetShortestPath(int* p_world, int p_w, int p_h);

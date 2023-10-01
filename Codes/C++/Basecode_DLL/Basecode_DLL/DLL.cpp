@@ -1,5 +1,12 @@
 #include "DLL.h"
 
+int g_populationSize = 0;
+int g_selectionSize = 0;
+int g_childrenSize = 0;
+int g_mutationRate = 0;
+
+NN** g_population = nullptr;
+
 // Fonctions pour le script scr_playerAI.cs
 
 UnityDLL void DLL_Init(int p_populationSize, int p_selectionSize, int p_childrenSize, int p_mutationRate)
@@ -21,10 +28,7 @@ UnityDLL void DLL_Init(int p_populationSize, int p_selectionSize, int p_children
 
 UnityDLL void DLL_Quit(void)
 {
-	for (int i = 0; i < g_populationSize; i++)
-	{
-		delete g_population[i];
-	}
+	Population_Clear();
 
 	delete[] g_population;
 }
@@ -39,7 +43,7 @@ UnityDLL float DLL_NN_GetScore(int p_nnIndex)
 	return g_population[p_nnIndex]->GetScore();
 }
 
-UnityDLL int DLL_Population_Update()
+UnityDLL bool DLL_Population_Update(void)
 {
 	// On vérifie si tous les NN ont été évalués.
 
@@ -118,9 +122,9 @@ UnityDLL int DLL_Population_Update()
 	return false;
 }
 
-// Fonctions pour le script scr_playerAI.cs
+// Fonctions pour le script scr_player.cs
 
-UnityDLL bool DLL_NN_Forward(int p_nnIndex, int* p_world, int w, int h)
+UnityDLL bool DLL_NN_Forward(int p_nnIndex, int* p_world, int p_w, int p_h)
 {
 	NN* nn = g_population[p_nnIndex];
 
@@ -129,7 +133,7 @@ UnityDLL bool DLL_NN_Forward(int p_nnIndex, int* p_world, int w, int h)
 		return true;
 	}
 
-	Matrix* X = World_ToInput(p_world, w, h);
+	Matrix* X = World_ToInput(p_world, p_w, p_h);
 
 	if (!X)
 	{
@@ -146,6 +150,11 @@ UnityDLL bool DLL_NN_Forward(int p_nnIndex, int* p_world, int w, int h)
 UnityDLL int DLL_NN_GetOutput(int p_nnIndex)
 {
 	NN* nn = g_population[p_nnIndex];
+
+	if (!nn)
+	{
+		return -1;
+	}
 
 	Layer* output = nn->GetLayer(-1);
 
@@ -164,28 +173,27 @@ UnityDLL int DLL_NN_GetOutput(int p_nnIndex)
 	return index;
 }
 
-UnityDLL float DLL_World_GetShortestPath(int* p_world, int w, int h)
+UnityDLL float DLL_World_GetShortestPath(int* p_world, int p_w, int p_h)
 {
-	if ((w != WORLD_MATRIX_W) || (h != WORLD_MATRIX_H))
+	if ((p_w != WORLD_MATRIX_W) || (p_h != WORLD_MATRIX_H))
 	{
 		return -1.0f;
 	}
 
 	// Création du graphe.
 
-	int size = w * h;
-	Graph* graph = new Graph(size);
+	Graph* graph = new Graph(p_w * p_h);
 
 	// Création des arcs + Recherche du joueur et de la sortie.
 
 	int playerID = -1;
 	int exitID = -1;
 
-	for (int j = 0; j < h; j++)
+	for (int j = 0; j < p_h; j++)
 	{
-		for (int i = 0; i < w; i++)
+		for (int i = 0; i < p_w; i++)
 		{
-			int index = (j * w) + i;
+			int index = Coord_ToIndex(i, j, p_w);
 			int value = p_world[index];
 
 			if (value == CASE_PLAYER)
@@ -199,53 +207,53 @@ UnityDLL float DLL_World_GetShortestPath(int* p_world, int w, int h)
 			}
 
 			if (
-				!Coord_OutOfDimension(i + 1, j, w, h)
+				!Coord_OutOfDimension(i + 1, j, p_w, p_h)
 				&&
-				(p_world[Coord_ToIndex(i + 1, j, w)] != CASE_WALL)
+				(p_world[Coord_ToIndex(i + 1, j, p_w)] != CASE_WALL)
 				)
 			{
 				graph->SetWeight(
 					index,
-					Coord_ToIndex(i + 1, j, w),
+					Coord_ToIndex(i + 1, j, p_w),
 					1.0f
 				);
 			}
 
 			if (
-				!Coord_OutOfDimension(i - 1, j, w, h)
+				!Coord_OutOfDimension(i - 1, j, p_w, p_h)
 				&&
-				(p_world[Coord_ToIndex(i - 1, j, w)] != CASE_WALL)
+				(p_world[Coord_ToIndex(i - 1, j, p_w)] != CASE_WALL)
 				)
 			{
 				graph->SetWeight(
 					index,
-					Coord_ToIndex(i - 1, j, w),
+					Coord_ToIndex(i - 1, j, p_w),
 					1.0f
 				);
 			}
 
 			if (
-				!Coord_OutOfDimension(i, j + 1, w, h)
+				!Coord_OutOfDimension(i, j + 1, p_w, p_h)
 				&&
-				(p_world[Coord_ToIndex(i, j + 1, w)] != CASE_WALL)
+				(p_world[Coord_ToIndex(i, j + 1, p_w)] != CASE_WALL)
 				)
 			{
 				graph->SetWeight(
 					index,
-					Coord_ToIndex(i, j + 1, w),
+					Coord_ToIndex(i, j + 1, p_w),
 					1.0f
 				);
 			}
 
 			if (
-				!Coord_OutOfDimension(i, j - 1, w, h)
+				!Coord_OutOfDimension(i, j - 1, p_w, p_h)
 				&&
-				(p_world[Coord_ToIndex(i, j - 1, w)] != CASE_WALL)
+				(p_world[Coord_ToIndex(i, j - 1, p_w)] != CASE_WALL)
 				)
 			{
 				graph->SetWeight(
 					index,
-					Coord_ToIndex(i, j - 1, w),
+					Coord_ToIndex(i, j - 1, p_w),
 					1.0f
 				);
 			}
@@ -263,7 +271,11 @@ UnityDLL float DLL_World_GetShortestPath(int* p_world, int w, int h)
 	float distance = 0.0f;
 	DList<int>* PCC = graph->Dijkstra(playerID, exitID, &distance);
 
-	delete PCC;
+	if (PCC)
+	{
+		delete PCC;
+	}
+
 	delete graph;
 
 	return distance;
