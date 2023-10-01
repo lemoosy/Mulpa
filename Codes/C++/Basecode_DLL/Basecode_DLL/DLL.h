@@ -1,9 +1,8 @@
 #pragma once
 
-#include "Settings.h"
-#include "World.h"
-#include "Utils.h"
 #include "Functions.h"
+#include "Settings.h"
+#include "Utils.h"
 
 // Fonctions pour le script scr_playerAI.cs
 
@@ -25,7 +24,10 @@ UnityDLL int DLL_Population_Update();
 // Fonctions pour le script scr_playerAI.cs
 
 /// @brief Réalise la propagation avant d'un réseau de neurones.
-UnityDLL void NN_Forward(int p_id, string p_world);
+UnityDLL bool DLL_NN_Forward(int p_id, int* p_world, int w, int h);
 
 /// @brief Retourne la sortie d'un réseau de neurones (0 = left, 1 = right, 2 = jump).
-UnityDLL int NN_GetOutput(int p_id);
+UnityDLL int DLL_NN_GetOutput(int p_nnIndex);
+
+/// @brief Retourne la distance entre le joueur et la sortie (PCC).
+UnityDLL float DLL_World_GetShortestPath(int* p_world, int w, int h);

@@ -2,7 +2,7 @@
 
 NN* NN_Create(void)
 {
-	NN* nn = new NN(512);
+	NN* nn = new NN(NN_INPUT_SIZE);
 
 	nn->AddLayer(256, &ReLU);
 	nn->AddLayer(128, &ReLU);
@@ -13,15 +13,18 @@ NN* NN_Create(void)
 	return nn;
 }
 
-NN* NN_PopulationRemoveMinimum(void)
+NN* Population_RemoveMinimum(void)
 {
 	int index = 0;
 
 	for (int i = 1; i < g_populationSize; i++)
 	{
-		if (g_population[i]->GetScore() < g_population[index]->GetScore())
+		if (g_population[i])
 		{
-			index = i;
+			if (g_population[i]->GetScore() < g_population[index]->GetScore())
+			{
+				index = i;
+			}
 		}
 	}
 
@@ -32,55 +35,72 @@ NN* NN_PopulationRemoveMinimum(void)
 	return res;
 }
 
-
-
-
-
-
-
-
-
-
-
-UnityDLL void NN_UpdateScore(int p_id, string p_world)
+NN* Population_RemoveMaximum(void)
 {
-	if (p_world == "") return;
+	int index = 0;
 
-	NN* nn = gNN_GetNN(p_id);
-
-	Matrix* world = World_LoadMatrix(p_world);
-
-	float distance = 0.0f;
-	DList<int>* PCC = World_GetShortestPath(world, &distance);
-
-	nn->SetScore(distance);
-
-	delete PCC;
-
-	delete world;
-}
-
-UnityDLL int NN_Crossover(int p_id_1, int p_id_2)
-{
-	NN* nn_1 = gNN_GetNN(p_id_1);
-	NN* nn_2 = gNN_GetNN(p_id_2);
-	NN* nn_3 = nn_1->Crossover(nn_2);
-
-	int id_3 = gNN_GetEmptyID();
-
-	assert(id_3 != -1);
-
-	gNN_SetNN(id_3, nn_3);
-
-	return id_3;
-}
-
-UnityDLL void NN_Mutation(int p_id, int rate)
-{
-	NN* nn = gNN_GetNN(p_id);
-
-	for (int i = 0; i < rate; i++)
+	for (int i = 1; i < g_populationSize; i++)
 	{
-		nn->Mutation();
+		if (g_population[i])
+		{
+			if (g_population[i]->GetScore() > g_population[index]->GetScore())
+			{
+				index = i;
+			}
+		}
 	}
+
+	NN* res = g_population[index];
+
+	g_population[index] = nullptr;
+
+	return res;
+}
+
+void Population_Clear(void)
+{
+	for (int i = 0; i < g_populationSize; i++)
+	{
+		if (g_population[i])
+		{
+			delete g_population[i];
+			g_population[i] = nullptr;
+		}
+	}
+}
+
+Matrix* World_ToInput(int* p_world, int w, int h)
+{
+	if ((w != WORLD_MATRIX_W) || (h != WORLD_MATRIX_H))
+	{
+		return nullptr;
+	}
+
+	Matrix* res = new Matrix(NN_INPUT_SIZE, 1);
+
+	int size = w * h;
+
+	for (int j = 0; j < h; j++)
+	{
+		for (int i = 0; i < w; i++)
+		{
+			int index = (j * w) + i;
+
+			int value = p_world[index];
+
+			res->SetValue(index + size * value, 0, 1.0f);
+		}
+	}
+
+	return res;
+}
+
+bool Coord_OutOfDimension(int i, int j, int w, int h)
+{
+	return ((i < 0) || (j < 0) || (i >= w) || (j >= h));
+}
+
+int Coord_ToIndex(int i, int j, int w)
+{
+	return (j * w) + i;
 }
