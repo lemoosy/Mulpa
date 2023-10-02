@@ -33,9 +33,9 @@ UnityDLL void DLL_Quit(void)
 	delete[] g_population;
 }
 
-UnityDLL void DLL_NN_SetScore(int p_nnIndex, float score)
+UnityDLL void DLL_NN_SetScore(int p_nnIndex, float p_score)
 {
-	g_population[p_nnIndex]->SetScore(score);
+	g_population[p_nnIndex]->SetScore(p_score);
 }
 
 UnityDLL float DLL_NN_GetScore(int p_nnIndex)

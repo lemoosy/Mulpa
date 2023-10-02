@@ -12,7 +12,7 @@ UnityDLL void DLL_Init(int p_populationSize, int p_selectionSize, int p_children
 UnityDLL void DLL_Quit(void);
 
 /// @brief Modifie le score d'un réseau de neurones.
-UnityDLL void DLL_NN_SetScore(int p_nnIndex, float score);
+UnityDLL void DLL_NN_SetScore(int p_nnIndex, float p_score);
 
 /// @brief Retourne le score d'un réseau de neurones.
 UnityDLL float DLL_NN_GetScore(int p_nnIndex);
