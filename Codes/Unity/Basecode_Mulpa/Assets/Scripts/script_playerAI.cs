@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -18,10 +19,13 @@ public class script_AI : MonoBehaviour
     private static extern void DLL_Quit();
 
     [DllImport("Basecode_DLL.dll")]
-    private static extern void DLL_NNSetScore(int p_nnIndex, float p_score);
+    private static extern void DLL_NN_SetScore(int p_nnIndex, float p_score);
 
     [DllImport("Basecode_DLL.dll")]
-    private static extern void DLL_PopulationUpdate();
+    private static extern float DLL_NN_GetScore(int p_nnIndex);
+
+    [DllImport("Basecode_DLL.dll")]
+    private static extern bool DLL_Population_Update();
 
     #endregion
 
@@ -30,20 +34,21 @@ public class script_AI : MonoBehaviour
     // Unity
 
     public GameObject m_objSpawn;
-    public GameObject m_objPlayer = null;
+    public GameObject m_objPlayerCopy;
+    public GameObject m_objPlayer;
 
     // PG
 
-    public bool m_activeAI = false;
+    public bool m_activeAI;
 
-    public int m_populationSize = 50;
-    public int m_selectionSize = 5;
-    public int m_childrenSize = 20;
-    public int m_mutationRate = 10;
+    public int m_populationSize;
+    public int m_selectionSize;
+    public int m_childrenSize;
+    public int m_mutationRate;
 
-    public int m_populationCursor = 0;
+    public int m_populationCursor;
 
-    public int m_generation = 0;
+    public int m_generation;
 
     #endregion
 
@@ -53,11 +58,24 @@ public class script_AI : MonoBehaviour
     {
         if (m_activeAI)
         {
+            m_populationSize = 50;
+            m_selectionSize = 5;
+            m_childrenSize = 20;
+            m_mutationRate = 10;
+
+            m_populationCursor = 0;
+
+            m_generation = 0;
+
             DLL_Init(m_populationSize, m_selectionSize, m_childrenSize, m_mutationRate);
         }
         else
         {
-            Instantiate(m_objPlayer, m_objSpawn.transform.position, m_objSpawn.transform.rotation);
+            m_objPlayer = Instantiate(m_objPlayerCopy, m_objSpawn.transform.position, m_objSpawn.transform.rotation);
+
+            player scr = m_objPlayer.GetComponent<player>();
+            scr.m_objSpawn = m_objSpawn;
+            scr.m_isIA = false;
         }
     }
 
@@ -71,7 +89,7 @@ public class script_AI : MonoBehaviour
 
             if (scr.m_isDead)
             {
-                DLL_NNSetScore(scr.m_nnIndex, scr.m_score);
+                DLL_NN_SetScore(scr.m_nnIndex, scr.m_score);
                 Destroy(m_objPlayer);
                 m_objPlayer = null;
                 SceneManager.LoadScene(0);
@@ -81,7 +99,7 @@ public class script_AI : MonoBehaviour
         {
             if (m_populationCursor == m_populationSize)
             {
-                DLL_PopulationUpdate();
+                DLL_Population_Update();
                 m_populationCursor = m_selectionSize;
             }
             else
@@ -89,16 +107,17 @@ public class script_AI : MonoBehaviour
                 int nnIndex = m_populationCursor;
                 m_populationCursor++;
 
-                m_objPlayer = Instantiate(m_objPlayer, m_objSpawn.transform.position, m_objSpawn.transform.rotation);
+                m_objPlayer = Instantiate(m_objPlayerCopy, m_objSpawn.transform.position, m_objSpawn.transform.rotation);
 
                 player scr = m_objPlayer.GetComponent<player>();
+                scr.m_objSpawn = m_objSpawn;
                 scr.m_isIA = true;
                 scr.m_nnIndex = nnIndex;
             }
         }
     }
 
-    public void OnDestroy()
+    void OnDestroy()
     {
         DLL_Quit();
     }

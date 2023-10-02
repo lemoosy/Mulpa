@@ -133,7 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 239403493}
   - component: {fileID: 239403495}
-  - component: {fileID: 239403494}
+  - component: {fileID: 239403496}
   m_Layer: 0
   m_Name: obj_playerAI
   m_TagString: Untagged
@@ -156,30 +156,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &239403494
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 239403492}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c150df7fbbeb4d34abbeb21f93f4862a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_activeAI: 0
-  m_objSpawn: {fileID: 0}
-  m_objPlayer: {fileID: 0}
-  m_populationSize: 0
-  m_population: 
-  m_populationCursor: 0
-  m_selectionSize: 0
-  m_selection: 
-  m_childrenSize: 0
-  m_children: 
-  m_mutationRate: 0
-  generation: 0
 --- !u!114 &239403495
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -195,6 +171,28 @@ MonoBehaviour:
   _data:
     _json: '{"declarations":{"Kind":"Object","collection":{"$content":[],"$version":"A"},"$version":"A"}}'
     _objectReferences: []
+--- !u!114 &239403496
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 239403492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c150df7fbbeb4d34abbeb21f93f4862a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_objSpawn: {fileID: 1585989720}
+  m_objPlayerCopy: {fileID: 1332028083160640919, guid: 8b0e0280fd80e14428428da2d4e23aba, type: 3}
+  m_objPlayer: {fileID: 0}
+  m_activeAI: 1
+  m_populationSize: 50
+  m_selectionSize: 5
+  m_childrenSize: 20
+  m_mutationRate: 0
+  m_populationCursor: 0
+  m_generation: 0
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -816,6 +814,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4e37b7e83df25c142b25044f0dcd94f8, type: 3}
+--- !u!1 &1585989720 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7662820822353678063, guid: 47cd0a0d803aa294c93e95f29522a9e1, type: 3}
+  m_PrefabInstance: {fileID: 1234477788587615732}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1685386354
 GameObject:
   m_ObjectHideFlags: 0
