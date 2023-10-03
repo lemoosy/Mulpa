@@ -43,13 +43,13 @@ public class player : MonoBehaviour
 
     // Entrées
 
-    public bool m_left;
-    public bool m_right;
-    public bool m_jump;
+    public bool m_left = false;
+    public bool m_right = false;
+    public bool m_jump = false;
 
     // Objets
 
-    public int m_coin;
+    public int m_coin = 0;
 
     // Physique
 
@@ -59,12 +59,12 @@ public class player : MonoBehaviour
 
     // États
 
-    public bool m_onGround;
-    public bool m_isDead;
+    public bool m_onGround = false;
+    public bool m_isDead = false;
 
     // Pièce
 
-    public bool m_sceneIsUpdated;
+    public bool m_sceneIsUpdated = false;
     public int m_sceneIndex;
 
     #endregion
@@ -78,9 +78,8 @@ public class player : MonoBehaviour
         if (m_sceneIsUpdated)
         {
             m_objSpawn = GameObject.Find("obj_spawn");
-            m_objSpawnBody = m_objSpawn.GetComponent<Rigidbody2D>();
             
-            m_objSelfBody.position = m_objSpawnBody.position;
+            m_objSelfBody.position = m_objSpawn.transform.position;
 
             m_tick = 0;
          
@@ -99,10 +98,9 @@ public class player : MonoBehaviour
         // Unity
 
         m_objSpawn = GameObject.Find("obj_spawn");
-        m_objSpawnBody = m_objSpawn.GetComponent<Rigidbody2D>();
         
         m_objSelfBody = GetComponent<Rigidbody2D>();
-        m_objSelfBody.position = m_objSpawnBody.position;
+        m_objSelfBody.position = m_objSpawn.transform.position;
 
         // IA
 
@@ -119,28 +117,12 @@ public class player : MonoBehaviour
         m_worldSizeMatrix = new Vector2(18.0f, 10.0f);
         m_worldSize = m_worldSizeTile * m_worldSizeMatrix;
 
-        // Entrées
-
-        m_left = false;
-        m_right = false;
-        m_jump = false;
-
-        // Objets
-
-        m_coin = 0;
-
         // Physique
 
         m_speed = new Vector2(128.0f, 256.0f);
 
-        // États
-
-        m_onGround = false;
-        m_isDead = false;
-
         // Pièce
 
-        m_sceneIsUpdated = false;
         m_sceneIndex = SceneManager.GetActiveScene().buildIndex;
     }
 
@@ -201,11 +183,11 @@ public class player : MonoBehaviour
     {
         if (m_isIA)
         {
-            //DLL_NN_Forward(m_nnIndex, m_worldMatrix, (int)m_worldSize.x, (int)m_worldSize.y);
+            int[] matrix = World_GetMatrix();
 
-            //int res = DLL_NN_GetOutput(m_nnIndex);
+            DLL_NN_Forward(m_nnIndex, matrix, (int)m_worldSize.x, (int)m_worldSize.y);
 
-            int res = 1;
+            int res = DLL_NN_GetOutput(m_nnIndex);
 
             switch (res)
             {
@@ -273,7 +255,7 @@ public class player : MonoBehaviour
             }
             else
             {
-                position = m_objSpawnBody.position;
+                position = m_objSpawn.transform.position;
             }
         }
 
@@ -296,6 +278,11 @@ public class player : MonoBehaviour
             {
                 m_isDead = true;
             }
+
+            if (m_isDead)
+            {
+                m_score = 10;
+            }
         }
     }
 
@@ -303,16 +290,63 @@ public class player : MonoBehaviour
     // ##### Monde #####
     // #################
 
-    public void World_UpdateMatrix()
+    public int[] World_GetMatrix()
     {
-        //int [,] m_worldMatrix = new int[(int)m_worldSizeMatrix.x * (int)m_worldSizeMatrix.y];
+        int[] matrix = new int[(int)m_worldSize.x * (int)m_worldSize.y];
 
         GameObject[] allGameObjects = GameObject.FindObjectsOfType<GameObject>();
 
         foreach (GameObject obj in allGameObjects)
         {
-            continue;
+            float x = obj.transform.position.x + 4.0f;
+            float y = obj.transform.position.y + 4.0f;
+
+            int i = (int)(x / m_worldSizeTile.x);
+            int j = (int)(y / m_worldSizeTile.y);
+
+            int index = j * (int)m_worldSizeMatrix.x + i;
+
+            if ((index < 0) || (index >= m_worldSizeMatrix.x * m_worldSizeMatrix.y))
+            {
+                continue;
+            }
+
+            switch (obj.tag)
+            {
+                case "tag_settings":
+                    break;
+
+                case "tag_attack":
+                    matrix[index] = 1;
+                    break;
+
+                case "tag_coin":
+                    matrix[index] = 2;
+                    break;
+
+                case "tag_player":
+                    matrix[index] = 3;
+                    break;
+
+                case "tag_exit":
+                    matrix[index] = 4;
+                    break;
+
+                case "tag_button":
+                    matrix[index] = 5;
+                    break;
+
+                case "tag_door":
+                    matrix[index] = 6;
+                    break;
+
+                default:
+                    Debug.Assert(false, "ERROR - World_GetMatrix()");
+                    break;
+            }
         }
+
+        return matrix;
     }
 
     #endregion

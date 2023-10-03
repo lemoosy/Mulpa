@@ -82,8 +82,12 @@ public class script_AI : MonoBehaviour
             {
                 if (m_populationCursor == m_populationSize)
                 {
-                    DLL_Population_Update();
-                    m_populationCursor = m_selectionSize;
+                    //bool res = DLL_Population_Update();
+
+                    //if (res) print("ERROR - DLL_Population_Update()");
+
+                    m_populationCursor = 0;
+                    m_generation++;
                 }
                 else
                 {

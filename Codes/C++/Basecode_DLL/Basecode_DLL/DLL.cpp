@@ -64,6 +64,12 @@ UnityDLL bool DLL_Population_Update(void)
 	for (int i = 0; i < g_selectionSize; i++)
 	{
 		selection[i] = Population_RemoveMinimum();
+
+		if (!selection[i])
+		{
+			delete selection;
+			return true;
+		}
 	}
 
 	// Nettoyage de la population.
@@ -100,24 +106,23 @@ UnityDLL bool DLL_Population_Update(void)
 		g_population[i] = selection[i];
 	}
 
-	int size = g_selectionSize + childrenSize;
+	delete selection;
 
-	for (int i = g_selectionSize; i < size; i++)
+	for (int i = 0; i < g_childrenSize; i++)
 	{
-		g_population[i] = children[i];
+		g_population[g_selectionSize + i] = children[i];
 	}
 
+	delete children;
+
 	// Remplissage de la population.
+
+	int size = g_selectionSize + childrenSize;
 
 	for (int i = size; i < g_populationSize; i++)
 	{
 		g_population[i] = NN_Create();
 	}
-
-	// Libération de la mémoire.
-
-	delete children;
-	delete selection;
 
 	return false;
 }
