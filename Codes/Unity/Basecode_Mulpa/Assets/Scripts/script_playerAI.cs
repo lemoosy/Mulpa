@@ -33,22 +33,24 @@ public class script_AI : MonoBehaviour
 
     // Unity
 
-    public GameObject m_objSpawn;
     public GameObject m_objPlayerCopy;
-    public GameObject m_objPlayer;
+    
+    private GameObject m_objPlayer = null;
+
+    private bool m_firstFrame = true;
 
     // PG
 
-    public bool m_activeAI;
+    public bool m_activeAI = false;
 
-    public int m_populationSize;
-    public int m_selectionSize;
-    public int m_childrenSize;
-    public int m_mutationRate;
+    public int m_populationSize = 50;
+    public int m_selectionSize = 20;
+    public int m_childrenSize = 10;
+    public int m_mutationRate = 10;
 
-    public int m_populationCursor;
+    private int m_populationCursor = 0;
 
-    public int m_generation;
+    public int m_generation = 0;
 
     #endregion
 
@@ -56,34 +58,54 @@ public class script_AI : MonoBehaviour
 
     void Start()
     {
+        DontDestroyOnLoad(gameObject);
+
+        SceneManager.LoadScene(1);
+
         if (m_activeAI)
         {
-            m_populationSize = 50;
-            m_selectionSize = 5;
-            m_childrenSize = 20;
-            m_mutationRate = 10;
-
-            m_populationCursor = 0;
-
-            m_generation = 0;
-
             DLL_Init(m_populationSize, m_selectionSize, m_childrenSize, m_mutationRate);
-        }
-        else
-        {
-            m_objPlayer = Instantiate(m_objPlayerCopy, m_objSpawn.transform.position, m_objSpawn.transform.rotation);
-
-            player scr = m_objPlayer.GetComponent<player>();
-            scr.m_objSpawn = m_objSpawn;
-            scr.m_isIA = false;
         }
     }
 
     void Update()
     {
-        if (!m_activeAI) return;
+        if (m_firstFrame)
+        {
+            m_firstFrame = false;
+            return;
+        }
 
-        if (m_objPlayer)
+        if (m_objPlayer == null)
+        {
+            if (m_activeAI)
+            {
+                if (m_populationCursor == m_populationSize)
+                {
+                    DLL_Population_Update();
+                    m_populationCursor = m_selectionSize;
+                }
+                else
+                {
+                    int nnIndex = m_populationCursor;
+                    m_populationCursor++;
+
+                    m_objPlayer = Instantiate(m_objPlayerCopy);
+
+                    player scr = m_objPlayer.GetComponent<player>();
+                    scr.m_isIA = true;
+                    scr.m_nnIndex = nnIndex;
+                }
+            }
+            else
+            {
+                m_objPlayer = Instantiate(m_objPlayerCopy);
+
+                player scr = m_objPlayer.GetComponent<player>();
+                scr.m_isIA = false;
+            }
+        }
+        else
         {
             player scr = m_objPlayer.GetComponent<player>();
 
@@ -92,34 +114,17 @@ public class script_AI : MonoBehaviour
                 DLL_NN_SetScore(scr.m_nnIndex, scr.m_score);
                 Destroy(m_objPlayer);
                 m_objPlayer = null;
-                SceneManager.LoadScene(0);
-            }
-        }
-        else
-        {
-            if (m_populationCursor == m_populationSize)
-            {
-                DLL_Population_Update();
-                m_populationCursor = m_selectionSize;
-            }
-            else
-            {
-                int nnIndex = m_populationCursor;
-                m_populationCursor++;
-
-                m_objPlayer = Instantiate(m_objPlayerCopy, m_objSpawn.transform.position, m_objSpawn.transform.rotation);
-
-                player scr = m_objPlayer.GetComponent<player>();
-                scr.m_objSpawn = m_objSpawn;
-                scr.m_isIA = true;
-                scr.m_nnIndex = nnIndex;
+                SceneManager.LoadScene(1);
             }
         }
     }
 
     void OnDestroy()
     {
-        DLL_Quit();
+        if (m_activeAI)
+        {
+            DLL_Quit();
+        }
     }
 
     #endregion

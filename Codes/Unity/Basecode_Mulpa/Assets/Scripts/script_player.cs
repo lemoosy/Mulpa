@@ -26,7 +26,7 @@ public class player : MonoBehaviour
 
     public GameObject m_objSpawn;
     public Rigidbody2D m_objSpawnBody;
-    
+
     public Rigidbody2D m_objSelfBody;
 
     // Monde
@@ -34,11 +34,10 @@ public class player : MonoBehaviour
     public Vector2 m_worldSizeTile;
     public Vector2 m_worldSizeMatrix;
     public Vector2 m_worldSize;
-    public int[] m_worldMatrix;
 
     // IA
 
-    public bool m_isIA;
+    public bool m_isIA = false;
     public int m_nnIndex;
     public float m_score;
 
@@ -55,7 +54,8 @@ public class player : MonoBehaviour
     // Physique
 
     public Vector2 m_speed;
-    public int m_tick;
+
+    public int m_tick = 0;
 
     // États
 
@@ -64,10 +64,8 @@ public class player : MonoBehaviour
 
     // Pièce
 
-    public bool m_sceneIsNext;
-    public bool m_sceneIsUpdate;
-
-    public int m_scene;
+    public bool m_sceneIsUpdated;
+    public int m_sceneIndex;
 
     #endregion
 
@@ -75,20 +73,42 @@ public class player : MonoBehaviour
 
     // Unity
 
+    private void FixedUpdate()
+    {
+        if (m_sceneIsUpdated)
+        {
+            m_objSpawn = GameObject.Find("obj_spawn");
+            m_objSpawnBody = m_objSpawn.GetComponent<Rigidbody2D>();
+            
+            m_objSelfBody.position = m_objSpawnBody.position;
+
+            m_tick = 0;
+         
+            m_sceneIsUpdated = false;
+        }
+        else
+        {
+            m_tick++;
+        }
+    }
+
     private void Start()
     {
         DontDestroyOnLoad(gameObject);
 
         // Unity
 
+        m_objSpawn = GameObject.Find("obj_spawn");
         m_objSpawnBody = m_objSpawn.GetComponent<Rigidbody2D>();
+        
         m_objSelfBody = GetComponent<Rigidbody2D>();
+        m_objSelfBody.position = m_objSpawnBody.position;
 
         // IA
 
         if (m_isIA)
         {
-            Time.timeScale = 5;
+            //Time.timeScale = 5;
         }
 
         m_score = 0.0f;
@@ -98,7 +118,6 @@ public class player : MonoBehaviour
         m_worldSizeTile = new Vector2(16.0f, 16.0f);
         m_worldSizeMatrix = new Vector2(18.0f, 10.0f);
         m_worldSize = m_worldSizeTile * m_worldSizeMatrix;
-        m_worldMatrix = new int[(int)m_worldSizeMatrix.x * (int)m_worldSizeMatrix.y];
 
         // Entrées
 
@@ -121,14 +140,8 @@ public class player : MonoBehaviour
 
         // Pièce
 
-        m_sceneUpdate = false;
-        m_scene = SceneManager.GetActiveScene().buildIndex;
-    }
-
-    private void FixedUpdate()
-    {
-        m_tick++;
-        UpdateState();
+        m_sceneIsUpdated = false;
+        m_sceneIndex = SceneManager.GetActiveScene().buildIndex;
     }
 
     private void OnTriggerEnter2D(Collider2D collider)
@@ -136,13 +149,16 @@ public class player : MonoBehaviour
         if (collider.gameObject.CompareTag("tag_coin"))
         {
             m_coin++;
+
             Destroy(collider.gameObject); 
         }
 
         if (collider.gameObject.CompareTag("tag_exit"))
         {
-            m_scene++;
-            SceneManager.LoadScene(m_scene + 1);
+            m_sceneIsUpdated = true;
+            m_sceneIndex++;
+
+            SceneManager.LoadScene(m_sceneIndex);
         }
 
         // tag_button
@@ -171,39 +187,15 @@ public class player : MonoBehaviour
 
     private void Update()
     {
-        UpdateWorld();
         UpdateInput();
         UpdateVelocity();
         UpdatePosition();
         UpdateState();
-        UpdateScene();
     }
 
     // ##################
     // ##### Joueur #####
     // ##################
-
-    // Unity
-
-    private void UpdateSpawn()
-    {
-        if (m_sceneIsUpdate)
-        {
-            m_objSpawn = GameObject.Find("obj_spawn");
-            m_objSpawnBody = m_objSpawn.GetComponent<Rigidbody2D>();
-        }
-    }
-
-    // IA
-
-    // Monde
-
-    private void UpdateWorld()
-    {
-        World_UpdateMatrix();
-    }
-
-    // Entrées
 
     private void UpdateInput()
     {
@@ -241,8 +233,6 @@ public class player : MonoBehaviour
             m_jump = Input.GetKey(KeyCode.UpArrow) && m_onGround;
         }
     }
-    
-    // Physique
 
     private void UpdateVelocity()
     {
@@ -277,55 +267,34 @@ public class player : MonoBehaviour
 
         if (m_isDead)
         {
-            position = m_objSpawnBody.position;
+            if (m_isIA)
+            {
+                // ...
+            }
+            else
+            {
+                position = m_objSpawnBody.position;
+            }
         }
 
         m_objSelfBody.position = position;
     }
-
-    // États
 
     private void UpdateState()
     {
         m_onGround = false;
         m_isDead = false;
 
-        if (m_objSelfBody.position.y < -(m_worldSize.y / 2.0f)) // todo
+        if (m_objSelfBody.position.y < -(m_worldSize.y / 2.0f))
         {
             m_isDead = true;
         }
 
-        if ((float)m_tick / 50.0f > 5.0f)
+        if (m_isIA)
         {
-            m_isDead = true;
-        }
-    }
-
-    // Pièce
-
-    private void UpdateScene()
-    {
-        if (m_sceneIsNext)
-        {
-            
-            
-            m_sceneIsNext = false;
-            m_sceneIsUpdate = true;
-        }
-        else if (m_sceneIsUpdate)
-        {
-            m_sceneIsUpdate = false;
-        }
-
-        if (m_isDead)
-        {
-            if (m_isIA)
+            if ((float)m_tick / 50.0f > 5.0f) // 5 secondes
             {
-                // script_playerAI.cs s'en occupe.
-            }
-            else
-            {
-                SceneManager.LoadScene(m_scene);
+                m_isDead = true;
             }
         }
     }
@@ -336,6 +305,8 @@ public class player : MonoBehaviour
 
     public void World_UpdateMatrix()
     {
+        //int [,] m_worldMatrix = new int[(int)m_worldSizeMatrix.x * (int)m_worldSizeMatrix.y];
+
         GameObject[] allGameObjects = GameObject.FindObjectsOfType<GameObject>();
 
         foreach (GameObject obj in allGameObjects)
