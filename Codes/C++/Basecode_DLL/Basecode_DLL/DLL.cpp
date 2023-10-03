@@ -89,11 +89,11 @@ UnityDLL bool DLL_Population_Update(void)
 
 		if (nn1 == nn2) continue;
 
-		children[i] = nn1->Crossover(nn2);
+		children[childrenSize] = nn1->Crossover(nn2);
 		
 		for (int j = 0; j < g_mutationRate; j++)
 		{
-			children[i]->Mutation();
+			children[childrenSize]->Mutation();
 		}
 
 		childrenSize++;
@@ -108,7 +108,7 @@ UnityDLL bool DLL_Population_Update(void)
 
 	delete selection;
 
-	for (int i = 0; i < g_childrenSize; i++)
+	for (int i = 0; i < childrenSize; i++)
 	{
 		g_population[g_selectionSize + i] = children[i];
 	}
@@ -268,7 +268,7 @@ UnityDLL float DLL_World_GetShortestPath(int* p_world, int p_w, int p_h)
 	if ((playerID == -1) || (exitID == -1))
 	{
 		delete graph;
-		return -1.0f;
+		return 1000.0f;
 	}
 
 	// Calcule du PCC.
