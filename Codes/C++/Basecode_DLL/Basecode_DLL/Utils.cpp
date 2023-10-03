@@ -97,6 +97,8 @@ Matrix* World_ToInput(int* p_world, int p_w, int p_h)
 			int index = Coord_ToIndex(i, j, p_w);
 			int value = p_world[index];
 
+			if (value == CASE_VOID) continue;
+
 			res->SetValue(index + size * value, 0, 1.0f);
 		}
 	}

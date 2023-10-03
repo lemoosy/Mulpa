@@ -13,6 +13,7 @@ using namespace std;
 
 typedef enum eCaseID
 {
+	CASE_VOID = 0,
 	CASE_WALL,
 	CASE_MONSTER,
 	CASE_COIN,
@@ -20,7 +21,7 @@ typedef enum eCaseID
 	CASE_EXIT,
 	CASE_BUTTON,
 	CASE_DOOR,
-	CASE_COUNT
+	CASE_COUNT = 7
 }CaseID;
 
 /// Macros.
