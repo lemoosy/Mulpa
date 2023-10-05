@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4673246323899226811}
   - component: {fileID: 8892001450634033179}
-  - component: {fileID: 767120102865531974}
   - component: {fileID: 78230857837646549}
   - component: {fileID: 6573977831895320420}
+  - component: {fileID: 4429099424348289392}
   m_Layer: 0
   m_Name: obj_player
   m_TagString: tag_player
@@ -87,36 +87,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &767120102865531974
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1332028083160640919}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 259c5a2090488804db0f3703a6d4f0c2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_body: {fileID: 0}
-  m_objectPlayerInit: {fileID: 0}
-  m_isIA: 1
-  m_nnID: 0
-  m_coin: 0
-  m_score: 0
-  m_worldSizeTile: {x: 0, y: 0}
-  m_worldSizeMatrix: {x: 0, y: 0}
-  m_worldSize: {x: 0, y: 0}
-  m_worldString: 
-  m_left: 0
-  m_right: 0
-  m_jump: 0
-  m_speed: {x: 0, y: 0}
-  m_positionStart: {x: 0, y: 0}
-  m_onGround: 0
-  m_isDead: 0
-  m_scene: 0
 --- !u!50 &78230857837646549
 Rigidbody2D:
   serializedVersion: 4
@@ -189,3 +159,31 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 16, y: 16}
   m_EdgeRadius: 0
+--- !u!114 &4429099424348289392
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1332028083160640919}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 259c5a2090488804db0f3703a6d4f0c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_worldSizeTile: {x: 16, y: 16}
+  m_worldSizeMatrix: {x: 18, y: 10}
+  m_worldSize: {x: 0, y: 0}
+  m_worldMatrix: 
+  m_isAI: 0
+  m_nnIndex: 0
+  m_score: 0
+  m_timeScale: 1
+  m_left: 0
+  m_right: 0
+  m_jump: 0
+  m_coin: 0
+  m_speed: {x: 128, y: 256}
+  m_onGround: 0
+  m_isDead: 0
+  m_sceneIndex: 0

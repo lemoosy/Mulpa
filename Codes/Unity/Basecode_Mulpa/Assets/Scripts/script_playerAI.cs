@@ -10,6 +10,9 @@ using UnityEngine.SceneManagement;
 
 public class script_AI : MonoBehaviour
 {
+
+
+
     #region DLL
 
     [DllImport("Basecode_DLL.dll")]
@@ -28,6 +31,8 @@ public class script_AI : MonoBehaviour
     private static extern bool DLL_Population_Update();
 
     #endregion
+
+
 
     #region Variables
 
@@ -48,11 +53,15 @@ public class script_AI : MonoBehaviour
     public int m_childrenSize = 10;
     public int m_mutationRate = 10;
 
-    private int m_populationCursor = 0;
+    public int m_populationCursor = 0;
 
     public int m_generation = 0;
 
+    public float m_timeScale = 1.0f;
+
     #endregion
+
+
 
     #region Fonctions
 
@@ -76,17 +85,35 @@ public class script_AI : MonoBehaviour
             return;
         }
 
-        if (m_objPlayer == null)
+        if (m_activeAI)
         {
-            if (m_activeAI)
+            if (m_objPlayer)
+            {
+                player script = m_objPlayer.GetComponent<player>();
+
+                if (script.m_isDead)
+                {
+                    DLL_NN_SetScore(script.m_nnIndex, script.m_score);
+                    
+                    Destroy(m_objPlayer);
+                    
+                    m_objPlayer = null;
+                    
+                    SceneManager.LoadScene(1);
+                }
+            }
+            else
             {
                 if (m_populationCursor == m_populationSize)
                 {
-                    //bool res = DLL_Population_Update();
+                    bool res = DLL_Population_Update();
 
-                    //if (res) print("ERROR - DLL_Population_Update()");
+                    Debug.Assert(res == false, "ERROR - DLL_Population_Update()");
 
-                    m_populationCursor = 0;
+                    print(DLL_NN_GetScore(0) + " " + DLL_NN_GetScore(1) + " " + DLL_NN_GetScore(2) + " " + DLL_NN_GetScore(3) + " " + DLL_NN_GetScore(4) + " " + DLL_NN_GetScore(5) + " " + DLL_NN_GetScore(6) + " " + DLL_NN_GetScore(7) + " " + DLL_NN_GetScore(8) + " " + DLL_NN_GetScore(9));
+
+                    m_populationCursor = m_selectionSize;
+
                     m_generation++;
                 }
                 else
@@ -96,29 +123,24 @@ public class script_AI : MonoBehaviour
 
                     m_objPlayer = Instantiate(m_objPlayerCopy);
 
-                    player scr = m_objPlayer.GetComponent<player>();
-                    scr.m_isIA = true;
-                    scr.m_nnIndex = nnIndex;
+                    player script = m_objPlayer.GetComponent<player>();
+                    script.m_isAI = true;
+                    script.m_nnIndex = nnIndex;
+                    script.m_timeScale = m_timeScale;
+                    script.ResetPosition();
                 }
-            }
-            else
-            {
-                m_objPlayer = Instantiate(m_objPlayerCopy);
-
-                player scr = m_objPlayer.GetComponent<player>();
-                scr.m_isIA = false;
             }
         }
         else
         {
-            player scr = m_objPlayer.GetComponent<player>();
-
-            if (scr.m_isDead)
+            if (!m_objPlayer)
             {
-                DLL_NN_SetScore(scr.m_nnIndex, scr.m_score);
-                Destroy(m_objPlayer);
-                m_objPlayer = null;
-                SceneManager.LoadScene(1);
+                m_objPlayer = Instantiate(m_objPlayerCopy);
+
+                player script = m_objPlayer.GetComponent<player>();
+                script.m_isAI = false;
+                script.m_timeScale = m_timeScale;
+                script.ResetPosition();
             }
         }
     }
@@ -131,5 +153,10 @@ public class script_AI : MonoBehaviour
         }
     }
 
+
+
     #endregion
+
+
+
 }

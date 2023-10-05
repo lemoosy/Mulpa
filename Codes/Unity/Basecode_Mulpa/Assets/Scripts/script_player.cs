@@ -1,12 +1,18 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Tilemaps;
+using UnityEngine.UIElements;
 
 public class player : MonoBehaviour
 {
+
+
+
     #region DLL
 
     [DllImport("Basecode_DLL.dll")]
@@ -18,28 +24,28 @@ public class player : MonoBehaviour
     [DllImport("Basecode_DLL.dll")]
     private static extern float DLL_World_GetShortestPath(int[] p_world, int p_w, int p_h);
 
+    [DllImport("Basecode_DLL.dll")]
+    private static extern IntPtr DLL_TEST(int[] p_world, int p_w, int p_h);
+
     #endregion
+
+
 
     #region Variables
 
-    // Unity
-
-    public GameObject m_objSpawn;
-    public Rigidbody2D m_objSpawnBody;
-
-    public Rigidbody2D m_objSelfBody;
-
     // Monde
 
-    public Vector2 m_worldSizeTile;
-    public Vector2 m_worldSizeMatrix;
-    public Vector2 m_worldSize;
+    public Vector2  m_worldSizeTile = new Vector2(16.0f, 16.0f);
+    public Vector2  m_worldSizeMatrix = new Vector2(18.0f, 10.0f);
+    public Vector2  m_worldSize;
+    public int[]    m_worldMatrix;
 
     // IA
 
-    public bool m_isIA = false;
+    public bool m_isAI = false;
     public int m_nnIndex;
-    public float m_score;
+    public float m_score = 0.0f;
+    public float m_timeScale = 1.0f;
 
     // Entrées
 
@@ -53,9 +59,9 @@ public class player : MonoBehaviour
 
     // Physique
 
-    public Vector2 m_speed;
+    public Vector2 m_speed = new Vector2(128.0f, 256.0f);
 
-    public int m_tick = 0;
+    private int m_tick = 0;
 
     // États
 
@@ -64,66 +70,40 @@ public class player : MonoBehaviour
 
     // Pièce
 
-    public bool m_sceneIsUpdated = false;
-    public int m_sceneIndex;
+    public int m_sceneIndex = SceneManager.GetActiveScene().buildIndex;
 
     #endregion
 
+
+
     #region Fonctions
 
-    // Unity
+
+
+    // #################
+    // ##### Unity #####
+    // #################
+
+
 
     private void FixedUpdate()
     {
-        if (m_sceneIsUpdated)
+        int sceneIndexCurr = SceneManager.GetActiveScene().buildIndex;
+
+        if (sceneIndexCurr != m_sceneIndex)
         {
-            m_objSpawn = GameObject.Find("obj_spawn");
-            
-            m_objSelfBody.position = m_objSpawn.transform.position;
+            ResetPosition();
 
             m_tick = 0;
          
-            m_sceneIsUpdated = false;
+            m_sceneIndex = sceneIndexCurr;
         }
         else
         {
+            
+
             m_tick++;
         }
-    }
-
-    private void Start()
-    {
-        DontDestroyOnLoad(gameObject);
-
-        // Unity
-
-        m_objSpawn = GameObject.Find("obj_spawn");
-        
-        m_objSelfBody = GetComponent<Rigidbody2D>();
-        m_objSelfBody.position = m_objSpawn.transform.position;
-
-        // IA
-
-        if (m_isIA)
-        {
-            //Time.timeScale = 5;
-        }
-
-        m_score = 0.0f;
-
-        // Monde
-
-        m_worldSizeTile = new Vector2(16.0f, 16.0f);
-        m_worldSizeMatrix = new Vector2(18.0f, 10.0f);
-        m_worldSize = m_worldSizeTile * m_worldSizeMatrix;
-
-        // Physique
-
-        m_speed = new Vector2(128.0f, 256.0f);
-
-        // Pièce
-
-        m_sceneIndex = SceneManager.GetActiveScene().buildIndex;
     }
 
     private void OnTriggerEnter2D(Collider2D collider)
@@ -131,21 +111,23 @@ public class player : MonoBehaviour
         if (collider.gameObject.CompareTag("tag_coin"))
         {
             m_coin++;
-
-            Destroy(collider.gameObject); 
+            Destroy(collider.gameObject);
         }
 
         if (collider.gameObject.CompareTag("tag_exit"))
         {
-            m_sceneIsUpdated = true;
-            m_sceneIndex++;
-
-            SceneManager.LoadScene(m_sceneIndex);
+            SceneManager.LoadScene(m_sceneIndex + 1);
         }
 
-        // tag_button
+        if (collider.gameObject.CompareTag("tag_button"))
+        {
+            // ...
+        }
 
-        // tag_door
+        if (collider.gameObject.CompareTag("tag_door"))
+        {
+            // ...
+        }
     }
 
     void OnCollisionStay2D(Collision2D collision)
@@ -167,25 +149,51 @@ public class player : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        DontDestroyOnLoad(gameObject);
+
+        m_worldSize = m_worldSizeTile * m_worldSizeMatrix;
+        m_worldMatrix = new int[(int)m_worldSizeMatrix.x * (int)m_worldSizeMatrix.y];
+    }
+
     private void Update()
     {
+        UpdateWorld();
         UpdateInput();
         UpdateVelocity();
         UpdatePosition();
         UpdateState();
+        UpdateAI();
     }
+
+
 
     // ##################
     // ##### Joueur #####
     // ##################
 
+
+
+    private void UpdateWorld()
+    {
+        m_worldMatrix = World_GetMatrix();
+    }
+
     private void UpdateInput()
     {
-        if (m_isIA)
+        if (m_isAI)
         {
-            int[] matrix = World_GetMatrix();
+            m_left = false;
+            m_right = false;
+            m_jump = false;
 
-            DLL_NN_Forward(m_nnIndex, matrix, (int)m_worldSize.x, (int)m_worldSize.y);
+            int w = (int)m_worldSizeMatrix.x;
+            int h = (int)m_worldSizeMatrix.y;
+
+            bool _res = DLL_NN_Forward(m_nnIndex, m_worldMatrix, w, h);
+
+            Debug.Assert(_res == false, "ERROR - DLL_NN_Forward()");
 
             int res = DLL_NN_GetOutput(m_nnIndex);
 
@@ -218,7 +226,7 @@ public class player : MonoBehaviour
 
     private void UpdateVelocity()
     {
-        Vector2 velocity = m_objSelfBody.velocity;
+        Vector2 velocity = GetVelocity();
     
         if (m_left)
         {
@@ -240,26 +248,22 @@ public class player : MonoBehaviour
             velocity.y = m_speed.y;
         }
 
-        m_objSelfBody.velocity = velocity;
+        SetVelocity(velocity);
     }
 
     private void UpdatePosition()
     {
-        Vector2 position = m_objSelfBody.position;
-
         if (m_isDead)
         {
-            if (m_isIA)
+            if (m_isAI)
             {
                 // ...
             }
             else
             {
-                position = m_objSpawn.transform.position;
+                ResetPosition();
             }
         }
-
-        m_objSelfBody.position = position;
     }
 
     private void UpdateState()
@@ -267,49 +271,174 @@ public class player : MonoBehaviour
         m_onGround = false;
         m_isDead = false;
 
-        if (m_objSelfBody.position.y < -(m_worldSize.y / 2.0f))
+        Vector2 position = GetPosition();
+
+        float w = GetWidth();
+        float h = GetHeight();
+
+        if ((position.y - h) < -(m_worldSize.y / 2.0f))
         {
             m_isDead = true;
         }
 
-        if (m_isIA)
+        if (m_isAI)
         {
             if ((float)m_tick / 50.0f > 5.0f) // 5 secondes
             {
                 m_isDead = true;
             }
+        }
+    }
+
+    private void UpdateAI()
+    {
+        if (m_isAI)
+        {
+            Time.timeScale = m_timeScale;
 
             if (m_isDead)
             {
-                m_score = 10;
+                // Fitness = PCC - 2 x Pièces - 100 x Niveaux
+
+                int w = (int)m_worldSizeMatrix.x;
+                int h = (int)m_worldSizeMatrix.y;
+
+                //print("Calcule PCC...");
+
+                float PCC = DLL_World_GetShortestPath(m_worldMatrix, w, h);
+
+                if (PCC == -1.0f)
+                {
+                    PCC = 100.0f;
+                }
+
+                //print("PCC=" + PCC);
+
+                Debug.Assert(PCC != -1.0f, "ERROR - DLL_World_GetShortestPath()");
+
+                m_score = PCC - 5.0f * (float)m_coin - 20.0f * (float)(m_sceneIndex - 1);
+                
+                //print("FIT=" + m_score);
             }
         }
     }
+
+
+
+    public float GetWidth()
+    {
+        BoxCollider2D collider = GetComponent<BoxCollider2D>();
+
+        return collider.size.x;
+    }
+
+    public float GetHeight()
+    {
+        BoxCollider2D collider = GetComponent<BoxCollider2D>();
+
+        return collider.size.y;
+    }
+
+
+
+    public Vector2 GetVelocity()
+    {
+        Rigidbody2D body = GetComponent<Rigidbody2D>();
+
+        return body.velocity;
+    }
+
+    public void SetVelocity(Vector2 velocity)
+    {
+        Rigidbody2D body = GetComponent<Rigidbody2D>();
+
+        body.velocity = velocity;
+    }
+
+
+
+    public Vector2 GetPosition()
+    {
+        Rigidbody2D body = GetComponent<Rigidbody2D>();
+        
+        return body.position;
+    }
+
+    public void SetPosition(Vector2 position)
+    {
+        Rigidbody2D body = GetComponent<Rigidbody2D>();
+
+        body.position = position;
+    }
+
+    public void ResetPosition()
+    {
+        GameObject obj = GameObject.Find("obj_spawn");
+
+        Debug.Assert(obj != null, "ERROR - ResetPosition()");
+
+        SetPosition(obj.transform.position);
+    }
+
+
 
     // #################
     // ##### Monde #####
     // #################
 
+
+
     public int[] World_GetMatrix()
     {
-        int[] matrix = new int[(int)m_worldSize.x * (int)m_worldSize.y];
+        int w = (int)m_worldSizeMatrix.x;
+        int h = (int)m_worldSizeMatrix.y;
 
-        GameObject[] allGameObjects = GameObject.FindObjectsOfType<GameObject>();
+        int[] matrix = new int[w * h];
 
-        foreach (GameObject obj in allGameObjects)
+        GameObject[] ALL = GameObject.FindObjectsOfType<GameObject>();
+
+        foreach (GameObject obj in ALL)
         {
-            float x = obj.transform.position.x + 4.0f;
-            float y = obj.transform.position.y + 4.0f;
+            SpriteRenderer spriteRenderer = obj.GetComponent<SpriteRenderer>();
+
+            if (spriteRenderer == null)
+            {
+                continue;
+            }
+
+            float x = obj.transform.position.x;
+            float y = obj.transform.position.y;
+
+            x += spriteRenderer.size.x / 2.0f;
+            y += spriteRenderer.size.y / 2.0f;
+
+            x += (m_worldSize.x / 2.0f);
+            y += (m_worldSize.y / 2.0f);
 
             int i = (int)(x / m_worldSizeTile.x);
             int j = (int)(y / m_worldSizeTile.y);
 
-            int index = j * (int)m_worldSizeMatrix.x + i;
-
-            if ((index < 0) || (index >= m_worldSizeMatrix.x * m_worldSizeMatrix.y))
+            if (i < 0)
             {
                 continue;
             }
+
+            if (j < 0)
+            {
+                continue;
+            }
+
+            if (i >= w)
+            {
+                continue;
+            }
+
+            if (j >= h)
+            {
+                continue;
+            }
+
+            int index = (j * w) + i;
 
             switch (obj.tag)
             {
@@ -317,37 +446,102 @@ public class player : MonoBehaviour
                     break;
 
                 case "tag_attack":
-                    matrix[index] = 1;
-                    break;
-
-                case "tag_coin":
                     matrix[index] = 2;
                     break;
 
-                case "tag_player":
+                case "tag_coin":
                     matrix[index] = 3;
                     break;
 
-                case "tag_exit":
+                case "tag_player":
                     matrix[index] = 4;
                     break;
 
-                case "tag_button":
+                case "tag_exit":
                     matrix[index] = 5;
                     break;
 
-                case "tag_door":
+                case "tag_button":
                     matrix[index] = 6;
                     break;
 
+                case "tag_door":
+                    matrix[index] = 7;
+                    break;
+
                 default:
-                    Debug.Assert(false, "ERROR - World_GetMatrix()");
+                    Debug.Assert(false, "ERROR - World_GetMatrix() - " + obj.tag);
                     break;
             }
         }
 
+        Tilemap walls = GameObject.Find("obj_walls").GetComponent<Tilemap>();
+
+        if (!walls)
+        {
+            return matrix;
+        }
+
+        foreach (Vector3Int position in walls.cellBounds.allPositionsWithin)
+        {
+            TileBase tile = walls.GetTile(position);
+
+            if (tile)
+            {
+                int i = position.x;
+                int j = position.y;
+
+
+                i += (w / 2);
+                j += (h / 2);
+
+                if (i < 0 || i >= w || j < 0 || j >= h) continue;
+                
+                int index = (j * w) + i;
+
+                matrix[index] = 1;
+            }
+        }
+
+        //string res = "";
+
+        //for (int level = 0; level < h; level++)
+        //{
+        //    res += World_DEBUG_Print(matrix, w, h, level) + "\n";
+        //}
+
+        //print(res);
+
         return matrix;
     }
 
+
+    private string World_DEBUG_Print(int[] matrix, int w, int h, int level)
+    {
+        //string res = "LEVEL (" + j + ") >> ";
+
+        //IntPtr tab = DLL_TEST(matrix, w, h);
+
+        //int[] result = new int[w * h * 7];
+
+        //Marshal.Copy(tab, result, 0, w * h * 7);
+
+        //int block = w * h;
+
+        //for (int i = 0; i < w * h; i++)
+        //{
+        //    res += result[i + level * block].ToString();
+        //}
+
+        //return res;
+
+        return "";
+    }
+
+
+
     #endregion
+
+
+
 }
