@@ -1,28 +1,35 @@
 #pragma once
 
 #include "Settings.h"
-#include "World.h"
-#include "gNN.h"
-#include "Functions.h"
- 
-NN** g_nn = nullptr;
+#include "Utils.h"
 
-struct sWindow* g_window = nullptr;
+// Fonctions pour le script scr_playerAI.cs
 
 /// @brief Initialise la DLL.
-GameMakerDLL double DLL_Init(double p_window);
+UnityDLL void DLL_Init(int p_populationSize, int p_selectionSize, int p_childrenSize, int p_mutationRate);
 
 /// @brief Quitte la DLL.
-GameMakerDLL double DLL_Free();
+UnityDLL void DLL_Quit(void);
 
-/// @brief Crée un réseau de neurones.
-/// @return L'ID du réseau de neurones ou -1 si erreur.
-GameMakerDLL double NN_Create();
+/// @brief Modifie le score d'un réseau de neurones.
+UnityDLL void DLL_NN_SetScore(int p_nnIndex, float p_score);
 
-/// @return Détruit un réseau de neurones.
-/// @return EXIT_FAILURE si erreur, sinon EXIT_SUCCESS.
-GameMakerDLL double NN_Destroy(double p_nnID);
+/// @brief Retourne le score d'un réseau de neurones.
+UnityDLL float DLL_NN_GetScore(int p_nnIndex);
 
-GameMakerDLL double NN_Forward(double p_nnID, char* p_world);
+/// @brief MAJ de la population (selection, crossover, mutation).
+/// @return true si erreur, false sinon.
+UnityDLL bool DLL_Population_Update(void);
 
-GameMakerDLL double NN_GetOutput(double p_nnID);
+// Fonctions pour le script scr_player.cs
+
+/// @brief Réalise la propagation avant d'un réseau de neurones à partir d'un monde.
+/// @return true si erreur, false sinon.
+UnityDLL bool DLL_NN_Forward(int p_nnIndex, int* p_world, int p_w, int p_h);
+
+/// @brief Retourne la sortie d'un réseau de neurones (-1 = erreur, 0 = left, 1 = right, 2 = jump).
+UnityDLL int DLL_NN_GetOutput(int p_nnIndex);
+
+/// @brief Retourne la distance entre le joueur et la sortie (PCC).
+/// @brief -1 si erreur.
+UnityDLL float DLL_World_GetShortestPath(int* p_world, int p_w, int p_h);

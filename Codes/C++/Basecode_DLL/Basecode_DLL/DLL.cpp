@@ -1,146 +1,287 @@
 #include "DLL.h"
 
-GameMakerDLL double DLL_Init(double p_window)
+int g_populationSize = 0;
+int g_selectionSize = 0;
+int g_childrenSize = 0;
+int g_mutationRate = 0;
+
+NN** g_population = nullptr;
+
+// Fonctions pour le script scr_playerAI.cs
+
+UnityDLL void DLL_Init(int p_populationSize, int p_selectionSize, int p_childrenSize, int p_mutationRate)
 {
 	srand(time(nullptr));
 
-	g_nn = new NN * [NN_CAPACITY]();
+	g_populationSize = p_populationSize;
+	g_selectionSize = p_selectionSize;
+	g_childrenSize = p_childrenSize;
+	g_mutationRate = p_mutationRate;
 
-	if (p_window == 1.0)
+	g_population = new NN*[p_populationSize]();
+
+	for (int i = 0; i < p_populationSize; i++)
 	{
-		//g_window = Window_Create("DLL", WINDOW_WIDTH, WINDOW_HEIGHT);
+		g_population[i] = NN_Create();
 	}
-
-	return 0.0;
 }
 
-GameMakerDLL double DLL_Free()
+UnityDLL void DLL_Quit(void)
 {
-	for (int i = 0; i < NN_CAPACITY; i++)
+	Population_Clear();
+
+	delete[] g_population;
+}
+
+UnityDLL void DLL_NN_SetScore(int p_nnIndex, float p_score)
+{
+	g_population[p_nnIndex]->SetScore(p_score);
+}
+
+UnityDLL float DLL_NN_GetScore(int p_nnIndex)
+{
+	return g_population[p_nnIndex]->GetScore();
+}
+
+UnityDLL bool DLL_Population_Update(void)
+{
+	// On vérifie si tous les NN ont été évalués.
+
+	for (int i = 0; i < g_populationSize; i++)
 	{
-		if (g_nn[i])
+		NN* nn = g_population[i];
+
+		if ((nn == nullptr) || (nn->GetScore() == (float)INT_MAX))
 		{
-			delete g_nn[i];
+			return true;
 		}
 	}
 
-	delete[] g_nn;
+	// Création de la sélection.
 
-	if (g_window)
+	NN** selection = new NN*[g_selectionSize]();
+
+	for (int i = 0; i < g_selectionSize; i++)
 	{
+		selection[i] = Population_RemoveMinimum();
 
+		if (!selection[i])
+		{
+			delete selection;
+			return true;
+		}
 	}
 
-	return 0.0;
+	// Nettoyage de la population.
+
+	Population_Clear();
+
+	// Création des enfants.
+
+	NN** children = new NN*[g_childrenSize]();
+
+	int childrenSize = 0; // Nombre d'enfants créés.
+
+	for (int i = 0; i < g_childrenSize; i++)
+	{
+		NN* nn1 = selection[rand() % g_selectionSize];
+		NN* nn2 = selection[rand() % g_selectionSize];
+
+		if (nn1 == nn2) continue;
+
+		children[childrenSize] = nn1->Crossover(nn2);
+		
+		for (int j = 0; j < g_mutationRate; j++)
+		{
+			children[childrenSize]->Mutation();
+		}
+
+		childrenSize++;
+	}
+
+	// On transfère la sélection et les enfants dans la population.
+
+	for (int i = 0; i < g_selectionSize; i++)
+	{
+		g_population[i] = selection[i];
+	}
+
+	delete selection;
+
+	for (int i = 0; i < childrenSize; i++)
+	{
+		g_population[g_selectionSize + i] = children[i];
+	}
+
+	delete children;
+
+	// Remplissage de la population.
+
+	int size = g_selectionSize + childrenSize;
+
+	for (int i = size; i < g_populationSize; i++)
+	{
+		g_population[i] = NN_Create();
+	}
+
+	return false;
 }
 
-GameMakerDLL double NN_Create()
+// Fonctions pour le script scr_player.cs
+
+UnityDLL bool DLL_NN_Forward(int p_nnIndex, int* p_world, int p_w, int p_h)
 {
-	int id = gNN_GetEmptyID();
+	NN* nn = g_population[p_nnIndex];
 
-	assert(id != -1);
+	if (!nn)
+	{
+		return true;
+	}
 
-	NN* nn = new NN(512);
-	nn->AddLayer(512, &sigmoid);
-	nn->AddLayer(512, &sigmoid);
-	nn->AddLayer(512, &sigmoid);
-	nn->AddLayer(3, &sigmoid);
+	Matrix* X = World_ToInput(p_world, p_w, p_h);
 
-	gNN_SetNN(id, nn);
-
-	return (double)id;
-}
-
-GameMakerDLL double NN_Destroy(double p_id)
-{
-	gNN_DestroyNN(p_id);
-
-	return 0.0;
-}
-
-GameMakerDLL double NN_Forward(double p_id, char* p_world)
-{
-	NN* nn = gNN_GetNN(p_id);
-
-	Matrix* world = World_Load(p_world);
-
-	Matrix* X = World_ToNN(world);
+	if (!X)
+	{
+		return true;
+	}
 
 	nn->Forward(X);
 
 	delete X;
-	
-	delete world;
 
-	return 0.0;
+	return false;
 }
 
-GameMakerDLL double NN_GetOutput(double p_id)
+UnityDLL int DLL_NN_GetOutput(int p_nnIndex)
 {
-	NN* nn = gNN_GetNN(p_id);
+	NN* nn = g_population[p_nnIndex];
+
+	if (!nn)
+	{
+		return -1;
+	}
 
 	Layer* output = nn->GetLayer(-1);
 
 	Matrix* Y = output->m_Y;
 
-	int minimum = 0;
+	int index = 0;
 
 	for (int i = 1; i < Y->GetWidth(); i++)
 	{
-		if (Y->GetValue(i, 0) > Y->GetValue(minimum, 0))
+		if (Y->GetValue(i, 0) > Y->GetValue(index, 0))
 		{
-			minimum = i;
+			index = i;
 		}
 	}
 
-	return (double)minimum;
+	return index;
 }
 
-GameMakerDLL double NN_GetScore(double p_id)
+UnityDLL float DLL_World_GetShortestPath(int* p_world, int p_w, int p_h)
 {
-	NN* nn = gNN_GetNN(p_id);
+	if ((p_w != WORLD_MATRIX_W) || (p_h != WORLD_MATRIX_H))
+	{
+		return -1.0f;
+	}
 
-	return (double)nn->GetScore();
-}
+	// Création du graphe.
 
-GameMakerDLL double NN_SetScore(double p_id, double p_score)
-{
-	NN* nn = gNN_GetNN(p_id);
+	Graph* graph = new Graph(p_w * p_h);
 
-	nn->SetScore(p_score);
+	// Création des arcs + Recherche du joueur et de la sortie.
 
-	return 0.0;
-}
+	int playerID = -1;
+	int exitID = -1;
 
-GameMakerDLL double NN_UpdateScore(double p_id, char* p_world)
-{
-	NN* nn = gNN_GetNN(p_id);
+	for (int j = 0; j < p_h; j++)
+	{
+		for (int i = 0; i < p_w; i++)
+		{
+			int index = Coord_ToIndex(i, j, p_w);
+			int value = p_world[index];
 
-	Matrix* world = World_Load(p_world);
+			if (value == CASE_PLAYER)
+			{
+				playerID = index;
+			}
+
+			if (value == CASE_EXIT)
+			{
+				exitID = index;
+			}
+
+			if (
+				!Coord_OutOfDimension(i + 1, j, p_w, p_h)
+				&&
+				(p_world[Coord_ToIndex(i + 1, j, p_w)] != CASE_WALL)
+				)
+			{
+				graph->SetWeight(
+					index,
+					Coord_ToIndex(i + 1, j, p_w),
+					1.0f
+				);
+			}
+
+			if (
+				!Coord_OutOfDimension(i - 1, j, p_w, p_h)
+				&&
+				(p_world[Coord_ToIndex(i - 1, j, p_w)] != CASE_WALL)
+				)
+			{
+				graph->SetWeight(
+					index,
+					Coord_ToIndex(i - 1, j, p_w),
+					1.0f
+				);
+			}
+
+			if (
+				!Coord_OutOfDimension(i, j + 1, p_w, p_h)
+				&&
+				(p_world[Coord_ToIndex(i, j + 1, p_w)] != CASE_WALL)
+				)
+			{
+				graph->SetWeight(
+					index,
+					Coord_ToIndex(i, j + 1, p_w),
+					1.0f
+				);
+			}
+
+			if (
+				!Coord_OutOfDimension(i, j - 1, p_w, p_h)
+				&&
+				(p_world[Coord_ToIndex(i, j - 1, p_w)] != CASE_WALL)
+				)
+			{
+				graph->SetWeight(
+					index,
+					Coord_ToIndex(i, j - 1, p_w),
+					1.0f
+				);
+			}
+		}
+	}
+
+	if ((playerID == -1) || (exitID == -1))
+	{
+		delete graph;
+		return 1000.0f;
+	}
+
+	// Calcule du PCC.
 
 	float distance = 0.0f;
-	DList<int>* PCC = World_GetShortestPath(world, &distance);
+	DList<int>* PCC = graph->Dijkstra(playerID, exitID, &distance);
 
-	nn->SetScore(distance);
+	if (PCC)
+	{
+		delete PCC;
+	}
 
-	delete PCC;
-
-	delete world;
+	delete graph;
 
 	return distance;
-}
-
-GameMakerDLL double NN_Crossover(double p_id_1, double p_id_2)
-{
-	NN* nn_1 = gNN_GetNN(p_id_1);
-	NN* nn_2 = gNN_GetNN(p_id_2);
-	NN* nn_3 = nn_1->Crossover(nn_2);
-
-	int id_3 = gNN_GetEmptyID();
-
-	assert(id_3 != -1);
-
-	gNN_SetNN(id_3, nn_3);
-
-	return (double)id_3;
 }
