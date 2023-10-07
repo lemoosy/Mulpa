@@ -4,8 +4,8 @@ NN* NN_Create(void)
 {
 	NN* nn = new NN(NN_INPUT_SIZE);
 
+	nn->AddLayer(512, &ReLU);
 	nn->AddLayer(256, &ReLU);
-	nn->AddLayer(128, &ReLU);
 	nn->AddLayer(3, &sigmoid);
 
 	nn->SetScore((float)INT_MAX);
@@ -99,7 +99,7 @@ Matrix* World_ToInput(int* p_world, int p_w, int p_h)
 
 			if (value == CASE_VOID) continue;
 
-			res->SetValue(index + size * value, 0, 1.0f);
+			res->SetValue(index + size * (value - 1), 0, 1.0f);
 		}
 	}
 
