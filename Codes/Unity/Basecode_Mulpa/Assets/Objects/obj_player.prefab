@@ -172,7 +172,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_worldSizeTile: {x: 16, y: 16}
+<<<<<<< HEAD
   m_worldSizeMatrix: {x: 24, y: 14}
+=======
+  m_worldSizeMatrix: {x: 18, y: 10}
+>>>>>>> 517c393d099404e848da1d3c06b11698ba3eea5d
   m_worldSize: {x: 0, y: 0}
   m_worldMatrix: 
   m_isAI: 0

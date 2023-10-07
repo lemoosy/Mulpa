@@ -23,7 +23,10 @@ namespace _Matrix
         public Matrix(int p_w, int p_h)
         {
             Debug.Assert((p_w > 0) && (p_h > 0), "ERROR - Matrix::Matrix()");
-    
+
+            m_w = p_w;
+            m_h = p_h;
+
             m_matrix = new int[p_w * p_h];
         }
 
@@ -35,12 +38,25 @@ namespace _Matrix
             string[] values = line.Split(',');
 
             m_w = int.Parse(values[0]);
-
             m_h = int.Parse(values[1]);
 
             for (int i = 0; i < m_w * m_h; i++)
             {
                 m_matrix[i] = int.Parse(values[i + 2]);
+            }
+        }
+
+        // Crée une matrice remplie de valeurs aléatoires entre p_a et p_b de taille (p_w, p_h).
+        public Matrix(int p_w, int p_h, int p_a, int p_b)
+        {
+            m_w = p_w;
+            m_h = p_h;
+
+            m_matrix = new int[p_w * p_h];
+
+            for (int k = 0; k < p_w * p_h; k++)
+            {
+                m_matrix[k] = rnd.Next(p_a, p_b + 1);
             }
         }
 

@@ -168,7 +168,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_objPlayerCopy: {fileID: 1332028083160640919, guid: 8b0e0280fd80e14428428da2d4e23aba, type: 3}
+<<<<<<< HEAD
   m_activeAI: 0
+=======
+  m_activeAI: 1
+>>>>>>> 517c393d099404e848da1d3c06b11698ba3eea5d
   m_populationSize: 500
   m_selectionSize: 50
   m_childrenSize: 250

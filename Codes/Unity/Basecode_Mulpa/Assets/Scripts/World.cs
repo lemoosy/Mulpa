@@ -3,29 +3,44 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using _Matrix;
-
-
-
-// Enumération des différents types de cases dans un monde.
-enum CaseID
-{
-    CASE_VOID,
-    CASE_WALL,
-    CASE_ATTACK,
-    CASE_COIN,
-    CASE_PLAYER,
-    CASE_EXIT,
-    CASE_COUNT = 5
-}
-
-
+using System.Runtime.InteropServices;
 
 public class World : MonoBehaviour
 {
 
 
 
+    #region DLL
+
+
+
+    [DllImport("Basecode_DLL.dll")]
+    private static extern float DLL_World_GetShortestPath(int[] p_world, int p_w, int p_h, int p_i1, int p_j1, int p_i2, int p_j2);
+
+    [DllImport("Basecode_DLL.dll")]
+    private static extern float DLL_World_GetShortestPathHard(int[] p_world, int p_w, int p_h, int p_i1, int p_j1, int p_i2, int p_j2);
+
+
+
+    #endregion
+
+
+
     #region Variables
+
+
+
+    // Enumération des différents types de cases dans un monde.
+    public enum CaseID
+    {
+        CASE_VOID,
+        CASE_WALL,
+        CASE_ATTACK,
+        CASE_COIN,
+        CASE_PLAYER,
+        CASE_EXIT,
+        CASE_COUNT = 5
+    }
 
 
 
@@ -143,12 +158,25 @@ public class World : MonoBehaviour
 
     }
 
+    // Calcule le PCC entre p_start et p_end.
+    public float ShortestPath(Vector2 p_start, Vector2 p_end)
+    {
+
+        return 0.0f;
+    }
+
+    // Calcule le PCC entre p_start et p_end en prennant en compte les murs.
+    public float ShortestPathHard(Vector2 p_start, Vector2 p_end)
+    {
+        return 0.0f;
+    }
+
     // Génère un monde aléatoire.
     public Matrix GenWorld()
     {
         Matrix res = new Matrix(m_matrixWidth, m_matrixHeight);
 
-
+        // ...
 
         return res;
     }
