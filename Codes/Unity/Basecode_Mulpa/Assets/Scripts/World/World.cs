@@ -88,6 +88,22 @@ namespace _World
 
         }
 
+        // Calcule le PCC entre (p_i1, p_j1) et (p_i2, p_j2).
+        // Retourne -1.0f si le PCC n'existe pas.
+        public float ShortestPath(int p_i1, int p_j1, int p_i2, int p_j2)
+        {
+            // ...
+
+            return 0.0f;
+        }
+
+        // Calcule le PCC entre (p_i1, p_j1) et (p_i2, p_j2) en prennant en compte les murs.
+        public float ShortestPathCross(int p_i1, int p_j1, int p_i2, int p_j2)
+        {
+            // ...
+
+            return 0.0f;
+        }
 
     }
 }
