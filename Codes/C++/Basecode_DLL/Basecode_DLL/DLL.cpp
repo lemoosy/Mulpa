@@ -144,7 +144,9 @@ UnityDLL int DLL_PG_GetOutput(int p_populationIndex)
 UnityDLL float DLL_PCC(int* p_world, int p_w, int p_h, int p_i1, int p_j1, int p_i2, int p_j2, bool p_cross)
 {
 	if (Coord_OutOfDimension(p_i1, p_j1, p_w, p_h) ||
-		Coord_OutOfDimension(p_i2, p_j2, p_w, p_h))
+		Coord_OutOfDimension(p_i2, p_j2, p_w, p_h) ||
+		(!p_cross && p_world[Coord_ToIndex(p_i1, p_j1, p_w)] == CASE_WALL)
+		)
 	{
 		return -1.0f;
 	}
