@@ -4,15 +4,6 @@ namespace _Settings
 {
     public class Settings
     {
-        // Variable pour générer des nombres aléatoires.
-        public static Random m_randomGenerator = new Random();
-
-        // Retourne un entier aléatoire entre p_a et p_b.
-        public static int IntRandom(int p_a, int p_b)
-        {
-            return m_randomGenerator.Next(p_a, p_b + 1);
-        }
-
         // Enumération des différents modes de jeu.
         public enum ModeID
         {
@@ -35,6 +26,15 @@ namespace _Settings
             CASE_PLAYER,
             CASE_EXIT,
             CASE_COUNT
+        }
+
+        // Variable pour générer des nombres aléatoires.
+        public static Random m_randomGenerator = new Random();
+
+        // Retourne un entier aléatoire entre p_a et p_b.
+        public static int IntRandom(int p_a, int p_b)
+        {
+            return m_randomGenerator.Next(p_a, p_b + 1);
         }
     }
 }

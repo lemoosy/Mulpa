@@ -24,9 +24,9 @@ namespace _DLL
         // Fonctions pour le PCC.
 
         [DllImport("Basecode_DLL.dll")]
-        public static extern float DLL_PCC_Normal(int[] p_world, int p_w, int p_h, int p_i1, int p_j1, int p_i2, int p_j2);
+        public static extern float DLL_PCC_1(int[] p_world, int p_w, int p_h, int p_i1, int p_j1, int p_i2, int p_j2);
 
         [DllImport("Basecode_DLL.dll")]
-        public static extern float DLL_PCC_Cross(int[] p_world, int p_w, int p_h, int p_i1, int p_j1, int p_i2, int p_j2);
+        public static extern float DLL_PCC_2(int[] p_world, int p_w, int p_h, int p_i1, int p_j1, int p_i2, int p_j2);
     }
 }

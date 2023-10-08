@@ -9,8 +9,8 @@ using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
 
 using _DLL;
-using _Game;
 using _Settings;
+using _World;
 
 public class GameSettings : MonoBehaviour
 {
@@ -27,16 +27,16 @@ public class GameSettings : MonoBehaviour
 
     
     // Taille de la population.
-    public int m_populationSize = 50;
+    public const int m_populationSize = 10;
 
     // Taille de la sélection.
-    public int m_selectionSize = 20;
+    public const int m_selectionSize = 3;
 
     // Nombre d'enfants.
-    public int m_childrenSize = 10;
+    public const int m_childrenSize = 3;
 
     // Nombre de fois qu'un enfant est muté.
-    public int m_mutationRate = 10;
+    public const int m_mutationRate = 1;
 
     // Curseur pour la liste de population.
     public int m_populationCursor = 0;
@@ -46,11 +46,14 @@ public class GameSettings : MonoBehaviour
 
 
 
-    // Joueur.
-    public GameObject m_player = null;
+    // Objet pour instancier un joueur.
+    public GameObject m_playerCopy = null;
 
-    // Jeux.
-    public Game[] m_game = null;
+    // Objets pour instancier un monde.
+    public GameObject m_worldCopy = null;
+
+    // Mondes.
+    public GameObject[] m_worlds = null;
 
 
 
@@ -64,21 +67,24 @@ public class GameSettings : MonoBehaviour
 
     void Start()
     {
-        Debug.Assert(m_player, "ERROR - GameSettings::Start()");
-
-        Player playerScript = m_player.GetComponent<Player>();
+        Debug.Assert(m_playerCopy, "ERROR (1) - GameSettings::Start()");
+        Debug.Assert(m_worldCopy, "ERROR (2) - GameSettings::Start()");
 
         switch (m_mode)
         {
             case Settings.ModeID.MODE_SOLO:
             {
-                playerScript.m_isAI = false;
+                GameObject player = Instantiate(m_playerCopy);
+                Player playerScr = player.GetComponent<Player>();
+                playerScr.m_isAI = false;
                 
-                m_game = new Game[1];
-                
-                int[] worlds = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
-                
-                m_game[0] = new Game(Vector2.zero, worlds, m_player);
+                GameObject world = Instantiate(m_worldCopy);
+                World worldScr = player.GetComponent<World>();
+                worldScr.m_origin = new Vector2(0.0f, 0.0f);
+                worldScr.m_levels = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+                worldScr.m_player = Instantiate(m_playerCopy);
+
+                m_worlds[0] = world;
                 
                 break;
             }
@@ -87,17 +93,24 @@ public class GameSettings : MonoBehaviour
             {
                 DLL.DLL_PG_Init(m_populationSize, m_selectionSize, m_childrenSize, m_mutationRate);
 
-                playerScript.m_isAI = true;
-
-                int[] worlds = new int[] { 1, 2, 3, 4, 5 };
-
-                m_game = new Game[m_populationSize];
-
+                Vector2 origin = new Vector2(0.0f, 0.0f);
+                
                 for (int i = 0; i < m_populationSize; i++)
                 {
-                    playerScript.m_nnIndex = i;
+                    GameObject player = Instantiate(m_playerCopy);
+                    Player playerScr = player.GetComponent<Player>();
+                    playerScr.m_isAI = true;
+                    playerScr.m_populationIndex = i;
 
-                    m_game[i] = new Game(Vector2.zero, worlds, m_player); // TODO
+                    GameObject world = Instantiate(m_worldCopy);
+                    World worldScr = player.GetComponent<World>();
+                    worldScr.m_origin = origin;
+                    worldScr.m_levels = new int[] { 1, 2, 3, 4, 5 };
+                    worldScr.m_player = Instantiate(m_playerCopy);
+
+                    m_worlds[i] = world;
+
+                    origin.x += World.m_w + 10.0f;
                 }
                 
                 break;
@@ -107,19 +120,26 @@ public class GameSettings : MonoBehaviour
             {
                 DLL.DLL_PG_Init(m_populationSize, m_selectionSize, m_childrenSize, m_mutationRate);
 
-                playerScript.m_isAI = true;
-
-                int[] worlds = new int[] { 6, 7, 8, 9, 10 };
-
-                m_game = new Game[m_populationSize];
-
+                Vector2 origin = new Vector2(0.0f, 0.0f);
+                
                 for (int i = 0; i < m_populationSize; i++)
                 {
-                    playerScript.m_nnIndex = i;
+                    GameObject player = Instantiate(m_playerCopy);
+                    Player playerScr = player.GetComponent<Player>();
+                    playerScr.m_isAI = true;
+                    playerScr.m_populationIndex = i;
 
-                    m_game[i] = new Game(Vector2.zero, worlds, m_player); // TODO
+                    GameObject world = Instantiate(m_worldCopy);
+                    World worldScr = player.GetComponent<World>();
+                    worldScr.m_origin = origin;
+                    worldScr.m_levels = new int[] { 6, 7, 8, 9, 10, 11 };
+                    worldScr.m_player = Instantiate(m_playerCopy);
+
+                    m_worlds[i] = world;
+
+                    origin.x += World.m_w + 10.0f;
                 }
-
+                
                 break;
             }
 
@@ -127,19 +147,26 @@ public class GameSettings : MonoBehaviour
             {
                 DLL.DLL_PG_Init(m_populationSize, m_selectionSize, m_childrenSize, m_mutationRate);
 
-                playerScript.m_isAI = true;
-
-                int[] worlds = new int[] { 11, 12, 13, 14, 15 };
-
-                m_game = new Game[m_populationSize];
-
+                Vector2 origin = new Vector2(0.0f, 0.0f);
+                
                 for (int i = 0; i < m_populationSize; i++)
                 {
-                    playerScript.m_nnIndex = i;
+                    GameObject player = Instantiate(m_playerCopy);
+                    Player playerScr = player.GetComponent<Player>();
+                    playerScr.m_isAI = true;
+                    playerScr.m_populationIndex = i;
 
-                    m_game[i] = new Game(Vector2.zero, worlds, m_player); // TODO
+                    GameObject world = Instantiate(m_worldCopy);
+                    World worldScr = player.GetComponent<World>();
+                    worldScr.m_origin = origin;
+                    worldScr.m_levels = new int[] { 11, 12, 13, 14, 15 };
+                    worldScr.m_player = Instantiate(m_playerCopy);
+
+                    m_worlds[i] = world;
+
+                    origin.x += World.m_w + 10.0f;
                 }
-
+                
                 break;
             }
         }
@@ -153,12 +180,40 @@ public class GameSettings : MonoBehaviour
             break;
 
             case Settings.ModeID.MODE_TRAINING_EASY:
-            break;
-
             case Settings.ModeID.MODE_TRAINING_MEDIUM:
-            break;
-
             case Settings.ModeID.MODE_TRAINING_HARD:
+
+                bool res = false;
+
+                for (int i = 0; i < m_populationSize; i++)
+                {
+                    GameObject world = m_worlds[i];
+
+                    World worldScr = world.GetComponent<World>();
+
+                    if (worldScr.IsOver() == false)
+                    {
+                        res = true;
+                        break;
+                    }
+                }
+
+                if (res == false)
+                {
+                    DLL.DLL_PG_Update();
+
+                    for (int i = 0; i < m_populationSize; i++)
+                    {
+                        GameObject world = m_worlds[i];
+
+                        World worldScr = world.GetComponent<World>();
+                        worldScr.m_levelsCursor = 0;
+                        worldScr.LoadScene();
+                    }
+
+                    m_generation++;
+                }
+
             break;
         }
     }
@@ -168,18 +223,42 @@ public class GameSettings : MonoBehaviour
         switch (m_mode)
         {
             case Settings.ModeID.MODE_SOLO:
+
+                Destroy(m_worlds[0]);
+
             break;
 
             case Settings.ModeID.MODE_TRAINING_EASY:
+
                 DLL.DLL_PG_Quit();
+
+                for (int i = 0; i < m_populationSize; i++)
+                {
+                    Destroy(m_worlds[i]);
+                }
+
             break;
 
             case Settings.ModeID.MODE_TRAINING_MEDIUM:
+                
                 DLL.DLL_PG_Quit();
+
+                for (int i = 0; i < m_populationSize; i++)
+                {
+                    Destroy(m_worlds[i]);
+                }
+
             break;
 
             case Settings.ModeID.MODE_TRAINING_HARD:
+
                 DLL.DLL_PG_Quit();
+
+                for (int i = 0; i < m_populationSize; i++)
+                {
+                    Destroy(m_worlds[i]);
+                }
+
             break;
         }
     }

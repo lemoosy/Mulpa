@@ -49,10 +49,12 @@ namespace _Game
 
         #region Functions
 
-
+        
 
         public Game(Vector2 p_origin, int[] p_worlds, GameObject p_player)
         {
+            int a = World.m_tileH;
+
             m_origin = p_origin;
 
             m_worlds = p_worlds;

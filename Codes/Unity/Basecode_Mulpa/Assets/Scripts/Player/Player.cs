@@ -41,9 +41,9 @@ public class Player : MonoBehaviour
 
     // Permet de savoir si le joueur est un IA.
     public bool m_isAI = false;
-    
+
     // Index du réseau de neurones du joueur.
-    public int m_nnIndex = -1;
+    public int m_populationIndex = -1;
     
     // Score de l'IA.
     public float m_score = 0.0f;
