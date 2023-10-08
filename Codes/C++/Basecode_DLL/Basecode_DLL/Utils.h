@@ -6,7 +6,7 @@
 /// @brief Crée un réseau de neurones (architecture dans la fonction).
 NN* NN_Create(void);
 
-/// @brief Retire et renvoie le réseau de neurones ayant le score le moins élevé.
+/// @brief Retire et retourne le réseau de neurones ayant le score le moins élevé.
 NN* Population_RemoveMinimum(void);
 
 /// @brief Retire et renvoie le réseau de neurones ayant le score le plus élevé.
@@ -15,7 +15,7 @@ NN* Population_RemoveMaximum(void);
 /// @brief Retire et libère tous les réseaux de neurones de la population.
 void Population_Clear(void);
 
-/// @brief Renvoie l'entrée 'X' à partir d'un monde pour un réseau de neurones.
+/// @brief Retourne la matrice d'entrée pour un réseau de neurones à partir d'un monde.
 Matrix* World_ToInput(int* p_world, int p_w, int p_h);
 
 /// @brief Vérifie si les coordonnées sont hors de la dimension.

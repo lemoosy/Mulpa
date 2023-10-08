@@ -4,8 +4,8 @@ NN* NN_Create(void)
 {
 	NN* nn = new NN(NN_INPUT_SIZE);
 
-	nn->AddLayer(512, &ReLU);
-	nn->AddLayer(256, &ReLU);
+	nn->AddLayer(840, &ReLU);
+	nn->AddLayer(420, &ReLU);
 	nn->AddLayer(3, &sigmoid);
 
 	nn->SetScore((float)INT_MAX);
@@ -81,11 +81,6 @@ void Population_Clear(void)
 
 Matrix* World_ToInput(int* p_world, int p_w, int p_h)
 {
-	if ((p_w != WORLD_MATRIX_W) || (p_h != WORLD_MATRIX_H))
-	{
-		return nullptr;
-	}
-
 	Matrix* res = new Matrix(NN_INPUT_SIZE, 1);
 
 	int size = p_w * p_h;

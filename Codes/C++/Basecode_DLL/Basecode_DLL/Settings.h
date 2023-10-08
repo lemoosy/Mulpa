@@ -5,33 +5,31 @@
 #include <string>
 
 #include "DList.h"
-#include "Matrix.h"
 #include "Graph.h"
+#include "Matrix.h"
 #include "NN.h"
 
 using namespace std;
 
 typedef enum eCaseID
 {
-	CASE_VOID = 0,
+	CASE_VOID,
 	CASE_WALL,
-	CASE_MONSTER,
+	CASE_ATTACK,
 	CASE_COIN,
 	CASE_PLAYER,
 	CASE_EXIT,
-	CASE_BUTTON,
-	CASE_DOOR,
-	CASE_COUNT = 7
+	CASE_COUNT
 }CaseID;
 
 /// Macros.
 
 #define UnityDLL			extern "C" __declspec (dllexport)
 
-#define WORLD_MATRIX_W		18
-#define WORLD_MATRIX_H		10
+#define WORLD_MATRIX_W		24
+#define WORLD_MATRIX_H		14
 
-#define NN_INPUT_SIZE		(WORLD_MATRIX_W * WORLD_MATRIX_H) * CASE_COUNT
+#define NN_INPUT_SIZE		(WORLD_MATRIX_W * WORLD_MATRIX_H) * (CASE_COUNT - 1)
 
 /// Variables globales.
 

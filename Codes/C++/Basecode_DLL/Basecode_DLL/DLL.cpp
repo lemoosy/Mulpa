@@ -7,9 +7,9 @@ int g_mutationRate = 0;
 
 NN** g_population = nullptr;
 
-// Fonctions pour le script scr_playerAI.cs
+// PG
 
-UnityDLL void DLL_Init(int p_populationSize, int p_selectionSize, int p_childrenSize, int p_mutationRate)
+UnityDLL void DLL_PG_Init(int p_populationSize, int p_selectionSize, int p_childrenSize, int p_mutationRate)
 {
 	srand(time(nullptr));
 
@@ -26,37 +26,25 @@ UnityDLL void DLL_Init(int p_populationSize, int p_selectionSize, int p_children
 	}
 }
 
-UnityDLL void DLL_Quit(void)
+UnityDLL void DLL_PG_Quit(void)
 {
 	Population_Clear();
 
 	delete[] g_population;
 }
 
-UnityDLL void DLL_NN_SetScore(int p_nnIndex, float p_score)
+UnityDLL void DLL_PG_SetScore(int p_populationIndex, float p_score)
 {
-	g_population[p_nnIndex]->SetScore(p_score);
+	g_population[p_populationIndex]->SetScore(p_score);
 }
 
-UnityDLL float DLL_NN_GetScore(int p_nnIndex)
+UnityDLL float DLL_PG_GetScore(int p_populationIndex)
 {
-	return g_population[p_nnIndex]->GetScore();
+	return g_population[p_populationIndex]->GetScore();
 }
 
-UnityDLL bool DLL_Population_Update(void)
+UnityDLL void DLL_PG_Update(void)
 {
-	// On vérifie si tous les NN ont été évalués.
-
-	for (int i = 0; i < g_populationSize; i++)
-	{
-		NN* nn = g_population[i];
-
-		if ((nn == nullptr) || (nn->GetScore() == (float)INT_MAX))
-		{
-			return true;
-		}
-	}
-
 	// Création de la sélection.
 
 	NN** selection = new NN*[g_selectionSize]();
@@ -64,12 +52,6 @@ UnityDLL bool DLL_Population_Update(void)
 	for (int i = 0; i < g_selectionSize; i++)
 	{
 		selection[i] = Population_RemoveMinimum();
-
-		if (!selection[i])
-		{
-			delete selection;
-			return true;
-		}
 	}
 
 	// Nettoyage de la population.
@@ -123,43 +105,22 @@ UnityDLL bool DLL_Population_Update(void)
 	{
 		g_population[i] = NN_Create();
 	}
-
-	return false;
 }
 
-// Fonctions pour le script scr_player.cs
-
-UnityDLL bool DLL_NN_Forward(int p_nnIndex, int* p_world, int p_w, int p_h)
+UnityDLL void DLL_PG_Forward(int p_populationIndex, int* p_world, int p_w, int p_h)
 {
-	NN* nn = g_population[p_nnIndex];
-
-	if (!nn)
-	{
-		return true;
-	}
+	NN* nn = g_population[p_populationIndex];
 
 	Matrix* X = World_ToInput(p_world, p_w, p_h);
-
-	if (!X)
-	{
-		return true;
-	}
 
 	nn->Forward(X);
 
 	delete X;
-
-	return false;
 }
 
-UnityDLL int DLL_NN_GetOutput(int p_nnIndex)
+UnityDLL int DLL_PG_GetOutput(int p_populationIndex)
 {
-	NN* nn = g_population[p_nnIndex];
-
-	if (!nn)
-	{
-		return -1;
-	}
+	NN* nn = g_population[p_populationIndex];
 
 	Layer* output = nn->GetLayer(-1);
 
@@ -178,9 +139,12 @@ UnityDLL int DLL_NN_GetOutput(int p_nnIndex)
 	return index;
 }
 
-UnityDLL float DLL_World_GetShortestPath(int* p_world, int p_w, int p_h)
+// PCC
+
+UnityDLL float DLL_PCC(int* p_world, int p_w, int p_h, int p_i1, int p_j1, int p_i2, int p_j2, bool p_cross)
 {
-	if ((p_w != WORLD_MATRIX_W) || (p_h != WORLD_MATRIX_H))
+	if (Coord_OutOfDimension(p_i1, p_j1, p_w, p_h) ||
+		Coord_OutOfDimension(p_i2, p_j2, p_w, p_h))
 	{
 		return -1.0f;
 	}
@@ -189,92 +153,91 @@ UnityDLL float DLL_World_GetShortestPath(int* p_world, int p_w, int p_h)
 
 	Graph* graph = new Graph(p_w * p_h);
 
-	// Création des arcs + Recherche du joueur et de la sortie.
-
-	int playerID = -1;
-	int exitID = -1;
+	// Création des arcs.
 
 	for (int j = 0; j < p_h; j++)
 	{
 		for (int i = 0; i < p_w; i++)
 		{
-			int index = Coord_ToIndex(i, j, p_w);
-			int value = p_world[index];
+			int u = Coord_ToIndex(i, j, p_w);
 
-			if (value == CASE_PLAYER)
+			if (!Coord_OutOfDimension(i + 1, j, p_w, p_h))
 			{
-				playerID = index;
+				int v = Coord_ToIndex(i + 1, j, p_w);
+
+				if (p_world[v] == CASE_WALL)
+				{
+					if (p_cross)
+					{
+						graph->SetWeight(u, v, 10.0f);
+					}
+				}
+				else
+				{
+					graph->SetWeight(u, v, 1.0f);
+				}
 			}
 
-			if (value == CASE_EXIT)
+			if (!Coord_OutOfDimension(i - 1, j, p_w, p_h))
 			{
-				exitID = index;
+				int v = Coord_ToIndex(i - 1, j, p_w);
+
+				if (p_world[v] == CASE_WALL)
+				{
+					if (p_cross)
+					{
+						graph->SetWeight(u, v, 10.0f);
+					}
+				}
+				else
+				{
+					graph->SetWeight(u, v, 1.0f);
+				}
 			}
 
-			if (
-				!Coord_OutOfDimension(i + 1, j, p_w, p_h)
-				&&
-				(p_world[Coord_ToIndex(i + 1, j, p_w)] != CASE_WALL)
-				)
+			if (!Coord_OutOfDimension(i, j + 1, p_w, p_h))
 			{
-				graph->SetWeight(
-					index,
-					Coord_ToIndex(i + 1, j, p_w),
-					1.0f
-				);
+				int v = Coord_ToIndex(i, j + 1, p_w);
+
+				if (p_world[v] == CASE_WALL)
+				{
+					if (p_cross)
+					{
+						graph->SetWeight(u, v, 10.0f);
+					}
+				}
+				else
+				{
+					graph->SetWeight(u, v, 1.0f);
+				}
 			}
 
-			if (
-				!Coord_OutOfDimension(i - 1, j, p_w, p_h)
-				&&
-				(p_world[Coord_ToIndex(i - 1, j, p_w)] != CASE_WALL)
-				)
+			if (!Coord_OutOfDimension(i, j - 1, p_w, p_h))
 			{
-				graph->SetWeight(
-					index,
-					Coord_ToIndex(i - 1, j, p_w),
-					1.0f
-				);
-			}
+				int v = Coord_ToIndex(i, j - 1, p_w);
 
-			if (
-				!Coord_OutOfDimension(i, j + 1, p_w, p_h)
-				&&
-				(p_world[Coord_ToIndex(i, j + 1, p_w)] != CASE_WALL)
-				)
-			{
-				graph->SetWeight(
-					index,
-					Coord_ToIndex(i, j + 1, p_w),
-					1.0f
-				);
-			}
-
-			if (
-				!Coord_OutOfDimension(i, j - 1, p_w, p_h)
-				&&
-				(p_world[Coord_ToIndex(i, j - 1, p_w)] != CASE_WALL)
-				)
-			{
-				graph->SetWeight(
-					index,
-					Coord_ToIndex(i, j - 1, p_w),
-					1.0f
-				);
+				if (p_world[v] == CASE_WALL)
+				{
+					if (p_cross)
+					{
+						graph->SetWeight(u, v, 10.0f);
+					}
+				}
+				else
+				{
+					graph->SetWeight(u, v, 1.0f);
+				}
 			}
 		}
 	}
 
-	if ((playerID == -1) || (exitID == -1))
-	{
-		delete graph;
-		return 1000.0f;
-	}
-
 	// Calcule du PCC.
 
+	int u = Coord_ToIndex(p_i1, p_j1, p_w);
+	int v = Coord_ToIndex(p_i2, p_j2, p_w);
+
 	float distance = 0.0f;
-	DList<int>* PCC = graph->Dijkstra(playerID, exitID, &distance);
+	DList<int>* PCC = graph->Dijkstra(u, v, &distance);
 
 	if (PCC)
 	{
