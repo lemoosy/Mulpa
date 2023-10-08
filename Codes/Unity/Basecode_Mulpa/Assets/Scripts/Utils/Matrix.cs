@@ -1,15 +1,12 @@
-using System;
 using System.Diagnostics;
 using System.IO;
+using _Settings;
 
 namespace _Matrix
 {
     // Classe représentant une matrice 2D.
     public class Matrix
     {
-        // Variable pour générer des nombres aléatoires.
-        private Random rnd = new Random();
-    
         // Largeur de la matrice.
         public int m_w;
     
@@ -19,7 +16,7 @@ namespace _Matrix
         // Matrice.
         private int[] m_matrix;
     
-        // Crée une matrice remplie de 0 de taille (p_w, p_h).
+        // Crée une matrice p_w x p_h (toutes les valeurs sont initialisées à 0).
         public Matrix(int p_w, int p_h)
         {
             Debug.Assert((p_w > 0) && (p_h > 0), "ERROR - Matrix::Matrix()");
@@ -29,24 +26,8 @@ namespace _Matrix
 
             m_matrix = new int[p_w * p_h];
         }
-
-        // Importe une matrice depuis un fichier TXT.
-        public Matrix(string p_path)
-        {
-            string line = File.ReadAllText(p_path);
-
-            string[] values = line.Split(',');
-
-            m_w = int.Parse(values[0]);
-            m_h = int.Parse(values[1]);
-
-            for (int i = 0; i < m_w * m_h; i++)
-            {
-                m_matrix[i] = int.Parse(values[i + 2]);
-            }
-        }
-
-        // Crée une matrice remplie de valeurs aléatoires entre p_a et p_b de taille (p_w, p_h).
+        
+        // Crée une matrice p_w x p_h (toutes les valeurs sont initialisées entre p_a et p_b).
         public Matrix(int p_w, int p_h, int p_a, int p_b)
         {
             m_w = p_w;
@@ -56,7 +37,7 @@ namespace _Matrix
 
             for (int k = 0; k < p_w * p_h; k++)
             {
-                m_matrix[k] = rnd.Next(p_a, p_b + 1);
+                m_matrix[k] = Settings.IntRandom(p_a, p_b);
             }
         }
 
@@ -82,26 +63,14 @@ namespace _Matrix
             m_matrix[(p_j * m_w) + p_i] = p_value;
         }
 
-        // Exporte une matrice dans un fichier TXT (exemple: "m_w, m_h, 0, 0, 1, 0, 1, ...").
-        public void Export(string p_path)
-        {
-            string w = m_w.ToString() + ", ";
-
-            string h = m_h.ToString() + ", ";
-
-            string matrix = string.Join(",", m_matrix);
-
-            File.WriteAllText(p_path, w + h + matrix);
-        }
-
-        // Mélange les valeurs de la matrice this et p_mSource (p_mSource n'est pas modifié).
+        // Mélange les valeurs de la matrice this et p_mSource (p_mSource n'est pas modifiée).
         public void Crossover(Matrix p_mSource)
         {
             for (int j = 0; j < m_h; j++)
             {
                 for (int i = 0; i < m_w; i++)
                 {
-                    if (rnd.Next(2) == 0)
+                    if (Settings.IntRandom(0, 1) == 0)
                     {
                         Set(i, j, p_mSource.Get(i, j));
                     }
@@ -109,13 +78,40 @@ namespace _Matrix
             }
         }
 
-        // Modifie une case aléatoire de la matrice par une valeur aléatoire entre a et b.
+        // Modifie une case aléatoire de la matrice par une valeur entre p_a et p_b.
         public void Mutation(int p_a, int p_b)
         {
-            int i = rnd.Next(m_w);
-            int j = rnd.Next(m_h);
+            int i = Settings.IntRandom(0, m_w - 1);
+            int j = Settings.IntRandom(0, m_h - 1);
 
-            Set(i, j, rnd.Next(p_a, p_b + 1));
+            Set(i, j, Settings.IntRandom(p_a, p_b));
+        }
+
+        // Importe une matrice depuis un fichier TXT.
+        public void Import(string p_path)
+        {
+            string line = File.ReadAllText(p_path);
+
+            string[] values = line.Split(',');
+
+            m_w = int.Parse(values[0]);
+            m_h = int.Parse(values[1]);
+
+            for (int i = 0; i < m_w * m_h; i++)
+            {
+                m_matrix[i] = int.Parse(values[i + 2]);
+            }
+        }
+
+        // Exporte une matrice dans un fichier TXT.
+        public void Export(string p_path)
+        {
+            string w = m_w.ToString() + ", ";
+            string h = m_h.ToString() + ", ";
+
+            string matrix = string.Join(",", m_matrix);
+
+            File.WriteAllText(p_path, w + h + matrix);
         }
     }
 }

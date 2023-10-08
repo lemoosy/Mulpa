@@ -36,6 +36,8 @@ public class Player : MonoBehaviour
     #region Variables
 
 
+    public World m_world = null;
+
 
     // Permet de savoir si le joueur est un IA.
     public bool m_isAI = false;
