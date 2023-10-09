@@ -23,7 +23,7 @@ namespace _Settings
             CASE_WALL,
             CASE_ATTACK,
             CASE_COIN,
-            CASE_PLAYER,
+            CASE_SPAWN,
             CASE_EXIT,
             CASE_COUNT
         }

@@ -103,7 +103,7 @@ namespace _Matrix
             {
                 for (int i = 0; i < m_w; i++)
                 {
-                    int index = j * m_w + i;
+                    int index = (m_h - j - 1) * m_w + i;
 
                     m_matrix[index] = (int)lines[j + 2][i];
                 }

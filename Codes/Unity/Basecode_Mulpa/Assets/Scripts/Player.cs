@@ -1,14 +1,7 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Threading;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.Tilemaps;
-using UnityEngine.UIElements;
 
 using _DLL;
+using _Settings;
 using _World;
 
 public class Player : MonoBehaviour
@@ -39,38 +32,31 @@ public class Player : MonoBehaviour
 
 
 
-    // Score du joueur.
-    public float m_score = 0.0f;
+    public int m_tick = 0; // +1 par frame.
+    public const float m_maxSeconds = 5.0f; // max. 5 secondes pour l'IA.
 
-
+    // Gestionnaire de collisions.
+    public GameObject[] m_collisions = new GameObject[(int)Settings.CaseID.CASE_COUNT];
 
     // Entrées du joueur.
     public bool m_left = false;
     public bool m_right = false;
     public bool m_jump = false;
 
-
-
-    // Nombre de pièces ramassées.
-    public int m_coin = 0;
-
-
-
-    // Ajoute +1 à chaque FixedUpdate().
-    private int m_tick = 0;
-
-
-
     // Vitesses du joueur.
     public const float m_speedX = 128.0f;
     public const float m_speedY = 256.0f;
 
-
-
+    // Items du joueur.
+    public int m_coin = 0;
+    
     // États du joueur.
     public bool m_onGround = false;
     public bool m_isDead = false;
     public bool m_atExit = false;
+
+    // Score du joueur.
+    public float m_score = 0.0f;
 
 
 
@@ -82,29 +68,44 @@ public class Player : MonoBehaviour
 
 
 
+    // Unity.
+
     private void FixedUpdate()
     {
         m_tick++;
+
+        int size = m_collisions.Length;
+
+        for (int i = 0; i < size; i++)
+        {
+            m_collisions[i] = null;
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collider)
     {
         if (collider.gameObject.CompareTag("tag_coin"))
         {
-            m_coin++;
-            Destroy(collider.gameObject);
+            m_collisions[(int)Settings.CaseID.CASE_COIN] = collider.gameObject;
+        }
+
+        if (collider.gameObject.CompareTag("tag_spawn"))
+        {
+            m_collisions[(int)Settings.CaseID.CASE_SPAWN] = collider.gameObject;
         }
 
         if (collider.gameObject.CompareTag("tag_exit"))
         {
-            m_atExit = true;
+            m_collisions[(int)Settings.CaseID.CASE_EXIT] = collider.gameObject;
         }
     }
 
-    void OnCollisionStay2D(Collision2D collision)
+    private void OnCollisionStay2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("tag_wall"))
         {
+            m_collisions[(int)Settings.CaseID.CASE_WALL] = collision.gameObject;
+
             foreach (ContactPoint2D point in collision.contacts)
             {
                 if (point.normal.y > 0.9f)
@@ -116,17 +117,17 @@ public class Player : MonoBehaviour
 
         if (collision.gameObject.CompareTag("tag_attack"))
         {
-            m_isDead = true;
+            m_collisions[(int)Settings.CaseID.CASE_ATTACK] = collision.gameObject;
         }
     }
 
     private void Start()
     {
-        Debug.Assert(m_world, "ERROR (1) - Player::Start()");
+        Debug.Assert(m_world);
 
         if (m_isAI)
         {
-            Debug.Assert(m_populationIndex != -1, "ERROR (2) - Player::Start()");
+            Debug.Assert(m_populationIndex != -1);
         }
     }
 
@@ -135,25 +136,35 @@ public class Player : MonoBehaviour
         UpdateInput();
         UpdateVelocity();
         UpdatePosition();
+        UpdateItem();
         UpdateState();
         UpdateAI();
     }
     
 
 
-    private void UpdateInput()
+    // Input.
+
+    public void ResetInput()
     {
         m_left = false;
         m_right = false;
         m_jump = false;
+    }
+
+    public void UpdateInput()
+    {
+        ResetInput();
 
         if (m_isAI)
         {
-            World worldScr = m_world.GetComponent<World>();
+            //World worldScr = m_world.GetComponent<World>();
 
-            DLL.DLL_PG_Forward(m_populationIndex, worldScr.m_matrixForNN, World.m_w, World.m_h);
+            //DLL.DLL_PG_Forward(m_populationIndex, worldScr.m_matrixForNN, World.m_w, World.m_h);
 
-            int res = DLL.DLL_PG_GetOutput(m_populationIndex);
+            //int res = DLL.DLL_PG_GetOutput(m_populationIndex);
+
+            int res = 1;
 
             switch (res)
             {
@@ -170,7 +181,7 @@ public class Player : MonoBehaviour
                     break;
 
                 default:
-                    Debug.Assert(false, "ERROR - Player::UpdateInput()");
+                    Debug.Assert(false);
                     break;
             }
         }
@@ -182,7 +193,23 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void UpdateVelocity()
+
+
+    // Velocity.
+
+    public Vector2 GetVelocity()
+    {
+        Rigidbody2D body = GetComponent<Rigidbody2D>();
+        return body.velocity;
+    }
+
+    public void SetVelocity(Vector2 velocity)
+    {
+        Rigidbody2D body = GetComponent<Rigidbody2D>();
+        body.velocity = velocity;
+    }
+
+    public void UpdateVelocity()
     {
         Vector2 velocity = GetVelocity();
     
@@ -209,39 +236,89 @@ public class Player : MonoBehaviour
         SetVelocity(velocity);
     }
 
-    private void UpdatePosition()
+
+
+    // Position.
+
+    public Vector2 GetPosition()
     {
-        if (m_isDead)
+        Rigidbody2D body = GetComponent<Rigidbody2D>();
+        return body.position;
+    }
+
+    public void SetPosition(Vector2 position)
+    {
+        Rigidbody2D body = GetComponent<Rigidbody2D>();
+        body.position = position;
+    }
+
+    public void ResetPosition()
+    {
+        World world = m_world.GetComponent<World>();
+
+        int i = world.m_spawnPositionI;
+        int j = world.m_spawnPositionJ;
+
+        Debug.Assert((i != -1) && (j != -1));
+
+        Vector2 origin = world.m_origin;
+        Vector2 position = new Vector2(i * World.m_tileW, j * World.m_tileH);
+
+        SetPosition(origin + position);
+    }
+
+    public void UpdatePosition()
+    {
+        // World.cs s'en occupe.
+    }
+
+
+
+    // Item.
+
+    public void UpdateItem()
+    {
+        if (m_collisions[(int)Settings.CaseID.CASE_COIN])
         {
-            if (m_isAI)
-            {
-                // World.cs s'en occupe.
-            }
-            else
-            {
-                ResetPosition();
-            }
+            m_coin++;
+            
+            GameObject obj = m_collisions[(int)Settings.CaseID.CASE_COIN];
+            Destroy(obj);
         }
+    }
+
+
+
+    // State.
+
+    public void ResetState()
+    {
+        m_onGround = false;
+        m_isDead = false;
+        m_atExit = false;
     }
 
     private void UpdateState()
     {
-        m_onGround = false;
-        m_isDead = false;
+        ResetState();
 
-        if (OutOfDimenseion())
+        if (OutOfDimension() || m_collisions[(int)Settings.CaseID.CASE_ATTACK])
         {
             m_isDead = true;
         }
 
         if (m_isAI)
         {
-            if ((float)m_tick / 50.0f > 5.0f) // 5 secondes
+            if ((float)m_tick / 50.0f > (float)m_maxSeconds)
             {
                 m_isDead = true;
             }
         }
     }
+
+
+
+   // AI.
 
     private void UpdateAI()
     {
@@ -249,110 +326,71 @@ public class Player : MonoBehaviour
         {
             if (m_isDead)
             {
-                World worldScr = m_world.GetComponent<World>();
+                //World worldScr = m_world.GetComponent<World>();
 
-                // Fitness = PCC - 2 x Pièces - 100 x Niveaux
+                //// Fitness = PCC - 2 x Pièces - 100 x Niveaux
 
-                float PCC = DLL.DLL_PCC(
-                    worldScr.m_matrixForPCC,
-                    World.m_w,
-                    World.m_h,
-                    worldScr.m_playerPositionI,
-                    worldScr.m_playerPositionJ,
-                    worldScr.m_exitPositionI,
-                    worldScr.m_exitPositionJ,
-                    false
-                );
+                //float PCC = DLL.DLL_PCC(
+                //    worldScr.m_matrixForPCC,
+                //    World.m_w,
+                //    World.m_h,
+                //    worldScr.m_playerPositionI,
+                //    worldScr.m_playerPositionJ,
+                //    worldScr.m_exitPositionI,
+                //    worldScr.m_exitPositionJ,
+                //    false
+                //);
 
-                // Si le joueur est hors dimension.
-                if (PCC == -1.0f)
-                {
-                    m_score = 1000.0f;
-                }
-                else
-                {
-                    m_score = PCC - 5.0f * (float)m_coin - 100.0f * (float)(worldScr.m_levelsCursor);
-                }
+                //// Si le joueur est hors dimension.
+                //if (PCC == -1.0f)
+                //{
+                //    m_score = 1000.0f;
+                //}
+                //else
+                //{
+                //    m_score = PCC - 5.0f * (float)m_coin - 100.0f * (float)(worldScr.m_levelsCursor);
+                //}
             }
         }
     }
 
 
 
+    // Collision.
+
     public float GetWidth()
     {
         BoxCollider2D collider = GetComponent<BoxCollider2D>();
-
         return collider.size.x;
     }
 
     public float GetHeight()
     {
         BoxCollider2D collider = GetComponent<BoxCollider2D>();
-
         return collider.size.y;
     }
 
-
-
-    public Vector2 GetVelocity()
+    public bool OutOfDimension()
     {
-        Rigidbody2D body = GetComponent<Rigidbody2D>();
+        World worldScr = m_world.GetComponent<World>();
 
-        return body.velocity;
-    }
+        // Position Gauche-Basse du monde.
+        float x0 = worldScr.m_origin.x;
+        float y0 = worldScr.m_origin.y;
 
-    public void SetVelocity(Vector2 velocity)
-    {
-        Rigidbody2D body = GetComponent<Rigidbody2D>();
+        // Position Droite-Haute du monde.
+        float x1 = x0 + World.m_w;
+        float y1 = y0 + World.m_h;
 
-        body.velocity = velocity;
-    }
-
-
-
-    public Vector2 GetPosition()
-    {
-        Rigidbody2D body = GetComponent<Rigidbody2D>();
-        
-        return body.position;
-    }
-
-    public void SetPosition(Vector2 position)
-    {
-        Rigidbody2D body = GetComponent<Rigidbody2D>();
-
-        body.position = position;
-    }
-
-    public bool OutOfDimenseion()
-    {
+        // Taille du joueur.
         float w = GetWidth();
         float h = GetHeight();
 
-        //if ((position.y - h) < -(World.m_h / 2.0f))
-        //{
-        //    m_isDead = true;
-        //}
+        // Position centrale du joueur.
+        float x = GetPosition().x + w / 2.0f;
+        float y = GetPosition().y + h / 2.0f;
 
-        if (m_isAI)
-        {
-            if ((float)m_tick / 50.0f > 5.0f) // 5 secondes
-            {
-                m_isDead = true;
-            }
-        }
-
-        return false;
-    }
-
-    public void ResetPosition()
-    {
-        GameObject obj = GameObject.Find("obj_spawn");
-
-        Debug.Assert(obj != null, "ERROR - ResetPosition()");
-
-        SetPosition(obj.transform.position);
+        return (x < x0 || x > x1 || y < y0 || y > y1);
     }
 
 

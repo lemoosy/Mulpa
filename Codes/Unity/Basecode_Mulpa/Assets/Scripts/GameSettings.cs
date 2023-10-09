@@ -30,7 +30,7 @@ public class GameSettings : MonoBehaviour
 
 
     // Mode de jeu.
-    public Settings.ModeID m_mode = Settings.ModeID.MODE_SOLO;
+    public Settings.ModeID m_mode = Settings.ModeID.MODE_TRAINING_EASY;
 
 
     
@@ -55,6 +55,8 @@ public class GameSettings : MonoBehaviour
     public GameObject[] m_worlds;
 
 
+    public float m_worldSpace = 30.0f;
+
 
     #endregion
 
@@ -66,8 +68,8 @@ public class GameSettings : MonoBehaviour
 
     void Start()
     {
-        Debug.Assert(m_worldCopy, "ERROR (2) - GameSettings::Start()");
-        Debug.Assert(m_playerCopy, "ERROR (1) - GameSettings::Start()");
+        Debug.Assert(m_worldCopy, "ERROR (1) - GameSettings::Start()");
+        Debug.Assert(m_playerCopy, "ERROR (2) - GameSettings::Start()");
 
         switch (m_mode)
         {
@@ -82,6 +84,7 @@ public class GameSettings : MonoBehaviour
                 worldScr.m_player = player;
                 worldScr.m_origin = new Vector2(0.0f, 0.0f);
                 worldScr.m_levels = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+                worldScr.CreateScene();
 
                 Player playerScr = player.GetComponent<Player>();
                 playerScr.m_world = world;
@@ -109,6 +112,7 @@ public class GameSettings : MonoBehaviour
                     worldScr.m_player = player;
                     worldScr.m_origin = origin;
                     worldScr.m_levels = new int[] { 1, 2, 3, 4, 5 };
+                    worldScr.CreateScene();
 
                     Player playerScr = player.GetComponent<Player>();
                     playerScr.m_world = world;
@@ -117,7 +121,7 @@ public class GameSettings : MonoBehaviour
                     
                     m_worlds[i] = world;
 
-                    origin.x += World.m_w + 10.0f;
+                    origin.x += World.m_w + m_worldSpace;
                 }
                 
                 break;
@@ -148,7 +152,7 @@ public class GameSettings : MonoBehaviour
                     
                     m_worlds[i] = world;
 
-                    origin.x += World.m_w + 10.0f;
+                    origin.x += World.m_w + m_worldSpace;
                 }
                 
                 break;
