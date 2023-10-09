@@ -28,6 +28,18 @@ namespace _Settings
             CASE_COUNT
         }
 
+        // Enumération des différentes cases d'une matrice dans un monde (char).
+        public enum CaseCharID
+        {
+            CASE_VOID      =   ' ',
+            CASE_WALL      =   'O',
+            CASE_ATTACK    =   '!',
+            CASE_COIN      =   '.',
+            CASE_PLAYER    =   'A',
+            CASE_EXIT      =   'B',
+            CASE_COUNT     =   5
+        }
+
         // Variable pour générer des nombres aléatoires.
         public static Random m_randomGenerator = new Random();
 

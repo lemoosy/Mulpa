@@ -18,7 +18,10 @@ namespace _World
         // ##### à définir ! #####
         // #######################
 
-        // Joueur dans le monde.
+        // Tous les objets que peut contenir un monde.
+        public GameObject[] m_objects = new GameObject[(int)Settings.CaseID.CASE_COUNT];
+
+        // Joueur.
         public GameObject m_player = null;
 
         // Origine du monde.
@@ -116,7 +119,7 @@ namespace _World
 
         public void CreateScene()
         {
-            string path = "Levels/level_" + m_levels[m_levelsCursor].ToString() + ".txt";
+            string path = "Assets/Levels/level_" + m_levels[m_levelsCursor].ToString() + ".txt";
 
             Matrix matrix = new Matrix(m_matrixW, m_matrixH);
             matrix.Import(path);
@@ -129,27 +132,60 @@ namespace _World
 
                     switch (value)
                     {
-                        case (int)Settings.CaseID.CASE_VOID:
+                        case (int)Settings.CaseCharID.CASE_VOID:
                         break;
 
-                        case (int)Settings.CaseID.CASE_WALL:
-                        break;
+                        case (int)Settings.CaseCharID.CASE_WALL:
+                            {
+                                int id = (int)Settings.CaseID.CASE_WALL;
 
-                        case (int)Settings.CaseID.CASE_ATTACK:
-                        break;
+                                Instantiate(m_objects[id], new Vector2(m_origin.x + (i * m_tileW), m_origin.y + (j * m_tileH)), Quaternion.identity);
+                            
+                                break;
+                            }
+                        
 
-                        case (int)Settings.CaseID.CASE_COIN:
-                        break;
+                        case (int)Settings.CaseCharID.CASE_ATTACK:
+                            {
+                                int id = (int)Settings.CaseID.CASE_ATTACK;
+                        
+                                Instantiate(m_objects[id], new Vector2(m_origin.x + (i * m_tileW), m_origin.y + (j * m_tileH)), Quaternion.identity);
+                        
+                                break;
+                            }
 
-                        case (int)Settings.CaseID.CASE_PLAYER: // CASE_SPAWN
-                            m_spawnPositionI = i;
-                            m_spawnPositionJ = j;
-                        break;
+                        case (int)Settings.CaseCharID.CASE_COIN:
+                            {
+                                int id = (int)Settings.CaseID.CASE_COIN;
 
-                        case (int)Settings.CaseID.CASE_EXIT:
-                            m_exitPositionI = i;
-                            m_exitPositionJ = j;
-                        break;
+                                Instantiate(m_objects[id], new Vector2(m_origin.x + (i * m_tileW), m_origin.y + (j * m_tileH)), Quaternion.identity);
+                                
+                                break;
+                            }
+
+                        case (int)Settings.CaseCharID.CASE_PLAYER: // CASE_SPAWN
+                            {
+                                int id = (int)Settings.CaseID.CASE_PLAYER;
+
+                                Instantiate(m_objects[id], new Vector2(m_origin.x + (i * m_tileW), m_origin.y + (j * m_tileH)), Quaternion.identity);
+
+                                m_spawnPositionI = i;
+                                m_spawnPositionJ = j;
+
+                                break;
+                            }
+
+                        case (int)Settings.CaseCharID.CASE_EXIT:
+                            {
+                                int id = (int)Settings.CaseID.CASE_EXIT;
+                                
+                                Instantiate(m_objects[id], new Vector2(m_origin.x + (i * m_tileW), m_origin.y + (j * m_tileH)), Quaternion.identity);
+                                
+                                m_exitPositionI = i;
+                                m_exitPositionJ = j;
+                                
+                                break;
+                            }
 
                         default:
                             Debug.Assert(false, "ERROR - World::LoadScene()");

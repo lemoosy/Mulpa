@@ -1,5 +1,7 @@
+using System;
 using System.Diagnostics;
 using System.IO;
+
 using _Settings;
 
 namespace _Matrix
@@ -90,28 +92,45 @@ namespace _Matrix
         // Importe une matrice depuis un fichier TXT.
         public void Import(string p_path)
         {
-            string line = File.ReadAllText(p_path);
+            string file = File.ReadAllText(p_path);
 
-            string[] values = line.Split(',');
+            string[] lines = file.Split('\n');
 
-            m_w = int.Parse(values[0]);
-            m_h = int.Parse(values[1]);
+            m_w = int.Parse(lines[0]);
+            m_h = int.Parse(lines[1]);
 
-            for (int i = 0; i < m_w * m_h; i++)
+            for (int j = 0; j < m_h; j++)
             {
-                m_matrix[i] = int.Parse(values[i + 2]);
+                for (int i = 0; i < m_w; i++)
+                {
+                    int index = j * m_w + i;
+
+                    m_matrix[index] = (int)lines[j + 2][i];
+                }
             }
         }
 
         // Exporte une matrice dans un fichier TXT.
         public void Export(string p_path)
         {
-            string w = m_w.ToString() + ", ";
-            string h = m_h.ToString() + ", ";
+            string file = "";
 
-            string matrix = string.Join(",", m_matrix);
+            file += m_w.ToString() + "\n";
+            file += m_h.ToString() + "\n";
 
-            File.WriteAllText(p_path, w + h + matrix);
+            for (int j = 0; j < m_h; j++)
+            {
+                for (int i = 0; i < m_w; i++)
+                {
+                    int index = j * m_w + i;
+
+                    file += m_matrix[index].ToString();
+                }
+
+                file += '\n';
+            }
+
+            File.WriteAllText(p_path, file);
         }
     }
 }

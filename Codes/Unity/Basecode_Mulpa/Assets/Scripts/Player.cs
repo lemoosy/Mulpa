@@ -330,10 +330,10 @@ public class Player : MonoBehaviour
         float w = GetWidth();
         float h = GetHeight();
 
-        if ((position.y - h) < -(World.m_h / 2.0f))
-        {
-            m_isDead = true;
-        }
+        //if ((position.y - h) < -(World.m_h / 2.0f))
+        //{
+        //    m_isDead = true;
+        //}
 
         if (m_isAI)
         {
