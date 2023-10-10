@@ -128,6 +128,11 @@ public class Player : MonoBehaviour
         if (m_isAI)
         {
             Debug.Assert(m_populationIndex != -1);
+
+            if (m_populationIndex > 0)
+            {
+                //gameObject.GetComponent<Renderer>().enabled = false;
+            }
         }
     }
 
@@ -158,13 +163,11 @@ public class Player : MonoBehaviour
 
         if (m_isAI)
         {
-            //World worldScr = m_world.GetComponent<World>();
+            World worldScr = m_world.GetComponent<World>();
 
-            //DLL.DLL_PG_Forward(m_populationIndex, worldScr.m_matrixForNN, World.m_w, World.m_h);
+            DLL.DLL_PG_Forward(m_populationIndex, worldScr.m_matrix, World.m_matrixW, World.m_matrixH);
 
-            //int res = DLL.DLL_PG_GetOutput(m_populationIndex);
-
-            int res = 1;
+            int res = DLL.DLL_PG_GetOutput(m_populationIndex);
 
             switch (res)
             {
@@ -309,10 +312,15 @@ public class Player : MonoBehaviour
 
         if (m_isAI)
         {
-            if ((float)m_tick / 50.0f > (float)m_maxSeconds)
+            if ((float)m_tick / 50.0f > m_maxSeconds)
             {
                 m_isDead = true;
             }
+        }
+
+        if (m_collisions[(int)Settings.CaseID.CASE_EXIT])
+        {
+            m_atExit = true;
         }
     }
 
@@ -324,16 +332,16 @@ public class Player : MonoBehaviour
     {
         if (m_isAI)
         {
-            if (m_isDead)
+            if (m_isDead && m_score == 0.0f)
             {
                 //World worldScr = m_world.GetComponent<World>();
 
                 //// Fitness = PCC - 2 x Pièces - 100 x Niveaux
 
                 //float PCC = DLL.DLL_PCC(
-                //    worldScr.m_matrixForPCC,
-                //    World.m_w,
-                //    World.m_h,
+                //    worldScr.m_matrix,
+                //    World.m_matrixW,
+                //    World.m_matrixH,
                 //    worldScr.m_playerPositionI,
                 //    worldScr.m_playerPositionJ,
                 //    worldScr.m_exitPositionI,

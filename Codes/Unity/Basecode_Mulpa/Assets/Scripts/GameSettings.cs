@@ -35,16 +35,16 @@ public class GameSettings : MonoBehaviour
 
     
     // Taille de la population.
-    public const int m_populationSize = 10;
+    public const int m_populationSize = 500;
 
     // Taille de la sélection.
-    public const int m_selectionSize = 3;
+    public const int m_selectionSize = 50;
 
     // Nombre d'enfants.
-    public const int m_childrenSize = 3;
+    public const int m_childrenSize = 200;
 
     // Nombre de fois qu'un enfant est muté.
-    public const int m_mutationRate = 1;
+    public const int m_mutationRate = 3;
 
     // Nombre de générations.
     public int m_generation = 0;
@@ -55,7 +55,7 @@ public class GameSettings : MonoBehaviour
     public GameObject[] m_worlds;
 
 
-    public float m_worldSpace = 30.0f;
+    public float m_worldSpace = 32.0f;
 
 
     #endregion
@@ -68,8 +68,8 @@ public class GameSettings : MonoBehaviour
 
     void Start()
     {
-        Debug.Assert(m_worldCopy, "ERROR (1) - GameSettings::Start()");
-        Debug.Assert(m_playerCopy, "ERROR (2) - GameSettings::Start()");
+        Debug.Assert(m_worldCopy);
+        Debug.Assert(m_playerCopy);
 
         switch (m_mode)
         {
@@ -81,14 +81,17 @@ public class GameSettings : MonoBehaviour
                 GameObject player = Instantiate(m_playerCopy);
 
                 World worldScr = world.GetComponent<World>();
+                Player playerScr = player.GetComponent<Player>();
+
                 worldScr.m_player = player;
-                worldScr.m_origin = new Vector2(0.0f, 0.0f);
+                playerScr.m_world = world;
+                
+                    worldScr.m_origin = new Vector2(0.0f, 0.0f);
                 worldScr.m_levels = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
                 worldScr.CreateScene();
 
-                Player playerScr = player.GetComponent<Player>();
-                playerScr.m_world = world;
                 playerScr.m_isAI = false;
+                playerScr.ResetPosition();
 
                 m_worlds[0] = world;
                 
@@ -109,15 +112,18 @@ public class GameSettings : MonoBehaviour
                     GameObject player = Instantiate(m_playerCopy);
 
                     World worldScr = world.GetComponent<World>();
+                    Player playerScr = player.GetComponent<Player>();
+
                     worldScr.m_player = player;
+                    playerScr.m_world = world;
+                    
                     worldScr.m_origin = origin;
                     worldScr.m_levels = new int[] { 1, 2, 3, 4, 5 };
                     worldScr.CreateScene();
 
-                    Player playerScr = player.GetComponent<Player>();
-                    playerScr.m_world = world;
                     playerScr.m_isAI = true;
                     playerScr.m_populationIndex = i;
+                    playerScr.ResetPosition();
                     
                     m_worlds[i] = world;
 
@@ -149,6 +155,7 @@ public class GameSettings : MonoBehaviour
                     playerScr.m_world = world;
                     playerScr.m_isAI = true;
                     playerScr.m_populationIndex = i;
+                    playerScr.ResetPosition();
                     
                     m_worlds[i] = world;
 
@@ -221,8 +228,11 @@ public class GameSettings : MonoBehaviour
                 {
                     DLL.DLL_PG_Update();
 
+                    string msg = "";
+
                     for (int i = 0; i < m_populationSize; i++)
                     {
+
                         GameObject world = m_worlds[i];
 
                         World worldScr = world.GetComponent<World>();
@@ -230,7 +240,24 @@ public class GameSettings : MonoBehaviour
                         worldScr.m_gameOver = false;
                         worldScr.DestroyScene();
                         worldScr.CreateScene();
+
+                        Player playerScr = worldScr.m_player.GetComponent<Player>();
+                        playerScr.m_tick = 0;
+                        playerScr.ResetPosition();
+                        playerScr.ResetState();
+                        playerScr.m_coin = 0;
+
+                        if (i <= 4)
+                        {
+                            msg += DLL.DLL_PG_GetScore(i).ToString() + " | ";
+                        }
+
+                        DLL.DLL_PG_SetScore(i, 1000.0f);
+
+                        playerScr.m_score = 0.0f;
                     }
+
+                    print(msg);
 
                     m_generation++;
                 }
