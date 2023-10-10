@@ -21,8 +21,10 @@ namespace _World
         // ##### à définir ! #####
         // #######################
 
-        public Tile myTile = null;
+        // Tuile pour les murs.
+        public Tile m_tile = null;
 
+        // Tilemap pour les murs.
         public Tilemap m_tilemap = null;
 
         // Tous les objets que peut contenir un monde.
@@ -90,11 +92,6 @@ namespace _World
 
 
 
-        // Vérifie si la partie est terminée pour ce monde.
-        public bool m_gameOver = false;
-
-
-
         #endregion
 
 
@@ -115,39 +112,18 @@ namespace _World
 
             if (playerScr.m_isAI)
             {
-                if (playerScr.m_isDead)
-                {
-                    DLL.DLL_PG_SetScore(playerScr.m_populationIndex, playerScr.m_score);
-                    m_gameOver = true;
-                }
-
                 if (playerScr.m_atExit)
                 {
                     m_levelsCursor++;
                     DestroyScene();
                     CreateScene();
+                    playerScr.m_tick = 0;
                     playerScr.ResetPosition();
                     playerScr.ResetState();
                 }
             }
             else
             {
-                if (playerScr.m_isDead)
-                {
-                    DestroyScene();
-                    CreateScene();
-                    playerScr.ResetPosition();
-                    playerScr.ResetState();
-                }
-
-                if (playerScr.m_collisions[(int)Settings.CaseID.CASE_EXIT])
-                {
-                    m_levelsCursor++;
-                    DestroyScene();
-                    CreateScene();
-                    playerScr.ResetPosition();
-                    playerScr.ResetState();
-                }
             }
 
             UpdateMatrix();
@@ -164,6 +140,8 @@ namespace _World
             Matrix matrix = new Matrix(m_matrixW, m_matrixH);
             matrix.Import(path);
 
+            Tilemap tilemapScr = m_tilemap.GetComponent<Tilemap>();
+
             for (int j = 0; j < m_matrixH; j++)
             {
                 for (int i = 0; i < m_matrixW; i++)
@@ -172,47 +150,60 @@ namespace _World
                     
                     GameObject obj = null;
 
-                    Tilemap tilemap = m_tilemap.GetComponent<Tilemap>();
-                    Vector3Int position = new Vector3Int(i + (int)(m_origin.x / (float)m_tileW), j, 0);
-                    tilemap.SetTile(position, null);
+                    int _i = (int)m_origin.x / m_tileW + i;
+                    int _j = (int)m_origin.y / m_tileH + j;
+
+                    Vector3Int pos = new Vector3Int(_i, _j, 0);
+                    tilemapScr.SetTile(pos, null);
 
                     switch (value)
                     {
-                        case (int)Settings.CaseCharID.CASE_VOID:
+                        case ' ':
                         break;
 
-                        case (int)Settings.CaseCharID.CASE_WALL:
+                        case 'O':
                             {
-                                position = new Vector3Int(i + (int)(m_origin.x / (float)m_tileW), j, 0);
-                                tilemap.SetTile(position, myTile);
+                                _i = (int)m_origin.x / m_tileW + i;
+                                _j = (int)m_origin.y / m_tileH + j;
+
+                                pos = new Vector3Int(_i, _j, 0);
+                                tilemapScr.SetTile(pos, m_tile);
 
                                 break;
                             }
-                        
 
-                        case (int)Settings.CaseCharID.CASE_ATTACK:
+                        case '!':
                             {
                                 int id = (int)Settings.CaseID.CASE_ATTACK;
-                        
-                                obj = Instantiate(m_objectsCopy[id], new Vector2(m_origin.x + (i * m_tileW), m_origin.y + (j * m_tileH)), Quaternion.identity);
+
+                                Vector2 position = new Vector2(i * m_tileW, j * m_tileH);
+                                position += m_origin;
+
+                                obj = Instantiate(m_objectsCopy[id], position, Quaternion.identity);
                         
                                 break;
                             }
 
-                        case (int)Settings.CaseCharID.CASE_COIN:
+                        case '.':
                             {
                                 int id = (int)Settings.CaseID.CASE_COIN;
 
-                                obj = Instantiate(m_objectsCopy[id], new Vector2(m_origin.x + (i * m_tileW), m_origin.y + (j * m_tileH)), Quaternion.identity);
+                                Vector2 position = new Vector2(i * m_tileW, j * m_tileH);
+                                position += m_origin;
+
+                                obj = Instantiate(m_objectsCopy[id], position, Quaternion.identity);
                                 
                                 break;
                             }
 
-                        case (int)Settings.CaseCharID.CASE_PLAYER:
+                        case 'A':
                             {
                                 int id = (int)Settings.CaseID.CASE_SPAWN;
 
-                                obj = Instantiate(m_objectsCopy[id], new Vector2(m_origin.x + (i * m_tileW), m_origin.y + (j * m_tileH)), Quaternion.identity);
+                                Vector2 position = new Vector2(i * m_tileW, j * m_tileH);
+                                position += m_origin;
+
+                                obj = Instantiate(m_objectsCopy[id], position, Quaternion.identity);
 
                                 m_spawnPositionI = i;
                                 m_spawnPositionJ = j;
@@ -220,11 +211,14 @@ namespace _World
                                 break;
                             }
 
-                        case (int)Settings.CaseCharID.CASE_EXIT:
+                        case 'B':
                             {
                                 int id = (int)Settings.CaseID.CASE_EXIT;
 
-                                obj = Instantiate(m_objectsCopy[id], new Vector2(m_origin.x + (i * m_tileW), m_origin.y + (j * m_tileH)), Quaternion.identity);
+                                Vector2 position = new Vector2(i * m_tileW, j * m_tileH);
+                                position += m_origin;
+
+                                obj = Instantiate(m_objectsCopy[id], position, Quaternion.identity);
                                 
                                 m_exitPositionI = i;
                                 m_exitPositionJ = j;
@@ -275,18 +269,50 @@ namespace _World
 
         public void UpdateMatrix()
         {
+            // Tiles.
+
+            Tilemap tilemapScr = m_tilemap.GetComponent<Tilemap>();
+
+            for (int j = 0; j < m_matrixH; j++)
+            {
+                for (int i = 0; i < m_matrixW; i++)
+                {
+                    int _i = (int)m_origin.x / m_tileW + i;
+                    int _j = (int)m_origin.y / m_tileH + j;
+
+                    Vector3Int pos = new Vector3Int(_i, _j, 0);
+
+                    if (tilemapScr.GetTile(pos))
+                    {
+                        int index = (j * m_matrixW) + i;
+
+                        m_matrix[index] = (int)Settings.CaseID.CASE_WALL;
+                    }
+                }
+            }
+
             // Objects.
 
             foreach (GameObject obj in m_objects)
             {
-                if (obj == null) continue;
+                if (!obj)
+                {
+                    continue;
+                }
 
                 Vector2 position = obj.transform.position;
-                
                 position -= m_origin;
 
-                int i = (int)((position.x + (float)m_tileW / 2.0f) / (float)m_tileW);
-                int j = (int)((position.y + (float)m_tileH / 2.0f) / (float)m_tileH);
+                float x = position.x + (float)m_tileW / 2.0f;
+                float y = position.y + (float)m_tileH / 2.0f;
+
+                int i = (int)(x / (float)m_tileW);
+                int j = (int)(y / (float)m_tileH);
+
+                if ((i < 0) || (i >= m_matrixW) || (j < 0) || (j >= m_matrixH))
+                {
+                    continue;
+                }
 
                 int index = (j * m_matrixW) + i;
 
@@ -305,6 +331,9 @@ namespace _World
                         value = (int)Settings.CaseID.CASE_COIN;
                         break;
 
+                    case "tag_spawn":
+                        break;
+
                     case "tag_exit":
                         value = (int)Settings.CaseID.CASE_EXIT;
                         break;
@@ -321,50 +350,34 @@ namespace _World
                 m_matrix[index] = value;
             }
 
-            // Tiles.
-
-            Tilemap tilemap = m_tilemap.GetComponent<Tilemap>();
-
-            for (int j = 0; j < m_matrixH; j++)
-            {
-                for (int i = 0; i < m_matrixW; i++)
-                {
-                    Vector3Int pos = new Vector3Int(i + (int)(m_origin.x / (float)m_tileW), j, 0);
-
-                    if (tilemap.GetTile(pos))
-                    {
-                        int index = (j * m_matrixW) + i;
-                        m_matrix[index] = (int)Settings.CaseID.CASE_WALL;
-                    }
-
-                }
-            }
-
             // Player.
+            {
+                Player playerScr = m_player.GetComponent<Player>();
 
-            Player playerScr = m_player.GetComponent<Player>();
+                m_playerPositionI = -1;
+                m_playerPositionJ = -1;
 
-            if (playerScr.OutOfDimension()) return;
+                Vector2 position = m_player.transform.position;
+                position -= m_origin;
 
-            Vector2 positionPlayer = m_player.transform.position;
+                float x = position.x + (float)m_tileW / 2.0f;
+                float y = position.y + (float)m_tileH / 2.0f;
 
-            positionPlayer -= m_origin;
+                int i = (int)(x / (float)m_tileW);
+                int j = (int)(y / (float)m_tileH);
 
-            int iPlayer = (int)((positionPlayer.x + (float)m_tileW / 2.0f) / (float)m_tileW);
-            int jPlayer = (int)((positionPlayer.y + (float)m_tileH / 2.0f) / (float)m_tileH);
+                if ((i < 0) || (i >= m_matrixW) || (j < 0) || (j >= m_matrixH))
+                {
+                    return;
+                }
 
-            int indexPlayer = (jPlayer * m_matrixW) + iPlayer;
+                int index = (j * m_matrixW) + i;
 
-            m_playerPositionI = -1;
-            m_playerPositionJ = -1;
+                m_matrix[index] = (int)Settings.CaseID.CASE_SPAWN;
 
-            if (iPlayer < 0 || iPlayer >= m_matrixW) return;
-            if (jPlayer < 0 || jPlayer >= m_matrixH) return;
-
-            m_matrix[indexPlayer] = (int)Settings.CaseID.CASE_SPAWN;
-
-            m_playerPositionI = iPlayer;
-            m_playerPositionJ = jPlayer;
+                m_playerPositionI = i;
+                m_playerPositionJ = j;
+            }
         }
 
 

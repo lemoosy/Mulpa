@@ -32,12 +32,6 @@ public class Player : MonoBehaviour
 
 
 
-    public int m_tick = 0; // +1 par frame.
-    public const float m_maxSeconds = 5.0f; // max. 5 secondes pour l'IA.
-
-    // Gestionnaire de collisions.
-    public GameObject[] m_collisions = new GameObject[(int)Settings.CaseID.CASE_COUNT];
-
     // Entrées du joueur.
     public bool m_left = false;
     public bool m_right = false;
@@ -58,6 +52,12 @@ public class Player : MonoBehaviour
     // Score du joueur.
     public float m_score = 0.0f;
 
+    public int m_tick = 0; // +1 par frame.
+    public const float m_maxSeconds = 5.0f; // max. 5 secondes pour l'IA.
+
+    // Gestionnaire de collisions.
+    public GameObject[] m_collisions = new GameObject[(int)Settings.CaseID.CASE_COUNT];
+
 
 
     #endregion
@@ -72,6 +72,13 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
+        UpdateInput();
+        UpdateVelocity();
+        UpdatePosition();
+        UpdateItem();
+        UpdateState();
+        UpdateAI();
+
         m_tick++;
 
         int size = m_collisions.Length;
@@ -128,22 +135,7 @@ public class Player : MonoBehaviour
         if (m_isAI)
         {
             Debug.Assert(m_populationIndex != -1);
-
-            if (m_populationIndex > 0)
-            {
-                //gameObject.GetComponent<Renderer>().enabled = false;
-            }
         }
-    }
-
-    private void Update()
-    {
-        UpdateInput();
-        UpdateVelocity();
-        UpdatePosition();
-        UpdateItem();
-        UpdateState();
-        UpdateAI();
     }
     
 
@@ -272,12 +264,16 @@ public class Player : MonoBehaviour
 
     public void UpdatePosition()
     {
-        // World.cs s'en occupe.
     }
 
 
 
     // Item.
+
+    public void ResetItem()
+    {
+        m_coin = 0;
+    }
 
     public void UpdateItem()
     {
@@ -305,19 +301,28 @@ public class Player : MonoBehaviour
     {
         ResetState();
 
-        if (OutOfDimension() || m_collisions[(int)Settings.CaseID.CASE_ATTACK])
-        {
-            m_isDead = true;
-        }
-
         if (m_isAI)
         {
-            if ((float)m_tick / 50.0f > m_maxSeconds)
+            if ((float)m_tick / 60.0f > m_maxSeconds)
             {
                 m_isDead = true;
             }
         }
+        else
+        {
 
+        }
+
+        if (OutOfDimension())
+        {
+            m_isDead = true;
+        }
+
+        if (m_collisions[(int)Settings.CaseID.CASE_ATTACK])
+        {
+            m_isDead = true;
+        }
+        
         if (m_collisions[(int)Settings.CaseID.CASE_EXIT])
         {
             m_atExit = true;
@@ -332,32 +337,32 @@ public class Player : MonoBehaviour
     {
         if (m_isAI)
         {
-            if (m_isDead && m_score == 0.0f)
+            if (m_isDead)
             {
-                //World worldScr = m_world.GetComponent<World>();
+                World worldScr = m_world.GetComponent<World>();
 
-                //// Fitness = PCC - 2 x Pièces - 100 x Niveaux
+                // Fitness = PCC - 2 x Pièces - 100 x Niveaux
 
-                //float PCC = DLL.DLL_PCC(
-                //    worldScr.m_matrix,
-                //    World.m_matrixW,
-                //    World.m_matrixH,
-                //    worldScr.m_playerPositionI,
-                //    worldScr.m_playerPositionJ,
-                //    worldScr.m_exitPositionI,
-                //    worldScr.m_exitPositionJ,
-                //    false
-                //);
+                float PCC = DLL.DLL_PCC(
+                    worldScr.m_matrix,
+                    World.m_matrixW,
+                    World.m_matrixH,
+                    worldScr.m_playerPositionI,
+                    worldScr.m_playerPositionJ,
+                    worldScr.m_exitPositionI,
+                    worldScr.m_exitPositionJ,
+                    false
+                );
 
-                //// Si le joueur est hors dimension.
-                //if (PCC == -1.0f)
-                //{
-                //    m_score = 1000.0f;
-                //}
-                //else
-                //{
-                //    m_score = PCC - 5.0f * (float)m_coin - 100.0f * (float)(worldScr.m_levelsCursor);
-                //}
+                // Si le joueur est hors dimension.
+                if (PCC == -1.0f)
+                {
+                    m_score = 1000.0f;
+                }
+                else
+                {
+                    m_score = PCC - 5.0f * (float)m_coin - 100.0f * (float)(worldScr.m_levelsCursor);
+                }
             }
         }
     }

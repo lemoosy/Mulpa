@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 
 namespace _Settings
 {
@@ -28,24 +29,14 @@ namespace _Settings
             CASE_COUNT
         }
 
-        // Enumération des différentes cases d'une matrice dans un monde (char).
-        public enum CaseCharID
-        {
-            CASE_VOID      =   ' ',
-            CASE_WALL      =   'O',
-            CASE_ATTACK    =   '!',
-            CASE_COIN      =   '.',
-            CASE_PLAYER    =   'A',
-            CASE_EXIT      =   'B',
-            CASE_COUNT     =   5
-        }
-
         // Variable pour générer des nombres aléatoires.
         public static Random m_randomGenerator = new Random();
 
         // Retourne un entier aléatoire entre p_a et p_b.
         public static int IntRandom(int p_a, int p_b)
         {
+            Debug.Assert(p_a < p_b);
+
             return m_randomGenerator.Next(p_a, p_b + 1);
         }
     }

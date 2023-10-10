@@ -21,7 +21,8 @@ namespace _Matrix
         // Crée une matrice p_w x p_h (toutes les valeurs sont initialisées à 0).
         public Matrix(int p_w, int p_h)
         {
-            Debug.Assert((p_w > 0) && (p_h > 0), "ERROR - Matrix::Matrix()");
+            Debug.Assert(p_w > 0);
+            Debug.Assert(p_h > 0);
 
             m_w = p_w;
             m_h = p_h;
@@ -32,6 +33,9 @@ namespace _Matrix
         // Crée une matrice p_w x p_h (toutes les valeurs sont initialisées entre p_a et p_b).
         public Matrix(int p_w, int p_h, int p_a, int p_b)
         {
+            Debug.Assert(p_w > 0);
+            Debug.Assert(p_h > 0);
+
             m_w = p_w;
             m_h = p_h;
 
@@ -52,7 +56,7 @@ namespace _Matrix
         // Retourne la valeur à la position (p_i, p_j).
         public int Get(int p_i, int p_j)
         {
-            Debug.Assert(!OutOfDimension(p_i, p_j), "ERROR - Matrix::Get()");
+            Debug.Assert(!OutOfDimension(p_i, p_j));
     
             return m_matrix[(p_j * m_w) + p_i];
         }
@@ -60,7 +64,7 @@ namespace _Matrix
         // Modifie la valeur à la position (p_i, p_j) par p_value.
         public void Set(int p_i, int p_j, int p_value)
         {
-            Debug.Assert(!OutOfDimension(p_i, p_j), "ERROR - Matrix::Set()");
+            Debug.Assert(!OutOfDimension(p_i, p_j));
             
             m_matrix[(p_j * m_w) + p_i] = p_value;
         }
@@ -127,7 +131,7 @@ namespace _Matrix
                     file += m_matrix[index].ToString();
                 }
 
-                file += '\n';
+                file += "\n";
             }
 
             File.WriteAllText(p_path, file);

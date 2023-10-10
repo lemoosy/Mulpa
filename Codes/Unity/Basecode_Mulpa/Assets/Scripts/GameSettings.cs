@@ -3,6 +3,7 @@ using UnityEngine;
 using _DLL;
 using _Settings;
 using _World;
+using UnityEngine.Tilemaps;
 
 public class GameSettings : MonoBehaviour
 {
@@ -16,6 +17,9 @@ public class GameSettings : MonoBehaviour
     // #######################
     // ##### à définir ! #####
     // #######################
+
+    // Tilemap pour les murs.
+    public Tilemap m_tilemapCopy = null;
 
     // Objet pour instancier un monde.
     public GameObject m_worldCopy = null;
@@ -35,16 +39,16 @@ public class GameSettings : MonoBehaviour
 
     
     // Taille de la population.
-    public const int m_populationSize = 500;
+    public int m_populationSize = 200;
 
     // Taille de la sélection.
-    public const int m_selectionSize = 50;
+    public int m_selectionSize = 50;
 
     // Nombre d'enfants.
-    public const int m_childrenSize = 200;
+    public int m_childrenSize = 100;
 
     // Nombre de fois qu'un enfant est muté.
-    public const int m_mutationRate = 3;
+    public int m_mutationRate = 3;
 
     // Nombre de générations.
     public int m_generation = 0;
@@ -55,7 +59,10 @@ public class GameSettings : MonoBehaviour
     public GameObject[] m_worlds;
 
 
-    public float m_worldSpace = 32.0f;
+
+    // Espacement entre les mondes.
+    public float m_worldSpace = 256.0f;
+
 
 
     #endregion
@@ -71,128 +78,80 @@ public class GameSettings : MonoBehaviour
         Debug.Assert(m_worldCopy);
         Debug.Assert(m_playerCopy);
 
+        m_tilemapCopy.ClearAllTiles();
+
         switch (m_mode)
         {
             case Settings.ModeID.MODE_SOLO:
             {
-                m_worlds = new GameObject[1];
+                    m_worlds = new GameObject[1];
 
-                GameObject world = Instantiate(m_worldCopy);
-                GameObject player = Instantiate(m_playerCopy);
+                    GameObject world = Instantiate(m_worldCopy);
+                    GameObject player = Instantiate(m_playerCopy);
 
-                World worldScr = world.GetComponent<World>();
-                Player playerScr = player.GetComponent<Player>();
+                    World worldScr = world.GetComponent<World>();
+                    Player playerScr = player.GetComponent<Player>();
 
-                worldScr.m_player = player;
-                playerScr.m_world = world;
-                
+                    worldScr.m_player = player;
+                    playerScr.m_world = world;
+                    
+                    worldScr.m_tilemap = m_tilemapCopy;
                     worldScr.m_origin = new Vector2(0.0f, 0.0f);
-                worldScr.m_levels = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
-                worldScr.CreateScene();
+                    worldScr.m_levels = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+                    worldScr.CreateScene();
 
-                playerScr.m_isAI = false;
-                playerScr.ResetPosition();
+                    playerScr.m_isAI = false;
+                    playerScr.ResetPosition();
 
-                m_worlds[0] = world;
-                
-                break;
+                    m_worlds[0] = world;
+                    
+                    break;
             }
 
             case Settings.ModeID.MODE_TRAINING_EASY:
             {
-                m_worlds = new GameObject[m_populationSize];
+                    m_worlds = new GameObject[m_populationSize];
 
-                DLL.DLL_PG_Init(m_populationSize, m_selectionSize, m_childrenSize, m_mutationRate);
+                    DLL.DLL_PG_Init(m_populationSize, m_selectionSize, m_childrenSize, m_mutationRate);
 
-                Vector2 origin = new Vector2(0.0f, 0.0f);
-                
-                for (int i = 0; i < m_populationSize; i++)
-                {
-                    GameObject world = Instantiate(m_worldCopy);
-                    GameObject player = Instantiate(m_playerCopy);
-
-                    World worldScr = world.GetComponent<World>();
-                    Player playerScr = player.GetComponent<Player>();
-
-                    worldScr.m_player = player;
-                    playerScr.m_world = world;
+                    Vector2 origin = new Vector2(0.0f, 0.0f);
                     
-                    worldScr.m_origin = origin;
-                    worldScr.m_levels = new int[] { 1, 2, 3, 4, 5 };
-                    worldScr.CreateScene();
+                    for (int i = 0; i < m_populationSize; i++)
+                    {
+                        GameObject world = Instantiate(m_worldCopy);
+                        GameObject player = Instantiate(m_playerCopy);
 
-                    playerScr.m_isAI = true;
-                    playerScr.m_populationIndex = i;
-                    playerScr.ResetPosition();
+                        World worldScr = world.GetComponent<World>();
+                        Player playerScr = player.GetComponent<Player>();
+
+
+                        worldScr.m_player = player;
+                        playerScr.m_world = world;
+
+                        worldScr.m_tilemap = m_tilemapCopy;
+                        worldScr.m_origin = origin;
+                        worldScr.m_levels = new int[] { 1, 2, 3, 4, 5 };
+                        worldScr.CreateScene();
+
+                        playerScr.m_isAI = true;
+                        playerScr.m_populationIndex = i;
+                        playerScr.ResetPosition();
+                        
+                        m_worlds[i] = world;
+
+                        origin.x += World.m_w + m_worldSpace;
+                    }
                     
-                    m_worlds[i] = world;
-
-                    origin.x += World.m_w + m_worldSpace;
-                }
-                
-                break;
+                    break;
             }
 
             case Settings.ModeID.MODE_TRAINING_MEDIUM:
             {
-                m_worlds = new GameObject[m_populationSize];
-
-                DLL.DLL_PG_Init(m_populationSize, m_selectionSize, m_childrenSize, m_mutationRate);
-
-                Vector2 origin = new Vector2(0.0f, 0.0f);
-                
-                for (int i = 0; i < m_populationSize; i++)
-                {
-                    GameObject world = Instantiate(m_worldCopy);
-                    GameObject player = Instantiate(m_playerCopy);
-
-                    World worldScr = world.GetComponent<World>();
-                    worldScr.m_player = player;
-                    worldScr.m_origin = origin;
-                    worldScr.m_levels = new int[] { 6, 7, 8, 9, 10 };
-
-                    Player playerScr = player.GetComponent<Player>();
-                    playerScr.m_world = world;
-                    playerScr.m_isAI = true;
-                    playerScr.m_populationIndex = i;
-                    playerScr.ResetPosition();
-                    
-                    m_worlds[i] = world;
-
-                    origin.x += World.m_w + m_worldSpace;
-                }
-                
                 break;
             }
 
             case Settings.ModeID.MODE_TRAINING_HARD:
             {
-                m_worlds = new GameObject[m_populationSize];
-
-                DLL.DLL_PG_Init(m_populationSize, m_selectionSize, m_childrenSize, m_mutationRate);
-                
-                Vector2 origin = new Vector2(0.0f, 0.0f);
-                
-                for (int i = 0; i < m_populationSize; i++)
-                {
-                    GameObject world = Instantiate(m_worldCopy);
-                    GameObject player = Instantiate(m_playerCopy);
-
-                    World worldScr = world.GetComponent<World>();
-                    worldScr.m_player = player;
-                    worldScr.m_origin = origin;
-                    worldScr.m_levels = new int[] { 11, 12, 13, 14, 15 };
-
-                    Player playerScr = player.GetComponent<Player>();
-                    playerScr.m_world = world;
-                    playerScr.m_isAI = true;
-                    playerScr.m_populationIndex = i;
-                    
-                    m_worlds[i] = world;
-
-                    origin.x += World.m_w + 10.0f;
-                }
-                
                 break;
             }
         }
@@ -216,8 +175,9 @@ public class GameSettings : MonoBehaviour
                     GameObject world = m_worlds[i];
 
                     World worldScr = world.GetComponent<World>();
+                    Player player = worldScr.m_player.GetComponent<Player>();
 
-                    if (worldScr.m_gameOver == false)
+                    if (player.m_isDead == false)
                     {
                         res = true;
                         break;
@@ -226,38 +186,43 @@ public class GameSettings : MonoBehaviour
 
                 if (res == false)
                 {
-                    DLL.DLL_PG_Update();
+                    m_tilemapCopy.ClearAllTiles();
 
-                    string msg = "";
+                    string msg = "[";
 
                     for (int i = 0; i < m_populationSize; i++)
                     {
+                        GameObject world = m_worlds[i];
+                        World worldScr = world.GetComponent<World>();
+                        Player playerScr = worldScr.m_player.GetComponent<Player>();
+                        DLL.DLL_PG_SetScore(i, playerScr.m_score);
 
+                        if (i < 10)
+                        {
+                            msg += DLL.DLL_PG_GetScore(i).ToString() + ", ";
+                        }
+                    }
+
+                    print(msg + "]");
+
+                    DLL.DLL_PG_Update();
+
+                    for (int i = 0; i < m_populationSize; i++)
+                    {
                         GameObject world = m_worlds[i];
 
                         World worldScr = world.GetComponent<World>();
                         worldScr.m_levelsCursor = 0;
-                        worldScr.m_gameOver = false;
                         worldScr.DestroyScene();
                         worldScr.CreateScene();
 
                         Player playerScr = worldScr.m_player.GetComponent<Player>();
                         playerScr.m_tick = 0;
                         playerScr.ResetPosition();
+                        playerScr.ResetItem();
                         playerScr.ResetState();
-                        playerScr.m_coin = 0;
-
-                        if (i <= 4)
-                        {
-                            msg += DLL.DLL_PG_GetScore(i).ToString() + " | ";
-                        }
-
-                        DLL.DLL_PG_SetScore(i, 1000.0f);
-
                         playerScr.m_score = 0.0f;
                     }
-
-                    print(msg);
 
                     m_generation++;
                 }
