@@ -14,8 +14,8 @@ private:
 	/// @brief Hauteur de la matrice.
 	int m_h;
 
-	/// @brief Valeurs de la matrice.
-	float* m_values;
+	/// @brief Matrice.
+	Eigen::MatrixXd* m_matrix;
 
 public:
 

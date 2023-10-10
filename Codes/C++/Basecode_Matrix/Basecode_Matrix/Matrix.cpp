@@ -8,7 +8,7 @@ Matrix::Matrix(int w, int h)
 	m_w = w;
 	m_h = h;
 
-	m_values = new float[w * h]();
+	m_matrix = new Eigen::MatrixXd(w, h);
 }
 
 Matrix::Matrix(const Matrix& m)
@@ -16,14 +16,12 @@ Matrix::Matrix(const Matrix& m)
 	m_w = m.m_w;
 	m_h = m.m_h;
 
-	m_values = new float[m_w * m_h];
-
-	memccpy(m_values, m.m_values, m_w * m_h, sizeof(float));
+	m_matrix = new Eigen::MatrixXd(m.m_matrix);
 }
 
 Matrix::~Matrix()
 {
-	delete[] m_values;
+	delete m_matrix;
 }
 
 void Matrix::SetValue(int i, int j, float value)
@@ -31,7 +29,7 @@ void Matrix::SetValue(int i, int j, float value)
 	assert((0 <= i) && (i < m_w));
 	assert((0 <= j) && (j < m_h));
 
-	m_values[j * m_w + i] = value;
+	(*m_matrix)(i, j) = value;
 }
 
 float Matrix::GetValue(int i, int j) const
@@ -39,25 +37,13 @@ float Matrix::GetValue(int i, int j) const
 	assert((0 <= i) && (i < m_w));
 	assert((0 <= j) && (j < m_h));
 
-	return m_values[j * m_w + i];
+	return (*m_matrix)(i, j);
 }
 
 void Matrix::Print() const
 {
-	cout << "Matrix (" << m_w << "x" << m_h << ") :\n\n";
-
-	for (int j = 0; j < m_h; j++)
-	{
-		for (int i = 0; i < m_w; i++)
-		{
-			int index = j * m_w + i;
-
-			cout << fixed << setprecision(2) << m_values[index] << '\t';
-		}
-
-		cout << '\n';
-	}
-
+	cout << "Matrix (" << m_w << "x" << m_h << ") :\n";
+	cout << m_matrix;
 	cout << endl;
 }
 
@@ -66,22 +52,15 @@ void Matrix::Copy(const Matrix& m)
 	assert(m_w == m.m_w);
 	assert(m_h == m.m_h);
 
-	memccpy(m_values, m.m_values, m_w * m_h, sizeof(float));
+	(*m_matrix) = (*m.m_matrix);
 }
 
 void Matrix::Add(const Matrix& m)
 {
 	assert(m_w == m.m_w);
 	assert(m_h == m.m_h);
-
-	int size = m_w * m_h;
 	
-	float* tab = m.m_values;
-
-	for (int k = 0; k < size; k++)
-	{
-		m_values[k] += tab[k];
-	}
+	(*m_matrix) += (*m.m_matrix);
 }
 
 void Matrix::Sub(const Matrix& m)
@@ -89,80 +68,50 @@ void Matrix::Sub(const Matrix& m)
 	assert(m_w == m.m_w);
 	assert(m_h == m.m_h);
 
-	int size = m_w * m_h;
-
-	float* tab = m.m_values;
-
-	for (int k = 0; k < size; k++)
-	{
-		m_values[k] -= tab[k];
-	}
+	(*m_matrix) -= (*m.m_matrix);
 }
 
 void Matrix::Scale(float s)
 {
-	int size = m_w * m_h;
-
-	for (int k = 0; k < size; k++)
-	{
-		m_values[k] *= s;
-	}
+	(*m_matrix) *= s;
 }
 
 Matrix Matrix::Multiply(const Matrix& m) const
 {
 	assert(m_w == m.m_h);
 
-	int w = m.m_w;
-	int h = m_h;
+	Eigen::MatrixXd matrix = (*m_matrix) * (*m.m_matrix);
 
-	Matrix res = Matrix(w, h);
-
-	for (int j = 0; j < h; j++)
-	{
-		for (int i = 0; i < w; i++)
-		{
-			float sum = 0.0f;
-
-			for (int k = 0; k < m_w; k++)
-			{
-				sum += GetValue(k, j) * m.GetValue(i, k);
-			}
-
-			res.SetValue(i, j, sum);
-		}
-	}
+	Matrix res(m.m_w, m_h);
+	res.m_matrix = new Eigen::MatrixXd(matrix);
 
 	return res;
 }
 
 void Matrix::FillValue(float value)
 {
-	int size = m_w * m_h;
-
-	for (int k = 0; k < size; k++)
-	{
-		m_values[k] = value;
-	}
+	m_matrix->fill(value);
 }
 
 void Matrix::FillValueRandom(float a, float b)
 {
-	int size = m_w * m_h;
-
-	for (int k = 0; k < size; k++)
+	for (int j = 0; j < m_h; j++)
 	{
-		m_values[k] = Float_Random(a, b);
+		for (int i = 0; i < m_w; i++)
+		{
+			SetValue(i, j, Float_Random(a, b));
+		}
 	}
 }
 
 void Matrix::Composition(float (*function)(float))
 {
-	int size = m_w * m_h;
-
-	for (int k = 0; k < size; k++)
+	for (int j = 0; j < m_h; j++)
 	{
-		m_values[k] = function(m_values[k]);
+		for (int i = 0; i < m_w; i++)
+		{
+			SetValue(i, j, function(GetValue(i, j)));
+		}
 	}
 }
 
@@ -176,15 +125,14 @@ void Matrix::Mix(const Matrix& m)
 	assert(m_w == m.m_w);
 	assert(m_h == m.m_h);
 
-	int size = m_w * m_h;
-
-	float* tab = m.m_values;
-
-	for (int k = 0; k < size; k++)
+	for (int j = 0; j < m_h; j++)
 	{
-		if (rand() % 2)
+		for (int i = 0; i < m_w; i++)
 		{
-			m_values[k] = tab[k];
+			if (rand() % 2)
+			{
+				SetValue(i, j, m.GetValue(i, j));
+			}
 		}
 	}
 }
