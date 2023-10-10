@@ -110,12 +110,10 @@ void NN::Forward(Matrix* X)
 	{
 		Layer* layer = curr->m_value;
 
-		Matrix W = *layer->m_W;						// Poids.
-		Matrix B = *layer->m_B;						// Biais.
-		Matrix Z = (*Xptr) * W + B;					// Sorties fonction somme.
-		Z.Composition(layer->m_activationFunc);		// Sorties fonction d'activation.
-
-		layer->m_Y->Copy(Z);
+		layer->m_Y->Copy(*Xptr);
+		layer->m_Y->Multiply(*layer->m_W);
+		layer->m_Y->Add(*layer->m_B);
+		layer->m_Y->Composition(layer->m_activationFunc);
 
 		Xptr = layer->m_Y;
 
