@@ -110,7 +110,7 @@ UnityDLL void DLL_PG_Update(void)
 UnityDLL void DLL_PG_Forward(int p_populationIndex, int* p_world, int p_w, int p_h)
 {
 	NN* nn = g_population[p_populationIndex];
-
+	
 	Matrix* X = World_ToInput(p_world, p_w, p_h);
 
 	nn->Forward(X);

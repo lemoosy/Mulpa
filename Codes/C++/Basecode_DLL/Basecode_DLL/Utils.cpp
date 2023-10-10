@@ -4,8 +4,8 @@ NN* NN_Create(void)
 {
 	NN* nn = new NN(NN_INPUT_SIZE);
 
-	nn->AddLayer(840, &ReLU);
-	nn->AddLayer(420, &ReLU);
+	nn->AddLayer(512, &ReLU);
+	nn->AddLayer(256, &ReLU);
 	nn->AddLayer(3, &sigmoid);
 
 	nn->SetScore((float)INT_MAX);

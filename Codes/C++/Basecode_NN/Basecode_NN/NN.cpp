@@ -111,7 +111,7 @@ void NN::Forward(Matrix* X)
 		Layer* layer = curr->m_value;
 
 		layer->m_Y->Copy(*Xptr);
-		layer->m_Y->Multiply(*layer->m_W);
+		//layer->m_Y->Multiply(*layer->m_W);
 		layer->m_Y->Add(*layer->m_B);
 		layer->m_Y->Composition(layer->m_activationFunc);
 
