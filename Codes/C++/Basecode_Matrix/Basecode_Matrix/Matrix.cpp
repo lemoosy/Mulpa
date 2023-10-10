@@ -8,12 +8,7 @@ Matrix::Matrix(int w, int h)
 	m_w = w;
 	m_h = h;
 
-	m_values = new float*[h];
-
-	for (int j = 0; j < h; j++)
-	{
-		m_values[j] = new float[w]();
-	}
+	m_values = new float[w * h]();
 }
 
 Matrix::Matrix(const Matrix& m)
@@ -21,26 +16,13 @@ Matrix::Matrix(const Matrix& m)
 	m_w = m.m_w;
 	m_h = m.m_h;
 
-	m_values = new float*[m_h];
+	m_values = new float[m_w * m_h];
 
-	for (int j = 0; j < m_h; j++)
-	{
-		m_values[j] = new float[m_w];
-
-		for (int i = 0; i < m_w; i++)
-		{
-			m_values[j][i] = m.m_values[j][i];
-		}
-	}
+	memccpy(m_values, m.m_values, m_w * m_h, sizeof(float));
 }
 
 Matrix::~Matrix()
 {
-	for (int j = 0; j < m_h; j++)
-	{
-		delete[] m_values[j];
-	}
-
 	delete[] m_values;
 }
 
@@ -49,7 +31,7 @@ void Matrix::SetValue(int i, int j, float value)
 	assert((0 <= i) && (i < m_w));
 	assert((0 <= j) && (j < m_h));
 
-	m_values[j][i] = value;
+	m_values[j * m_w + i] = value;
 }
 
 float Matrix::GetValue(int i, int j) const
@@ -57,7 +39,7 @@ float Matrix::GetValue(int i, int j) const
 	assert((0 <= i) && (i < m_w));
 	assert((0 <= j) && (j < m_h));
 
-	return m_values[j][i];
+	return m_values[j * m_w + i];
 }
 
 void Matrix::Print() const
@@ -68,7 +50,9 @@ void Matrix::Print() const
 	{
 		for (int i = 0; i < m_w; i++)
 		{
-			cout << fixed << setprecision(2) << m_values[j][i] << '\t';
+			int index = j * m_w + i;
+
+			cout << fixed << setprecision(2) << m_values[index] << '\t';
 		}
 
 		cout << '\n';
@@ -82,13 +66,7 @@ void Matrix::Copy(const Matrix& m)
 	assert(m_w == m.m_w);
 	assert(m_h == m.m_h);
 
-	for (int j = 0; j < m_h; j++)
-	{
-		for (int i = 0; i < m_w; i++)
-		{
-			m_values[j][i] = m.m_values[j][i];
-		}
-	}
+	memccpy(m_values, m.m_values, m_w * m_h, sizeof(float));
 }
 
 void Matrix::Add(const Matrix& m)
@@ -96,12 +74,13 @@ void Matrix::Add(const Matrix& m)
 	assert(m_w == m.m_w);
 	assert(m_h == m.m_h);
 
-	for (int j = 0; j < m_h; j++)
+	int size = m_w * m_h;
+	
+	float* tab = m.m_values;
+
+	for (int k = 0; k < size; k++)
 	{
-		for (int i = 0; i < m_w; i++)
-		{
-			m_values[j][i] += m.m_values[j][i];
-		}
+		m_values[k] += tab[k];
 	}
 }
 
@@ -110,23 +89,23 @@ void Matrix::Sub(const Matrix& m)
 	assert(m_w == m.m_w);
 	assert(m_h == m.m_h);
 
-	for (int j = 0; j < m_h; j++)
+	int size = m_w * m_h;
+
+	float* tab = m.m_values;
+
+	for (int k = 0; k < size; k++)
 	{
-		for (int i = 0; i < m_w; i++)
-		{
-			m_values[j][i] -= m.m_values[j][i];
-		}
+		m_values[k] -= tab[k];
 	}
 }
 
 void Matrix::Scale(float s)
 {
-	for (int j = 0; j < m_h; j++)
+	int size = m_w * m_h;
+
+	for (int k = 0; k < size; k++)
 	{
-		for (int i = 0; i < m_w; i++)
-		{
-			m_values[j][i] *= s;
-		}
+		m_values[k] *= s;
 	}
 }
 
@@ -147,10 +126,10 @@ Matrix Matrix::Multiply(const Matrix& m) const
 
 			for (int k = 0; k < m_w; k++)
 			{
-				sum += m_values[j][k] * m.m_values[k][i];
+				sum += GetValue(k, j) * m.GetValue(i, k);
 			}
 
-			res.m_values[j][i] = sum;
+			res.SetValue(i, j, sum);
 		}
 	}
 
@@ -159,34 +138,31 @@ Matrix Matrix::Multiply(const Matrix& m) const
 
 void Matrix::FillValue(float value)
 {
-	for (int j = 0; j < m_h; j++)
+	int size = m_w * m_h;
+
+	for (int k = 0; k < size; k++)
 	{
-		for (int i = 0; i < m_w; i++)
-		{
-			m_values[j][i] = value;
-		}
+		m_values[k] = value;
 	}
 }
 
 void Matrix::FillValueRandom(float a, float b)
 {
-	for (int j = 0; j < m_h; j++)
+	int size = m_w * m_h;
+
+	for (int k = 0; k < size; k++)
 	{
-		for (int i = 0; i < m_w; i++)
-		{
-			m_values[j][i] = Float_Random(a, b);
-		}
+		m_values[k] = Float_Random(a, b);
 	}
 }
 
 void Matrix::Composition(float (*function)(float))
 {
-	for (int j = 0; j < m_h; j++)
+	int size = m_w * m_h;
+
+	for (int k = 0; k < size; k++)
 	{
-		for (int i = 0; i < m_w; i++)
-		{
-			m_values[j][i] = function(m_values[j][i]);
-		}
+		m_values[k] = function(m_values[k]);
 	}
 }
 
@@ -200,14 +176,15 @@ void Matrix::Mix(const Matrix& m)
 	assert(m_w == m.m_w);
 	assert(m_h == m.m_h);
 
-	for (int j = 0; j < m_h; j++)
+	int size = m_w * m_h;
+
+	float* tab = m.m_values;
+
+	for (int k = 0; k < size; k++)
 	{
-		for (int i = 0; i < m_w; i++)
+		if (rand() % 2)
 		{
-			if (rand() % 2)
-			{
-				m_values[j][i] = m.m_values[j][i];
-			}
+			m_values[k] = tab[k];
 		}
 	}
 }

@@ -15,7 +15,7 @@ private:
 	int m_h;
 
 	/// @brief Valeurs de la matrice.
-	float** m_values;
+	float* m_values;
 
 public:
 
