@@ -8,7 +8,7 @@ Matrix::Matrix(int w, int h)
 	m_w = w;
 	m_h = h;
 
-	m_matrix = new Eigen::MatrixXd(w, h);
+	m_matrix = new Eigen::MatrixXd(h, w);
 }
 
 Matrix::Matrix(const Matrix& m)
@@ -16,7 +16,7 @@ Matrix::Matrix(const Matrix& m)
 	m_w = m.m_w;
 	m_h = m.m_h;
 
-	m_matrix = new Eigen::MatrixXd(m.m_matrix);
+	m_matrix = new Eigen::MatrixXd(*(m.m_matrix));
 }
 
 Matrix::~Matrix()
@@ -29,7 +29,7 @@ void Matrix::SetValue(int i, int j, float value)
 	assert((0 <= i) && (i < m_w));
 	assert((0 <= j) && (j < m_h));
 
-	(*m_matrix)(i, j) = value;
+	(*m_matrix)(j, i) = value;
 }
 
 float Matrix::GetValue(int i, int j) const
@@ -37,13 +37,13 @@ float Matrix::GetValue(int i, int j) const
 	assert((0 <= i) && (i < m_w));
 	assert((0 <= j) && (j < m_h));
 
-	return (*m_matrix)(i, j);
+	return (*m_matrix)(j, i);
 }
 
 void Matrix::Print() const
 {
 	cout << "Matrix (" << m_w << "x" << m_h << ") :\n";
-	cout << m_matrix;
+	cout << *m_matrix;
 	cout << endl;
 }
 
@@ -83,7 +83,7 @@ Matrix Matrix::Multiply(const Matrix& m) const
 	Eigen::MatrixXd matrix = (*m_matrix) * (*m.m_matrix);
 
 	Matrix res(m.m_w, m_h);
-	res.m_matrix = new Eigen::MatrixXd(matrix);
+	(*res.m_matrix) = matrix;
 
 	return res;
 }

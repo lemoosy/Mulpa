@@ -6,8 +6,7 @@
 /// @brief Classe représentant une matrice.
 class Matrix
 {
-private:
-
+public:
 	/// @brief Largeur de la matrice.
 	int m_w;
 
@@ -17,7 +16,6 @@ private:
 	/// @brief Matrice.
 	Eigen::MatrixXd* m_matrix;
 
-public:
 
 	/// @brief Construit une matrice w x h (toutes les valeurs sont initialisées à 0).
 	Matrix(int w, int h);

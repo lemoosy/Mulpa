@@ -106,14 +106,21 @@ void NN::Forward(Matrix* X)
 
 	Matrix* Xptr = X;
 
+	Eigen::MatrixXd m1(1500, 500);
+	Eigen::MatrixXd m2(500, 1500);
+
 	while (curr != sent)
 	{
 		Layer* layer = curr->m_value;
 
-		layer->m_Y->Copy(*Xptr);
-		//layer->m_Y->Multiply(*layer->m_W);
-		layer->m_Y->Add(*layer->m_B);
-		layer->m_Y->Composition(layer->m_activationFunc);
+		Eigen::MatrixXd m3 = m1 * m2;
+
+		//layer->m_Y->Copy(*Xptr);						// Poids.
+		//Matrix B = *layer->m_B;						// Biais.
+		//Matrix Z = (*Xptr) * W + B;					// Sorties fonction somme.
+		//Z.Composition(layer->m_activationFunc);		// Sorties fonction d'activation.
+		//
+		//layer->m_Y->Copy(Z);						// Sorties de la couche.
 
 		Xptr = layer->m_Y;
 

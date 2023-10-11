@@ -26,6 +26,33 @@ UnityDLL void DLL_PG_Init(int p_populationSize, int p_selectionSize, int p_child
 	}
 }
 
+UnityDLL void DLL_TEST()
+{
+	int w = 2;
+	int h = 3;
+
+	Matrix* m1 = new Matrix(w, h);
+	m1->SetValue(0, 0, 1);
+	m1->SetValue(1, 0, 2);
+	m1->SetValue(0, 1, 3);
+	m1->SetValue(1, 1, 4);
+	m1->SetValue(0, 2, 5);
+	m1->SetValue(1, 2, 6);
+	m1->Print();
+
+	Matrix* m2 = new Matrix(h, w);
+	m2->SetValue(0, 0, 1);
+	m2->SetValue(1, 0, 2);
+	m2->SetValue(2, 0, 3);
+	m2->SetValue(0, 1, 4);
+	m2->SetValue(1, 1, 5);
+	m2->SetValue(2, 1, 6);
+	m2->Print();
+
+	Matrix m3 = *m1 * *m2;
+	m3.Print();
+}
+
 UnityDLL void DLL_PG_Quit(void)
 {
 	Population_Clear();
