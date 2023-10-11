@@ -29,6 +29,7 @@ namespace _Settings
             CASE_COUNT
         }
 
+
         // Variable pour générer des nombres aléatoires.
         public static Random m_randomGenerator = new Random();
 

@@ -4,106 +4,95 @@ using _Matrix;
 using _Settings;
 using System.Collections.Generic;
 using UnityEngine.Tilemaps;
+
 using _DLL;
+using _Settings;
 
-namespace _World
+using CaseID = _Settings.Settings.CaseID;
+
+namespace _Environment
 {
-    public class World : MonoBehaviour
+    public class Environment : MonoBehaviour
     {
-
-
-
         #region Variables
 
+        // ############################
+        // ########## Joueur ##########
+        // ############################
 
-
-        // #######################
-        // ##### à définir ! #####
-        // #######################
-
-        // Tuile pour les murs.
-        public Tile m_tile = null;
-
-        // Tilemap pour les murs.
-        public Tilemap m_tilemap = null;
-
-        // Tous les objets que peut contenir un monde.
-        public GameObject[] m_objectsCopy = new GameObject[(int)Settings.CaseID.CASE_COUNT];
+        // Permet de savoir si le joueur est une IA.
+        public bool m_isAI = false;
 
         // Joueur associé au monde.
-        public GameObject m_player = null;
+        public GameObject m_playerCopy = null; // à définir sur Unity.
+
+        // ####################################
+        // ########## Monde - Matrix ##########
+        // ####################################
+
+        // Taille de la matrice.
+        public static Vector2Int m_matrixSize = new Vector2Int(24, 12);
+
+        // Matrice du monde qui s'actualise à chaque frame.
+        public int[] m_matrix = new int[m_matrixSize.x * m_matrixSize.y];
+
+        // Position départ/joueur/sortie dans la matrice.
+        public Vector2Int m_matrixPositionSpawn = new Vector2Int(-1, -1);
+        public Vector2Int m_matrixPositionPlayer = new Vector2Int(-1, -1);
+        public Vector2Int m_matrixPositionExit = new Vector2Int(-1, -1);
+
+        // ###########################
+        // ########## Monde ##########
+        // ###########################
+
+        // Taille d'une tuile.
+        public static Vector2Int m_tileSize = new Vector2Int(16, 16);
+
+        // Taille du monde.
+        public static Vector2Int m_size = m_matrixSize * m_tileSize;
 
         // Origine du monde.
-        public Vector2 m_origin;
+        public Vector2 m_origin = new Vector2(0.0f, 0.0f);
+
+        // Tuile pour les murs.
+        public Tile m_tileCopy = null; // à définir sur Unity.
+
+        // Grille des tuiles pour les murs.
+        public Tilemap m_tilemapCopy = null; // à définir sur Unity.
+        
+        // Liste de tous les objets de l'environnement.
+        public GameObject[] m_objectsCopy = new GameObject[(int)CaseID.CASE_COUNT]; // à définir sur Unity.
 
         // Niveaux.
         public int[] m_levels;
 
-        // #######################
-        // ##### à définir ! #####
-        // #######################
-
-
-
-        // Taille d'une tuile.
-        public const int m_tileW = 16;
-        public const int m_tileH = 16;
-
-        // Taille de la matrice.
-        public const int m_matrixW = 24;
-        public const int m_matrixH = 14;
-
-        // Taille du monde.
-        public const int m_w = m_matrixW * m_tileW;
-        public const int m_h = m_matrixH * m_tileH;
-
-
-
         // Curseur pour les niveaux.
         public int m_levelsCursor = 0;
-
-
 
         // Liste des objets dans le niveau actuel.
         public LinkedList<GameObject> m_objects = new LinkedList<GameObject>();
 
-
-
-        // Matrice du monde qui s'actualise à chaque frame.
-        public int[] m_matrix = new int[m_matrixW * m_matrixH];
-
-
-
-        // Position de départ du joueur.
-        public int m_spawnPositionI = -1;
-        public int m_spawnPositionJ = -1;
-
-
-
-        // Position du joueur.
-        public int m_playerPositionI = -1;
-        public int m_playerPositionJ = -1;
-
-
-
-        // Position de la sortie.
-        public int m_exitPositionI = -1;
-        public int m_exitPositionJ = -1;
-
-
-
         #endregion
-
-
 
         #region Function
 
-
-
-        // Unity.
-
         void Start()
         {
+            Debug.Assert(m_playerCopy);
+
+            if (m_isAI)
+            {
+                Player playerScr = m_playerCopy.GetComponent<Player>();
+                playerScr.m_isAI = true;
+            }
+
+            Debug.Assert(m_tileCopy);
+            Debug.Assert(m_tilemapCopy);
+
+            for (int i = 1; i < (int)CaseID.CASE_COUNT; i++) // 0 est null.
+            {
+                Debug.Assert(m_objectsCopy)
+            }
         }
 
         void Update()
@@ -124,14 +113,11 @@ namespace _World
             }
             else
             {
+
             }
 
             UpdateMatrix();
         }
-
-
-
-        // Scene.
 
         public void CreateScene()
         {
@@ -263,10 +249,6 @@ namespace _World
             }
         }
 
-
-
-        // Matrix.
-
         public void UpdateMatrix()
         {
             // Tiles.
@@ -380,11 +362,6 @@ namespace _World
             }
         }
 
-
-
         #endregion
-
-
-
     }
 }
