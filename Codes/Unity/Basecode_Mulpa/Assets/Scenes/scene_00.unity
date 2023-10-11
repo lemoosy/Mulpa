@@ -309,9 +309,9 @@ MonoBehaviour:
   m_worldCopy: {fileID: 7662820822353678063, guid: 64a828f665300bd43802e6427c8a7bd7, type: 3}
   m_playerCopy: {fileID: 7662820822353678063, guid: ccb8e3d1d825b0b4395f738d35a6eb7f, type: 3}
   m_mode: 1
-  m_populationSize: 1000
-  m_selectionSize: 100
-  m_childrenSize: 400
+  m_populationSize: 10
+  m_selectionSize: 5
+  m_childrenSize: 3
   m_mutationRate: 3
   m_generation: 0
   m_worlds: []

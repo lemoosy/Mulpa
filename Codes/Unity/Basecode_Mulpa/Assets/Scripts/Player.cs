@@ -299,7 +299,8 @@ public class Player : MonoBehaviour
 
     private void UpdateState()
     {
-        ResetState();
+        m_onGround = false;
+        m_atExit = false;
 
         if (m_isAI)
         {
@@ -339,30 +340,30 @@ public class Player : MonoBehaviour
         {
             if (m_isDead)
             {
-                World worldScr = m_world.GetComponent<World>();
+                //World worldScr = m_world.GetComponent<World>();
 
-                // Fitness = PCC - 2 x Pièces - 100 x Niveaux
+                //// Fitness = PCC - 2 x Pièces - 100 x Niveaux
 
-                float PCC = DLL.DLL_PCC(
-                    worldScr.m_matrix,
-                    World.m_matrixW,
-                    World.m_matrixH,
-                    worldScr.m_playerPositionI,
-                    worldScr.m_playerPositionJ,
-                    worldScr.m_exitPositionI,
-                    worldScr.m_exitPositionJ,
-                    false
-                );
+                //float PCC = DLL.DLL_PCC(
+                //    worldScr.m_matrix,
+                //    World.m_matrixW,
+                //    World.m_matrixH,
+                //    worldScr.m_playerPositionI,
+                //    worldScr.m_playerPositionJ,
+                //    worldScr.m_exitPositionI,
+                //    worldScr.m_exitPositionJ,
+                //    false
+                //);
 
-                // Si le joueur est hors dimension.
-                if (PCC == -1.0f)
-                {
-                    m_score = 1000.0f;
-                }
-                else
-                {
-                    m_score = PCC - 5.0f * (float)m_coin - 100.0f * (float)(worldScr.m_levelsCursor);
-                }
+                //// Si le joueur est hors dimension.
+                //if (PCC == -1.0f)
+                //{
+                //    m_score = 1000.0f;
+                //}
+                //else
+                //{
+                //    m_score = PCC - 5.0f * (float)m_coin - 100.0f * (float)(worldScr.m_levelsCursor);
+                //}
             }
         }
     }

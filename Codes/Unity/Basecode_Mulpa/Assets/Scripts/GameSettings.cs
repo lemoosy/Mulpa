@@ -124,7 +124,6 @@ public class GameSettings : MonoBehaviour
                         World worldScr = world.GetComponent<World>();
                         Player playerScr = player.GetComponent<Player>();
 
-
                         worldScr.m_player = player;
                         playerScr.m_world = world;
 
@@ -205,7 +204,7 @@ public class GameSettings : MonoBehaviour
 
                     print(msg + "]");
 
-                    DLL.DLL_PG_Update();
+                    //DLL.DLL_PG_Update();
 
                     for (int i = 0; i < m_populationSize; i++)
                     {
