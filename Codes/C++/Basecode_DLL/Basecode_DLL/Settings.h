@@ -1,31 +1,41 @@
-#ifndef _SETTINGS_H_
-#define _SETTINGS_H_
+#pragma once
 
 #include <cassert>
 #include <iostream>
 #include <string>
 
 #include "DList.h"
-#include "Matrix.h"
 #include "Graph.h"
+#include "Matrix.h"
 #include "NN.h"
-
-#include "Window.h"
 
 using namespace std;
 
-#define GameMakerDLL extern "C" __declspec (dllexport)	/// Pour la DLL.
+typedef enum eCaseID
+{
+	CASE_VOID,
+	CASE_WALL,
+	CASE_ATTACK,
+	CASE_COIN,
+	CASE_PLAYER,
+	CASE_EXIT,
+	CASE_COUNT
+}CaseID;
 
-#define NN_CAPACITY				1024					/// Nombre de réseaux de neurones maximum (Dashboard::nn).
-#define NN_INPUT_SIZE			512						/// Taille de l'entrée du réseau de neurones.
+/// Macros.
 
-#define WINDOW_DISPLAY			false
-#define WINDOW_WIDTH			256
-#define WINDOW_HEIGHT			128
-#define WINDOW_CASE_SIZE		16
+#define UnityDLL			extern "C" __declspec (dllexport)
 
-#define WORLD_MATRIX_WIDTH		16
-#define WORLD_MATRIX_HEIGHT		8
+#define WORLD_MATRIX_W		24
+#define WORLD_MATRIX_H		14
 
+#define NN_INPUT_SIZE		(WORLD_MATRIX_W * WORLD_MATRIX_H) * (CASE_COUNT - 1)
 
-#endif // _SETTINGS_H_
+/// Variables globales.
+
+extern int g_populationSize;
+extern int g_selectionSize;
+extern int g_childrenSize;
+extern int g_mutationRate;
+
+extern NN** g_population;

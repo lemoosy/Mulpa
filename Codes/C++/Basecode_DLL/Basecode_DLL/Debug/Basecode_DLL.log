@@ -1,0 +1,7 @@
+﻿  gNN.cpp
+C:\Users\PC Lemoosy\OneDrive\Bureau\Mulpa\Codes\C++\Basecode_DLL\Basecode_DLL\Settings.h(7,10): fatal  error C1083: Impossible d'ouvrir le fichier include : 'DList.h' : No such file or directory
+  DLL.cpp
+C:\Users\PC Lemoosy\OneDrive\Bureau\Mulpa\Codes\C++\Basecode_DLL\Basecode_DLL\Settings.h(7,10): fatal  error C1083: Impossible d'ouvrir le fichier include : 'DList.h' : No such file or directory
+  World.cpp
+C:\Users\PC Lemoosy\OneDrive\Bureau\Mulpa\Codes\C++\Basecode_DLL\Basecode_DLL\Settings.h(7,10): fatal  error C1083: Impossible d'ouvrir le fichier include : 'DList.h' : No such file or directory
+  Génération de code en cours...

@@ -110,12 +110,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../Basecode_DList/Basecode_DList;../../Basecode_Matrix/Basecode_Matrix</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../Basecode_DList/Basecode_DList;../../Basecode_Matrix/Basecode_Matrix;../eigen-3.4.0</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>../../Basecode_Matrix/x64/Debug/Basecode_Matrix.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>../../Basecode_Matrix/x64/Release/Basecode_Matrix.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -126,14 +126,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../../Basecode_DList/Basecode_DList;../../Basecode_Matrix/Basecode_Matrix</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../Basecode_DList/Basecode_DList;../../Basecode_Matrix/Basecode_Matrix;../eigen-3.4.0</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>../../Basecode_Matrix/x64/Debug/Basecode_Matrix.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>../../Basecode_Matrix/x64/Release/Basecode_Matrix.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

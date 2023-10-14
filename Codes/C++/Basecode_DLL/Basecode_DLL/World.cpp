@@ -1,14 +1,12 @@
 #include "World.h"
 
-Matrix* World_Load(char* p_world)
+Matrix* World_LoadMatrix(string p_world)
 {
-	string world(p_world);				// "123x456:WWWMOO..."
+	int posX = p_world.find('x');			// 'x'
+	int posSep = p_world.find(':');		// ':'
 
-	int posX = world.find('x');			// 'x'
-	int posSep = world.find(':');		// ':'
-
-	int w = stoi(world.substr(0, posX));
-	int h = stoi(world.substr(posX + 1, posSep - posX - 1));
+	int w = stoi(p_world.substr(0, posX));
+	int h = stoi(p_world.substr(posX + 1, posSep - posX - 1));
 
 	Matrix* res = new Matrix(w, h);
 
@@ -18,7 +16,7 @@ Matrix* World_Load(char* p_world)
 	{
 		for (int i = 0; i < w; i++)
 		{
-			res->SetValue(i, j, world[index]);
+			res->SetValue(i, j, p_world[index]);
 			index++;
 		}
 	}
@@ -26,7 +24,7 @@ Matrix* World_Load(char* p_world)
 	return res;
 }
 
-Matrix* World_ToNN(Matrix* p_world)
+Matrix* World_ToInputsNN(Matrix* p_world)
 {
 	int w = p_world->GetWidth();
 	int h = p_world->GetHeight();
@@ -168,9 +166,4 @@ DList<int>* World_GetShortestPath(Matrix* p_world, float* p_distance)
 	delete graph;
 
 	return PCC;
-}
-
-void World_Draw(Matrix* p_world)
-{
-
 }

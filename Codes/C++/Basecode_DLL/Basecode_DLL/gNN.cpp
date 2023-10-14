@@ -23,7 +23,7 @@ NN* gNN_GetNN(int p_id)
 void gNN_SetNN(int p_id, NN* p_nn)
 {
 	assert((0 <= p_id) && (p_id < NN_CAPACITY));
-	assert(g_nn[p_id] == nullptr);
+	assert(g_nn[p_id] == nullptr); // sinon fuite mémoire.
 
 	g_nn[p_id] = p_nn;
 }
