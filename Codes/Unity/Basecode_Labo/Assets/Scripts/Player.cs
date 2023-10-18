@@ -8,80 +8,276 @@ using Unity.MLAgents.Sensors;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
+using System.Drawing;
 
 public class Player : Agent
 {
     #region Variables
 
-    // AI.
-    public bool m_isAI = false;
+    // Random
+    public System.Random m_randomGenerator = new System.Random(73);
 
-    // Directions.
+    // Directions
     public bool m_left = false;
     public bool m_right = false;
     public bool m_up = false;
     public bool m_down = false;
 
-    // Physics.
-    public Vector2 m_speed = new Vector2(0.2f, 0.2f);
-    public int m_stepCount = 0;
+    // Physics
+    public Vector2 m_speed = new Vector2(1.0f, 1.0f);
+    public int m_tick = 0;
+    public int m_step = 0;
 
-    // Matrix.
-    static public Vector2Int m_matrixSize = new Vector2Int(20, 10);
+    // Matrix
+    static public Vector2Int m_matrixSize = new Vector2Int(10, 10);
     public int[] m_matrix = new int[m_matrixSize.x * m_matrixSize.y];
-
-    // Objects.
-    public Transform m_parent = null;
+    
+    // Prefabs
     public GameObject m_coinCopy = null;
-    public GameObject m_coinCurr = null;
+    public GameObject m_monsterCopy = null;
 
-    // Random.
-    public static System.Random m_randomGenerator = new System.Random();
+    // Objects
+    public GameObject m_coin = null;
+    public int m_monstersSize = 3;
+    public List<GameObject> m_monsters = new List<GameObject>();
+
+    // Parent
+    public Transform m_parent = null;
+
+    float m_score = 0.0f;
 
     #endregion
 
     #region Functions
 
-    // Unity.
+    // Unity
 
-    public void Start()
+    public void Awake()
     {
-        if (m_isAI) return;
-         
-        ResetAll();
-    }
+        // Coin
 
-    public void FixedUpdate()
-    {
-        if (m_isAI) return;
-         
-        UpdateInput();
-        UpdatePosition();
+        m_coin = Instantiate(m_coinCopy, m_parent);
+        
+        // Monsters
+
+        for (int i = 0; i < m_monstersSize; i++)
+        {
+            m_monsters.Add(Instantiate(m_monsterCopy, m_parent));
+        }
     }
 
     public void OnTriggerEnter2D(Collider2D collider)
     {
         if (collider.gameObject.CompareTag("tag_coin"))
         {
-            ResetCoin();
+            AddReward(+3.0f);
+            m_score += 3.0f;
+            EndEpisode();
+        }
 
-            m_stepCount = 0;
+        if (collider.gameObject.CompareTag("tag_monster"))
+        {
+            AddReward(-1.0f);
+            m_score -= 1.0f;
+            EndEpisode();
+        }
+    }
 
-            if (m_isAI)
+    public void FixedUpdate()
+    {
+        m_tick++;
+
+        if ((float)m_tick / 10.0f > 1.0f)
+        {
+            m_tick = 0;
+            m_step++;
+
+            RequestDecision();
+            RequestAction();
+
+            AddReward(-0.001f);
+            m_score += -0.001f;
+
+            if (m_step > 100) // >100 étapes ? On tue l'agent.
             {
-                AddReward(+1.0f);
+                AddReward(-1.0f);
+                m_score += -1.0f;
+                EndEpisode();
             }
         }
     }
 
-    // Update.
+    // Input
 
-    public void UpdateInput()
+    public void ResetInput()
     {
-        m_left = Input.GetKey(KeyCode.LeftArrow);
-        m_right = Input.GetKey(KeyCode.RightArrow);
-        m_up = Input.GetKey(KeyCode.UpArrow);
-        m_down = Input.GetKey(KeyCode.DownArrow);
+        m_left = false;
+        m_right = false;
+        m_up = false;
+        m_down = false;
+    }
+
+    public void SetInput(int index)
+    {
+        switch (index)
+        {
+            case 0:
+                break;
+
+            case 1:
+                m_left = true;
+                break;
+
+            case 2:
+                m_right = true;
+                break;
+
+            case 3:
+                m_up = true;
+                break;
+
+            case 4:
+                m_down = true;
+                break;
+
+            default:
+                print("ERROR - SetInput()");
+                break;
+        }
+    }
+
+    // Matrix
+
+    public void UpdateMatrix()
+    {
+        Array.Clear(m_matrix, 0, m_matrix.Length);
+
+        // Player
+
+        Vector2 position = GetPosition();
+
+        int i = (int)position.x;
+        int j = (int)position.y;
+
+        int index = j * m_matrixSize.x + i;
+
+        if (!OutOfDimension())
+        {
+            m_matrix[index] = 1;
+        }
+
+        // Coin
+
+        position = m_coin.transform.localPosition;
+
+        i = (int)position.x;
+        j = (int)position.y;
+
+        index = j * m_matrixSize.x + i;
+
+        m_matrix[index] = 2;
+
+        // Monsters
+
+        foreach (GameObject obj in m_monsters)
+        {
+            position = obj.transform.localPosition;
+
+            i = (int)position.x;
+            j = (int)position.y;
+
+            index = j * m_matrixSize.x + i;
+
+            m_matrix[index] = 3;
+        }
+    }
+
+    // Agent
+
+    public override void OnEpisodeBegin()
+    {
+        print(m_score);
+        m_score = 0.0f;
+        //m_randomGenerator = new System.Random(73);
+        m_tick = 0;
+        m_step = 0;
+
+        ResetPosition();
+        ResetPositionCoin();
+        ResetPositionMonsters();
+    }
+
+    public override void CollectObservations(VectorSensor sensor)
+    {
+        //UpdateMatrix();
+
+        //for (int k = 0; k < m_matrix.Length; k++)
+        //{
+        //    sensor.AddOneHotObservation(m_matrix[k], 3);
+        //}
+    }
+
+    public override void OnActionReceived(ActionBuffers actionBuffers)
+    {
+        int index = actionBuffers.DiscreteActions[0];
+
+        ResetInput();
+        SetInput(index);
+        UpdatePosition();
+
+        if (OutOfDimension())
+        {
+            AddReward(-5.0f);
+            m_score += -5.0f;
+            EndEpisode();
+        }
+    }
+
+    public override void Heuristic(in ActionBuffers actionsOut)
+    {
+        var discreteActionsOut = actionsOut.DiscreteActions;
+
+        if (Input.GetKey(KeyCode.LeftArrow))
+        {
+            discreteActionsOut[0] = 1;
+        }
+        else if (Input.GetKey(KeyCode.RightArrow))
+        {
+            discreteActionsOut[0] = 2;
+        }
+        else if (Input.GetKey(KeyCode.UpArrow))
+        {
+            discreteActionsOut[0] = 3;
+        }
+        else if (Input.GetKey(KeyCode.DownArrow))
+        {
+            discreteActionsOut[0] = 4;
+        }
+    }
+
+    // Position
+
+    public Vector3 GetPosition()
+    {
+        return transform.localPosition;
+    }
+
+    public void SetPosition(Vector2 position)
+    {
+        transform.localPosition = position;
+    }
+
+    public void ResetPosition()
+    {
+        int i = m_randomGenerator.Next(0, m_matrixSize.x);
+        int j = m_randomGenerator.Next(0, m_matrixSize.y);
+
+        Vector2 size = GetSize();
+        
+        Vector2 position = new Vector2(i, j);
+        position += (size / 2.0f);
+        
+        SetPosition(position);
     }
 
     public void UpdatePosition()
@@ -93,109 +289,53 @@ public class Player : Agent
         if (m_up)       position.y += m_speed.y;
         if (m_down)     position.y -= m_speed.y;
 
-        if (position.x < GetW() / 2.0f)
-        {
-            position.x = GetW() / 2.0f;
-
-            if (m_isAI)
-            {
-                AddReward(-1.0f);
-                EndEpisode();
-            }
-            else
-            {
-                ResetAll();
-            }
-                return;
-        }
-
-        if (position.x + GetW() / 2.0f > m_matrixSize.x)
-        {
-            position.x = m_matrixSize.x - GetW() / 2.0f;
-
-            if (m_isAI)
-            {
-                AddReward(-1.0f);
-                EndEpisode();
-            }
-            else
-            {
-                ResetAll();
-            }
-                return;
-        }
-
-        if (position.y < GetH() / 2.0f)
-        {
-            position.y = GetH() / 2.0f;
-
-            if (m_isAI)
-            {
-                AddReward(-1.0f);
-                EndEpisode();
-            }
-            else
-            {
-                ResetAll();
-            }
-                return;
-        }
-
-        if (position.y + GetH() / 2.0f > m_matrixSize.y)
-        {
-            position.y = m_matrixSize.y - GetH() / 2.0f;
-
-            if (m_isAI)
-            {
-                AddReward(-1.0f);
-                EndEpisode();
-            }
-            else
-            {
-                ResetAll();
-            }
-                return;
-        }
-
         SetPosition(position);
     }
+    
+    // Coin
 
-    public void UpdateMatrix()
+    public void ResetPositionCoin()
     {
-        Array.Clear(m_matrix, 0, m_matrix.Length);
+        int i = m_randomGenerator.Next(0, m_matrixSize.x);
+        int j = m_randomGenerator.Next(0, m_matrixSize.y);
 
-        // Player.
+        Vector2 size = new Vector2(1.0f, 1.0f);
 
-        Vector2 position = GetPosition();
-
-        float x = position.x;
-        float y = position.y;
-
-        int i = (int)x;
-        int j = (int)y;
-
-        int index = j * m_matrixSize.x + i;
-
-        m_matrix[index] = 1;
-
-        // Coin.
-
-        if (!m_coinCurr) return;
-
-        position = GetPosition();
-
-        x = position.x;
-        y = position.y;
-
-        i = (int)x;
-        j = (int)y;
-
-        index = j * m_matrixSize.x + i;
-
-        m_matrix[index] = 2;
+        Vector2 position = new Vector2(i, j);
+        position += (size / 2.0f);
+        
+        m_coin.transform.localPosition = position;
     }
 
-    // Physics.
+    // Monsters
+
+    public void ResetPositionMonsters()
+    {
+        Vector2 positionCoin = m_coin.transform.localPosition;
+
+        int iCoin = (int)positionCoin.x;
+        int jCoin = (int)positionCoin.y;
+
+        for (int k = 0; k < m_monstersSize; k++)
+        {
+            int iMonster = m_randomGenerator.Next(0, m_matrixSize.x);
+            int jMonster = m_randomGenerator.Next(0, m_matrixSize.y);
+
+            if ((iMonster == iCoin) && (jMonster == jCoin))
+            {
+                continue;
+            }
+
+            Vector2 size = new Vector2(1.0f, 1.0f);
+
+            Vector2 position = new Vector2(iMonster, jMonster);
+            position += (size / 2.0f);
+            
+            m_monsters[k].transform.localPosition = position;
+        }
+    }
+
+    // Utils
 
     public float GetW()
     {
@@ -211,91 +351,35 @@ public class Player : Agent
 
     public Vector2 GetSize()
     {
-        return (new Vector2(GetW(), GetH()));
+        Vector2 size = new Vector2(GetW(), GetH());
+        return size;
     }
-
-    public Vector2 GetPosition()
+    
+    public bool OutOfDimension()
     {
-        return transform.localPosition;
-    }
+        Vector3 position = GetPosition();
 
-    public void SetPosition(Vector2 position)
-    {
-        transform.localPosition = position;
-    }
-
-    // ResetAll.
-
-    public void ResetPlayer()
-    {
-        int i = m_randomGenerator.Next(0, m_matrixSize.x);
-        int j = m_randomGenerator.Next(0, m_matrixSize.y);
-
-        Vector2 position = new Vector2(i, j);
-        Vector2 size = GetSize();
-        position += (size / 2.0f);
-        SetPosition(position);
-    }
-
-    public void ResetCoin()
-    {
-        if (m_coinCurr)
+        if (position.x < GetW() / 2.0f)
         {
-            Destroy(m_coinCurr);
+            return true;
         }
 
-        int i = m_randomGenerator.Next(0, m_matrixSize.x);
-        int j = m_randomGenerator.Next(0, m_matrixSize.y);
-
-        Vector2 position = new Vector2(i, j);
-        Vector2 size = GetSize();
-        position += (size / 2.0f);
-        m_coinCurr = Instantiate(m_coinCopy, m_parent);
-        m_coinCurr.transform.localPosition = position;
-    }
-
-    public void ResetAll()
-    {
-        m_stepCount = 0;
-        ResetPlayer();
-        ResetCoin();
-    }
-
-    // Agent.
-
-    public override void OnEpisodeBegin()
-    {
-        ResetAll();
-    }
-
-    public override void CollectObservations(VectorSensor sensor)
-    {
-        print("in : " + "x=" + transform.localPosition.x.ToString() + " y=" + transform.localPosition.y.ToString() + " x=" + m_coinCurr.transform.localPosition.x.ToString() + " y=" + m_coinCurr.transform.localPosition.y.ToString());
-        sensor.AddObservation(transform.localPosition);
-        sensor.AddObservation(m_coinCurr.transform.localPosition);
-    }
-
-    public override void OnActionReceived(ActionBuffers actionBuffers)
-    {
-        float speedX = actionBuffers.ContinuousActions[0];
-        float speedY = actionBuffers.ContinuousActions[1];
-
-        print("out : " + speedX.ToString() + " " + speedY.ToString());
-
-        transform.localPosition += new Vector3(speedX, speedY, 0.0f) * 10.0f * Time.deltaTime;
-
-        UpdatePosition();
-
-        m_stepCount++;
-
-        if (m_stepCount / 60 > 10)
+        if (position.x + GetW() / 2.0f > m_matrixSize.x)
         {
-            EndEpisode();
+            return true;
         }
-    }
 
-    public override void Heuristic(in ActionBuffers actionsOut)
-    {
+        if (position.y < GetH() / 2.0f)
+        {
+            return true;
+        }
+
+        if (position.y + GetH() / 2.0f > m_matrixSize.y)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     #endregion
