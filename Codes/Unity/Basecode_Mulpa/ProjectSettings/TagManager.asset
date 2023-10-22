@@ -6,13 +6,11 @@ TagManager:
   tags:
   - tag_coin
   - tag_wall
-  - tag_attack
   - tag_exit
-  - tag_door
-  - tag_button
   - tag_player
   - tag_spawn
   - tag_settings
+  - tag_monster
   layers:
   - Default
   - TransparentFX

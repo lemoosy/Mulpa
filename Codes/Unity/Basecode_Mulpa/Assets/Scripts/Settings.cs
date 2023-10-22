@@ -17,18 +17,47 @@ namespace _Settings
             MODE_GENERATOR_HARD
         }
 
-        // Enumération des différentes cases d'une matrice dans un monde.
-        public enum CaseID
+        // Enumération des différentes cases dans la matrice m_matrixInit.
+        public enum CaseIDChar
         {
-            CASE_VOID,
-            CASE_WALL,
-            CASE_ATTACK,
-            CASE_COIN,
-            CASE_SPAWN,
-            CASE_EXIT,
-            CASE_COUNT
+            CASE_VOID       =   ' ',
+            CASE_LIGHT      =   '¤',
+            CASE_WALL       =   'O',
+            CASE_DOOR       =   '|',
+            CASE_MONSTER    =   'M',
+            CASE_SPADE      =   '!',
+            CASE_LAVA       =   'L',
+            CASE_COIN       =   '.',
+            CASE_SPAWN      =   'A',
+            CASE_LEVER      =   '/',
+            CASE_EXIT       =   'B'
         }
 
+        // Enumération des différentes cases dans la matrice m_matrixNN.
+        public enum CaseIDBin
+        {
+            CASE_VOID       =   0b000,
+            CASE_LIGHT      =   0b000,
+            CASE_WALL       =   0b001,
+            CASE_DOOR       =   0b001,
+            CASE_MONSTER    =   0b010,
+            CASE_SPADE      =   0b010,
+            CASE_LAVA       =   0b010,
+            CASE_COIN       =   0b011,
+            CASE_SPAWN      =   0b000,
+            CASE_LEVER      =   0b101,
+            CASE_EXIT       =   0b101,
+            CASE_PLAYER     =   0b100
+        }
+
+        // Enumération des différentes difficultés.
+        public enum Difficulty
+        {
+            EASY,
+            MEDIUM,
+            HARD,
+            ALL
+        }
 
         // Variable pour générer des nombres aléatoires.
         public static Random m_randomGenerator = new Random();
