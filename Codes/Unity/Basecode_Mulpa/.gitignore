@@ -1,9 +1,11 @@
+.vs
 Library
 Logs
 obj
+Packages
 Temp
 UsertSettings
 .vsconfig
-Assembly-CSharp.csproj
-Basecode_Mulpa.sln
+*.csproj
+*.sln
 *.htm
