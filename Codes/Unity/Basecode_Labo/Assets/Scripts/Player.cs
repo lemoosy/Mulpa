@@ -87,7 +87,7 @@ public class Player : Agent
     {
         m_tick++;
 
-        if ((float)m_tick / 10.0f > 1.0f)
+        if ((float)m_tick / 120.0f > 1.0f)
         {
             m_tick = 0;
             m_step++;
@@ -98,7 +98,7 @@ public class Player : Agent
             AddReward(-0.001f);
             m_score += -0.001f;
 
-            if (m_step > 100) // >100 étapes ? On tue l'agent.
+            if (m_step > 30) // >100 étapes ? On tue l'agent.
             {
                 AddReward(-1.0f);
                 m_score += -1.0f;
@@ -209,12 +209,37 @@ public class Player : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        //UpdateMatrix();
+        UpdateMatrix();
 
-        //for (int k = 0; k < m_matrix.Length; k++)
-        //{
-        //    sensor.AddOneHotObservation(m_matrix[k], 3);
-        //}
+        for (int k = 0; k < m_matrix.Length; k++)
+        {
+            switch (m_matrix[k])
+            {
+                case 0: // void
+                    sensor.AddObservation(0.0f);
+                    sensor.AddObservation(0.0f);
+                    break;
+
+                    case 1: // player
+                        sensor.AddObservation(0.0f);
+                        sensor.AddObservation(1.0f);
+                    break;
+
+                    case 2: // coin
+                        sensor.AddObservation(1.0f);
+                        sensor.AddObservation(0.0f);
+                    break;
+
+                    case 3: // monster
+                        sensor.AddObservation(1.0f);
+                        sensor.AddObservation(1.0f);
+                    break;
+
+                default:
+                    break;
+            }
+
+        }
     }
 
     public override void OnActionReceived(ActionBuffers actionBuffers)

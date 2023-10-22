@@ -1,0 +1,65 @@
+{
+    "myAI": {
+        "checkpoints": [
+            {
+                "steps": 1499996,
+                "file_path": "results\\ppo\\myAI\\myAI-1499996.onnx",
+                "reward": 1.7800083649208356,
+                "creation_time": 1697916731.3321803,
+                "auxillary_file_paths": [
+                    "results\\ppo\\myAI\\myAI-1499996.pt"
+                ]
+            },
+            {
+                "steps": 1999995,
+                "file_path": "results\\ppo\\myAI\\myAI-1999995.onnx",
+                "reward": 2.02335858706272,
+                "creation_time": 1697923173.6580148,
+                "auxillary_file_paths": [
+                    "results\\ppo\\myAI\\myAI-1999995.pt"
+                ]
+            },
+            {
+                "steps": 2499998,
+                "file_path": "results\\ppo\\myAI\\myAI-2499998.onnx",
+                "reward": 1.9030722907038355,
+                "creation_time": 1697929012.6453278,
+                "auxillary_file_paths": [
+                    "results\\ppo\\myAI\\myAI-2499998.pt"
+                ]
+            },
+            {
+                "steps": 2999997,
+                "file_path": "results\\ppo\\myAI\\myAI-2999997.onnx",
+                "reward": 2.0272082234509945,
+                "creation_time": 1697936918.6494868,
+                "auxillary_file_paths": [
+                    "results\\ppo\\myAI\\myAI-2999997.pt"
+                ]
+            },
+            {
+                "steps": 3076982,
+                "file_path": "results\\ppo\\myAI\\myAI-3076982.onnx",
+                "reward": 2.113957487344742,
+                "creation_time": 1697937882.8951292,
+                "auxillary_file_paths": [
+                    "results\\ppo\\myAI\\myAI-3076982.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 3076982,
+            "file_path": "results\\ppo\\myAI.onnx",
+            "reward": 2.113957487344742,
+            "creation_time": 1697937882.8951292,
+            "auxillary_file_paths": [
+                "results\\ppo\\myAI\\myAI-3076982.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "0.29.0",
+        "torch_version": "2.1.0+cpu"
+    }
+}

@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 8310314820269343531}
   - component: {fileID: 4169980166789413458}
   - component: {fileID: 1383862276467029758}
-  - component: {fileID: 4793239245688899866}
   - component: {fileID: 8214610879620310826}
   m_Layer: 0
   m_Name: Player2
@@ -101,7 +100,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 0
+    VectorObservationSize: 200
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 0
@@ -148,26 +147,6 @@ MonoBehaviour:
   m_monstersSize: 0
   m_monsters: []
   m_parent: {fileID: 0}
---- !u!114 &4793239245688899866
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1009280191805628876}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 282f342c2ab144bf38be65d4d0c4e07d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Camera: {fileID: 0}
-  m_SensorName: CameraSensor
-  m_Width: 84
-  m_Height: 84
-  m_Grayscale: 0
-  m_ObservationType: 0
-  m_ObservationStacks: 1
-  m_Compression: 1
 --- !u!61 &8214610879620310826
 BoxCollider2D:
   m_ObjectHideFlags: 0
