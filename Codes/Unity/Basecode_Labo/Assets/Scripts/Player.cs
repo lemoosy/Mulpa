@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 using System.Drawing;
+using System.Net.NetworkInformation;
 
 public class Player : Agent
 {
@@ -44,8 +45,6 @@ public class Player : Agent
     // Parent
     public Transform m_parent = null;
 
-    float m_score = 0.0f;
-
     #endregion
 
     #region Functions
@@ -71,14 +70,12 @@ public class Player : Agent
         if (collider.gameObject.CompareTag("tag_coin"))
         {
             AddReward(+3.0f);
-            m_score += 3.0f;
             EndEpisode();
         }
 
         if (collider.gameObject.CompareTag("tag_monster"))
         {
-            AddReward(-1.0f);
-            m_score -= 1.0f;
+            SetReward(-3.0f);
             EndEpisode();
         }
     }
@@ -87,7 +84,7 @@ public class Player : Agent
     {
         m_tick++;
 
-        if ((float)m_tick / 120.0f > 1.0f)
+        if ((float)m_tick / 10.0f > 1.0f)
         {
             m_tick = 0;
             m_step++;
@@ -95,13 +92,10 @@ public class Player : Agent
             RequestDecision();
             RequestAction();
 
-            AddReward(-0.001f);
-            m_score += -0.001f;
+            AddReward(-0.1f);
 
-            if (m_step > 30) // >100 étapes ? On tue l'agent.
+            if (m_step > 30) // >30 étapes ? On tue l'agent.
             {
-                AddReward(-1.0f);
-                m_score += -1.0f;
                 EndEpisode();
             }
         }
@@ -196,9 +190,6 @@ public class Player : Agent
 
     public override void OnEpisodeBegin()
     {
-        print(m_score);
-        m_score = 0.0f;
-        //m_randomGenerator = new System.Random(73);
         m_tick = 0;
         m_step = 0;
 
@@ -220,20 +211,20 @@ public class Player : Agent
                     sensor.AddObservation(0.0f);
                     break;
 
-                    case 1: // player
-                        sensor.AddObservation(0.0f);
-                        sensor.AddObservation(1.0f);
-                    break;
+                case 1: // player
+                    sensor.AddObservation(0.0f);
+                    sensor.AddObservation(1.0f);
+                break;
 
-                    case 2: // coin
-                        sensor.AddObservation(1.0f);
-                        sensor.AddObservation(0.0f);
-                    break;
+                case 2: // coin
+                    sensor.AddObservation(1.0f);
+                    sensor.AddObservation(0.0f);
+                break;
 
-                    case 3: // monster
-                        sensor.AddObservation(1.0f);
-                        sensor.AddObservation(1.0f);
-                    break;
+                case 3: // monster
+                    sensor.AddObservation(1.0f);
+                    sensor.AddObservation(1.0f);
+                break;
 
                 default:
                     break;
@@ -252,8 +243,7 @@ public class Player : Agent
 
         if (OutOfDimension())
         {
-            AddReward(-5.0f);
-            m_score += -5.0f;
+            SetReward(-3.0f);
             EndEpisode();
         }
     }
@@ -321,21 +311,38 @@ public class Player : Agent
 
     public void ResetPositionCoin()
     {
-        int i = m_randomGenerator.Next(0, m_matrixSize.x);
-        int j = m_randomGenerator.Next(0, m_matrixSize.y);
+        Vector2 position = GetPosition();
 
-        Vector2 size = new Vector2(1.0f, 1.0f);
+        int iPlayer = (int)position.x;
+        int jPlayer = (int)position.y;
 
-        Vector2 position = new Vector2(i, j);
-        position += (size / 2.0f);
-        
-        m_coin.transform.localPosition = position;
+        while (true)
+        {
+            int i = m_randomGenerator.Next(0, m_matrixSize.x);
+            int j = m_randomGenerator.Next(0, m_matrixSize.y);
+
+            if ((i == iPlayer) && (j == jPlayer)) continue;
+
+            Vector2 size = new Vector2(1.0f, 1.0f);
+
+            position = new Vector2(i, j);
+            position += (size / 2.0f);
+            
+            m_coin.transform.localPosition = position;
+
+            break;
+        }
     }
 
     // Monsters
 
     public void ResetPositionMonsters()
     {
+        Vector2 positionPlayer = GetPosition();
+
+        int iPlayer = (int)positionPlayer.x;
+        int jPlayer = (int)positionPlayer.y;
+
         Vector2 positionCoin = m_coin.transform.localPosition;
 
         int iCoin = (int)positionCoin.x;
@@ -346,10 +353,8 @@ public class Player : Agent
             int iMonster = m_randomGenerator.Next(0, m_matrixSize.x);
             int jMonster = m_randomGenerator.Next(0, m_matrixSize.y);
 
-            if ((iMonster == iCoin) && (jMonster == jCoin))
-            {
-                continue;
-            }
+            if ((iMonster == iPlayer) && (jMonster == jPlayer)) continue;
+            if ((iMonster == iCoin) && (jMonster == jCoin)) continue;
 
             Vector2 size = new Vector2(1.0f, 1.0f);
 

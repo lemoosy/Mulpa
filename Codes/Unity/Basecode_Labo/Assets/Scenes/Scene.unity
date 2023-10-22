@@ -2921,10 +2921,6 @@ PrefabInstance:
       propertyPath: m_parent
       value: 
       objectReference: {fileID: 1950504760}
-    - target: {fileID: 1383862276467029758, guid: c897fbe54e0cbce45a6210aad5b50ca5, type: 3}
-      propertyPath: m_monstersSize
-      value: 3
-      objectReference: {fileID: 0}
     - target: {fileID: 2423271709795749354, guid: c897fbe54e0cbce45a6210aad5b50ca5, type: 3}
       propertyPath: m_LocalPosition.x
       value: 5

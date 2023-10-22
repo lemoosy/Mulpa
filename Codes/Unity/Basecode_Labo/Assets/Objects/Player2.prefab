@@ -144,7 +144,7 @@ MonoBehaviour:
   m_coinCopy: {fileID: 2795389146559806653, guid: 242cbd71fef48774eb854fc6976678af, type: 3}
   m_monsterCopy: {fileID: 5212196825041552891, guid: cd87f449de17fdc4ab76ae9d1f3c1fde, type: 3}
   m_coin: {fileID: 0}
-  m_monstersSize: 0
+  m_monstersSize: 3
   m_monsters: []
   m_parent: {fileID: 0}
 --- !u!61 &8214610879620310826
