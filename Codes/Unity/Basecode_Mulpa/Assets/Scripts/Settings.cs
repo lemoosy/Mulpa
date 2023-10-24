@@ -5,7 +5,7 @@ namespace _Settings
 {
     public class Settings
     {
-        // Enumération des différents modes de jeu.
+        // Énumération des différents modes de jeu.
         public enum ModeID
         {
             MODE_SOLO,
@@ -17,7 +17,7 @@ namespace _Settings
             MODE_GENERATOR_HARD
         }
 
-        // Enumération des différentes cases dans la matrice m_matrixInit.
+        // Énumération des différentes cases dans la matrice m_matrixChar.
         public enum CaseIDChar
         {
             CASE_VOID       =   ' ',
@@ -33,7 +33,7 @@ namespace _Settings
             CASE_EXIT       =   'B'
         }
 
-        // Enumération des différentes cases dans la matrice m_matrixNN.
+        // Énumération des différentes cases dans la matrice m_matrixBin.
         public enum CaseIDBin
         {
             CASE_VOID       =   0b000,
@@ -50,7 +50,7 @@ namespace _Settings
             CASE_PLAYER     =   0b100
         }
 
-        // Enumération des différentes difficultés.
+        // Énumération des différentes difficultés.
         public enum Difficulty
         {
             EASY,

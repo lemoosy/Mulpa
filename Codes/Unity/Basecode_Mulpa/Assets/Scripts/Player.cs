@@ -4,49 +4,115 @@ using Unity.MLAgents.Sensors;
 using System.Collections.Generic;
 using Unity.MLAgents.Actuators;
 using Unity.VisualScripting;
-
-using _DLL;
-using _Settings;
 using System;
 
+using _Settings;
+using _Graph;
+using _Matrix;
+
+// CLasse représentant un joueur.
 public class Player : Agent
 {
     #region Variables
 
+
+
+
+
+    /////////////
+    /// Monde ///
+    /////////////
+
     // Monde associé au joueur. 
-    public GameObject m_world = null;                       // Référence vers le monde
+    public GameObject m_world = null;
 
-    // Physique
-    private int m_tick = 0;                                 // Ajoute +1 à chaque FixedUpdate()
-    private int m_tickMax = 15;                             // MAJ du joueur toutes les 'm_tickMax' frames
+
+
+
+
+    ////////////////
+    /// Physique ///
+    ////////////////
+
+    // Ajoute +1 à chaque fois que la fonction FixedUpdate() est appelée.
+    [HideInInspector] public int m_tick = 0;
+
+    // Met à jour le joueur tous les 120 ticks.
+    [HideInInspector] public int m_tickMax = 120;
+
+    // Vitesse du joueur.
+    [HideInInspector] public Vector2 m_speed = new Vector2(128.0f, 256.0f);
+
+
+
+
+
+    ////////////
+    /// État ///
+    ////////////
     
-    // IA
-    private int m_step = 0;                                 // Nombre de décisions + actions prises par l'IA
-    private int m_stepMax = 1000;                           // Nombre de décisions + actions maximum prises par l'IA
+    [HideInInspector] public bool m_onGround = false;
+    [HideInInspector] public bool m_collisionMonster = false; // Monster + Spade + Lava.
+    [HideInInspector] public bool m_collisionCoin = false;
+    [HideInInspector] public bool m_collisionLever = false;
+    [HideInInspector] public bool m_collisionExit = false;
+    [HideInInspector] public bool m_timerIsOver = false; // Si l'agent prend trop de temps pour finir le niveau.
+    [HideInInspector] public bool m_outOfDimension = false;
+    [HideInInspector] public bool m_isDead = false; // m_collisionMonster + m_timerIsOver + m_outOfDimension.
 
-    // Entrées
-    public bool m_left = false;
-    public bool m_right = false;
-    public bool m_jump = false;
 
-    // Vitesse du joueur
-    public Vector2 m_speed = new Vector2(128.0f, 256.0f);
 
-    // Récompenses
-    public float m_rewardCoin = 1.0f;                       // Récompense lorsque l'agent récupère une pièce
-    public float m_rewardMonster = -5.0f;                   // Récompense lorsque l'agent se fait toucher par un monstre
-    public float m_rewardOutOfDimension = -5.0f;            // Récompense lorsque le joueur sort de la dimension du monde
-    public float m_rewardExit = 5.0f;                       // Récompense lorsque le joueur atteint la sortie
-    public float m_rewardTotal = 0.0f;                      // Récompense totale de l'agent
 
-    // États
-    public bool m_onGround = false;
-    public bool m_isDead = false;
-    public bool m_atExit = false;
 
-    #region
+    /////////////
+    /// Agent ///
+    /////////////
+
+    // Nombre de décisions prises par l'agent.
+    [HideInInspector] public int m_step = 0;
+
+    // Nombre de décisions max. prises par l'agent.
+    [HideInInspector] public int m_stepMax = 1000;
+
+    // Récompenses.
+    [HideInInspector] public float m_rewardMove = -0.1f;
+    [HideInInspector] public float m_rewardMonster = -5.0f; // Monster + Spade + Lava.
+    [HideInInspector] public float m_rewardCoin = 1.0f;
+    [HideInInspector] public float m_rewardExit = 5.0f; // Lever + Exit.
+    [HideInInspector] public float m_rewardTimerIsOver = -5.0f;
+    [HideInInspector] public float m_rewardOutOfDimension = -5.0f;
+
+
+
+
+
+    //////////////
+    /// Entrée ///
+    //////////////
+
+    [HideInInspector] public bool m_left = false;
+    [HideInInspector] public bool m_right = false;
+    [HideInInspector] public bool m_jump = false;
+
+
+
+
+
+    #endregion
+
+
+
+
 
     #region Functions
+
+
+
+
+
+    /////////////
+    /// Unity ///
+    /////////////
 
     public void FixedUpdate()
     {
@@ -55,27 +121,47 @@ public class Player : Agent
         if (m_tick >= m_tickMax)
         {
             m_tick = 0;
-
-            m_step++;
-
             ResetState();
+            m_step++;
             RequestDecision();
-            RequestAction();
         }
     }
 
     public void OnTriggerEnter2D(Collider2D collider)
     {
+        if (collider.gameObject.CompareTag("tag_monster"))
+        {
+            m_collisionMonster = true;
+            m_isDead = true;
+        }
+
+        if (collider.gameObject.CompareTag("tag_spade"))
+        {
+            m_collisionMonster = true;
+            m_isDead = true;
+        }
+
+        if (collider.gameObject.CompareTag("tag_lava"))
+        {
+            m_collisionMonster = true;
+            m_isDead = true;
+        }
+
         if (collider.gameObject.CompareTag("tag_coin"))
         {
+            m_collisionCoin = true;
             Destroy(collider.gameObject);
-            AddReward2(m_rewardCoin);
+        }
+
+        if (collider.gameObject.CompareTag("tag_lever"))
+        {
+            m_collisionLever = true;
+            Destroy(collider.gameObject);
         }
 
         if (collider.gameObject.CompareTag("tag_exit"))
         {
-            m_atExit = true;
-            AddReward2(m_rewardExit);
+            m_collisionExit = true;
         }
     }
 
@@ -91,88 +177,138 @@ public class Player : Agent
                 }
             }
         }
-        
-        print("wow 2");
-
-        if (collision.gameObject.CompareTag("tag_monster"))
-        {
-            m_isDead = true;
-            AddReward2(m_rewardMonster);
-        }
     }
 
-    // État
+
+
+
+
+    ////////////
+    /// État ///
+    ////////////
 
     public void ResetState()
     {
-        print("wow 1");
         m_onGround = false;
+        m_collisionMonster = false;
+        m_collisionCoin = false;
+        m_collisionLever = false;
+        m_collisionExit = false;
+        m_timerIsOver = false;
+        m_outOfDimension = false;
         m_isDead = false;
-        m_atExit = false;
     }
 
     public void UpdateState()
     {
         if (m_step >= m_stepMax)
         {
+            m_timerIsOver = true;
             m_isDead = true;
         }
 
         if (OutOfDimension())
         {
+            m_outOfDimension = true;
             m_isDead = true;
         }
     }
 
-    // Récompense
 
-    public void SetReward2(float p_value)
-    {
-        SetReward(p_value);
-        m_rewardTotal = p_value;
-    }
 
-    public void AddReward2(float p_value)
-    {
-        AddReward(p_value);
-        m_rewardTotal += p_value;
-    }
 
-    public void ResetReward()
-    {
-        SetReward2(0.0f);
-    }
+
+    //////////////////
+    /// Récompense ///
+    //////////////////
 
     public void UpdateReward()
     {
+        if (m_collisionMonster)
+        {
+            AddReward(m_rewardMonster);
+        }
+
+        if (m_collisionCoin)
+        {
+            AddReward(m_rewardCoin);
+        }
+
+        if (m_collisionLever)
+        {
+            AddReward(m_rewardExit);
+        }
+
+        if (m_collisionExit)
+        {
+            AddReward(m_rewardExit); 
+        }
+
+        if (m_timerIsOver)
+        {
+            AddReward(m_rewardTimerIsOver);
+        }
+
+        if (m_outOfDimension)
+        {
+            AddReward(m_rewardOutOfDimension);
+            return; // Inutile de calculer le PCC.
+        }
+
         if (m_isDead)
         {
             World worldScr = m_world.GetComponent<World>();
 
-            float PCC = DLL.DLL_PCC(
-                worldScr.m_matrix,
-                World.m_matrixSize.x,
-                World.m_matrixSize.y,
-                worldScr.m_matrixPlayerPosition.x,
-                worldScr.m_matrixPlayerPosition.y,
-                worldScr.m_matrixExitPosition.x,
-                worldScr.m_matrixExitPosition.y,
-                false
-            );
+            // Joueur.
 
-            // Si le joueur est hors dimension
-            if (PCC == -1.0f)
+            Vector3 positionPlayer = transform.localPosition;
+
+            int iPlayer = (int)(positionPlayer.x / (float)World.m_tileSize.x);
+            int jPlayer = (int)(positionPlayer.y / (float)World.m_tileSize.y);
+
+            // Sortie.
+            
+            Vector3 positionExit = Vector3.zero;
+
+            // Si un levier existe, la sortie sera le levier.
+            if (worldScr.m_lever)
             {
-                AddReward2(m_rewardOutOfDimension);
+                positionExit = worldScr.m_lever.transform.localPosition;
             }
             else
             {
-                AddReward2(100.0f - PCC);
+                positionExit = worldScr.m_exit.transform.localPosition;
             }
+
+            int iExit = (int)(positionExit.x / (float)World.m_tileSize.x);
+            int jExit = (int)(positionExit.y / (float)World.m_tileSize.y);
+
+            // PCC.
+
+            float PCC = _Graph.Graph.GetSP(
+                worldScr.m_matrixBin.m_matrix,
+                World.m_matrixSize.x,
+                World.m_matrixSize.y,
+                iPlayer,
+                jPlayer,
+                iExit,
+                jExit,
+                false
+            );
+
+            Debug.Assert(PCC != -1.0f);
+
+            AddReward(-PCC / 10.0f); // pire cas 2x24 + 2x14 = 76.
         }
     }
 
-    // Entrées
+
+
+
+
+    //////////////
+    /// Entrée ///
+    //////////////
 
     public void ResetInput()
     {
@@ -197,7 +333,6 @@ public class Player : Agent
                 break;
 
             case 3:
-                print("wow 3" + m_onGround.ToString());
                 m_jump = m_onGround;
                 break;
 
@@ -207,7 +342,13 @@ public class Player : Agent
         }
     }
 
-    // Vélocité
+
+
+
+
+    ////////////////
+    /// Vélocité ///
+    ////////////////
 
     public Vector2 GetVelocity()
     {
@@ -253,7 +394,18 @@ public class Player : Agent
         SetVelocity(velocity);
     }
 
-    // Position
+
+
+
+
+    ////////////////
+    /// Position ///
+    ////////////////
+
+    public Vector2 GetPositionIJ()
+    {
+
+    }
 
     public Vector3 GetPosition()
     {
@@ -281,15 +433,87 @@ public class Player : Agent
         return false;
     }
 
-   // IA
+
+
+
+
+    /////////////
+    /// Agent ///
+    /////////////
 
     public override void OnEpisodeBegin()
     {
+        // Monde
+
+        World worldScr = m_world.GetComponent<World>();
+        worldScr.m_levelCursor = 0;
+        worldScr.LevelDestroy();
+        worldScr.LevelCreate();
+
+        // Joueur
+
         m_tick = 0;
-
+        ResetPosition();
         m_step = 0;
+    }
 
-        m_rewardTotal = 0.0f;
+    public int[] IntToBin(int n, int resSize)
+    {
+
+
+        return;
+    }
+
+    public override void CollectObservations(VectorSensor sensor)
+    {
+        if (m_isDead) return;
+
+        World worldScr = m_world.GetComponent<World>();
+        worldScr.MatrixBinUpdate();
+
+        for (int j = 0; j < World.m_matrixSize.y; j++)
+        {
+            for (int i = 0; i < World.m_matrixSize.x; i++)
+            {
+                int value = worldScr.m_matrixBin.Get(i, j);
+
+                int[] bin = IntToBin(value, 3);
+
+                for (int k = 0; k < bin.Length; k++)
+                {
+                    sensor.AddObservation(bin[k]);
+                }
+            }
+        }
+    }
+
+    public override void OnActionReceived(ActionBuffers actions)
+    {
+        // ResetState()
+
+        // OnTriggerEnter2D()
+        
+        // OnCollisionStay2D()
+        
+        // CollectObservations()
+        
+        UpdateState();
+        
+        UpdateReward();
+
+        if (m_isDead)
+        {
+            EndEpisode();
+            return;
+        }
+
+        int index = actions.DiscreteActions[0];
+        
+        ResetInput();
+
+        SetInput(index);
+        
+        UpdateVelocity();
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
@@ -312,41 +536,9 @@ public class Player : Agent
         }
     }
 
-    public override void OnActionReceived(ActionBuffers actions)
-    {
-        // ResetState()
-        // FixedUpdate()
-        // OnTriggerEnter2D()
-        // OnCollisionStay2D()
-        UpdateState();
-        UpdateReward();
-        int index = actions.DiscreteActions[0];
-        ResetInput();
-        SetInput(index);
-        UpdateVelocity();
-    }
 
-    // Outils
 
-    public Vector2 GetSize()
-    {
-        BoxCollider2D collider = GetComponent<BoxCollider2D>();
-        return collider.size;
-    }
 
-    public void InitNewLevel()
-    {
-        World worldScr = m_world.GetComponent<World>();
-
-        m_tick = 0;
-
-        m_step = 0;
-
-        Vector2Int matrixPositionSpawn = worldScr.m_matrixSpawnPosition;
-        matrixPositionSpawn *= World.m_tileSize;
-
-        SetPosition((Vector3Int)matrixPositionSpawn);
-    }
 
     #endregion
 }

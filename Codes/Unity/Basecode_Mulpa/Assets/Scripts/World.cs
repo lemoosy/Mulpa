@@ -17,6 +17,17 @@ public class World : MonoBehaviour
 
 
     //////////////
+    /// Joueur ///
+    //////////////
+
+    // Joueur associé au monde (depuis la liste m_objects).
+    public GameObject m_player = null;
+
+
+
+
+
+    //////////////
     /// Niveau ///
     //////////////
 
@@ -27,15 +38,15 @@ public class World : MonoBehaviour
     //      HARD -> m_levelIndex = [7, 8, 9, 10]
     //       ALL -> m_levelIndex = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     //
-    private Settings.Difficulty m_levelDifficulty = Settings.Difficulty.EASY; // à initialiser dans Unity.
+    public Settings.Difficulty m_levelDifficulty = Settings.Difficulty.EASY;
 
     // Liste représentant les indices des niveaux (level_X.txt, X = m_levelIndex[i], X in [1, 10]).
     [HideInInspector]
-    private int[] m_levelIndex = null;
+    public int[] m_levelIndex = null;
 
     // Curseur niveau actuel (level_X.txt, X = m_levelIndex[m_levelCursor], X in [1, 10]).
     [HideInInspector]
-    private int m_levelCursor = 0;
+    public int m_levelCursor = 0;
 
 
 
@@ -54,14 +65,14 @@ public class World : MonoBehaviour
     // Chaque case est un CaseIDChar.
     // Se met à jour dans CreateLevel().
     [HideInInspector]
-    private Matrix m_matrixChar = new Matrix(m_matrixSize.x, m_matrixSize.y);
+    public Matrix m_matrixChar = new Matrix(m_matrixSize.x, m_matrixSize.y);
 
     // Matrice du niveau actuel (optimisé pour l'agent).
-    // Elle représente les tuiles + tous les objets (prefabs) du niveau actuel.
+    // Elle représente les tuiles + tous les objets du niveau actuel.
     // Chaque case est un CaseIDBin.
-    // Se met à jour dans MatrixNNUpdate().
+    // Se met à jour dans MatrixBinUpdate().
     [HideInInspector]
-    public Matrix m_matrixNN = new Matrix(m_matrixSize.x, m_matrixSize.y);
+    public Matrix m_matrixBin = new Matrix(m_matrixSize.x, m_matrixSize.y);
     
 
 
@@ -75,11 +86,11 @@ public class World : MonoBehaviour
     [HideInInspector]
     public static Vector2Int m_tileSize = new Vector2Int(16, 16);
 
-    // Carte où sont stockées les tuiles.
-    private Tilemap m_tileMap = null; // à initialiser dans Unity.
+    // Carte des tuiles.
+    public Tilemap m_tileMap = null;
 
     // Tuile d'un mur.
-    private Tile m_tileWall = null; // à initialiser dans Unity.
+    public Tile m_tileWall = null;
 
 
 
@@ -90,20 +101,17 @@ public class World : MonoBehaviour
     /////////////
 
     // Préfabriqués des objets.
-    private GameObject m_doorPrefab = null; // à initialiser dans Unity.
-    private GameObject m_monsterPrefab = null; // à initialiser dans Unity.
-    private GameObject m_coinPrefab = null; // à initialiser dans Unity.
-    private GameObject m_spawnPrefab = null; // à initialiser dans Unity.
-    private GameObject m_leverPrefab = null; // à initialiser dans Unity.
-    private GameObject m_exitPrefab = null; // à initialiser dans Unity.
+    public GameObject m_doorPrefab = null;
+    public GameObject m_monsterPrefab = null;
+    public GameObject m_coinPrefab = null;
+    public GameObject m_spawnPrefab = null;
+    public GameObject m_leverPrefab = null;
+    public GameObject m_exitPrefab = null;
 
-    // Liste de tous les objets (prefabs) du niveau actuel.
+    // Liste de tous les objets du niveau actuel.
     // Se met à jour dans CreateLevel().
     [HideInInspector]
-    private List<GameObject> m_objects = new List<GameObject>();
-
-    // Objet player (depuis la liste m_objects).
-    public GameObject m_player = null; // à initialiser dans Unity.
+    public List<GameObject> m_objects = new List<GameObject>();
     
     // Objet spawn (depuis la liste m_objects).
     [HideInInspector]
@@ -130,17 +138,13 @@ public class World : MonoBehaviour
     public static Vector2Int m_size = m_tileSize * m_matrixSize;
 
     // Position de l'objet parent (environnement).
-    public Transform m_environment = null; // à initialiser dans Unity.
+    public Transform m_environment = null;
 
 
 
 
 
     #endregion
-
-
-
-
 
     #region Functions
 
@@ -177,30 +181,7 @@ public class World : MonoBehaviour
                 break;
         }
 
-        LevelCreate();
-        PlayerInitNewLevel();
-    }
-
-    public void FixedUpdate()
-    {
-        if (PlayerIsDead())
-        {
-            m_levelCursor = 0;
-            LevelDestroy();
-            LevelCreate();
-            PlayerInitNewLevel();
-        }
-        else if (PlayerAtExit())
-        {
-            m_levelCursor++;
-            LevelDestroy();
-            LevelCreate();
-            PlayerInitNewLevel();
-        }
-        else
-        {
-            MatrixNNUpdate();
-        }
+        m_objects.Add(m_player);
     }
 
 
@@ -325,37 +306,11 @@ public class World : MonoBehaviour
             Destroy(obj);
         }
 
+        m_objects.Clear();
+     
         m_spawn = null;
         m_lever = null;
         m_exit = null;
-
-        m_objects.Clear();
-    }
-
-
-
-
-
-    //////////////
-    /// Player ///
-    //////////////
-
-    public bool PlayerIsDead()
-    {
-        Player playerScr = m_player.GetComponent<Player>();
-        return playerScr.m_isDead;
-    }
-
-    public bool PlayerAtExit()
-    {
-        Player playerScr = m_player.GetComponent<Player>();
-        return playerScr.m_atExit;
-    }
-
-    public void PlayerInitNewLevel()
-    {
-        Player playerScr = m_player.GetComponent<Player>();
-        playerScr.InitNewLevel();
     }
 
 
@@ -366,7 +321,7 @@ public class World : MonoBehaviour
     /// Matrice ///
     ///////////////
 
-    public void MatrixNNClear()
+    public void MatrixBinClear()
     {
         for (int j = 0; j < m_matrixSize.y; j++)
         {
@@ -374,14 +329,14 @@ public class World : MonoBehaviour
             {
                 int value = (int)Settings.CaseIDBin.CASE_VOID;
 
-                m_matrixNN.Set(i, j, value);
+                m_matrixBin.Set(i, j, value);
             }
         }
     }
 
-    public void MatrixNNUpdate()
+    public void MatrixBinUpdate()
     {
-        MatrixNNClear();
+        MatrixBinClear();
 
         // Tuiles
 
@@ -397,7 +352,7 @@ public class World : MonoBehaviour
                 {
                     int value = (int)Settings.CaseIDBin.CASE_WALL;
 
-                    m_matrixNN.Set(i, j, value);
+                    m_matrixBin.Set(i, j, value);
                 }
             }
         }
@@ -424,7 +379,7 @@ public class World : MonoBehaviour
             }
 
             // On évite d'écraser le joueur.
-            if (m_matrixNN.Get(i, j) == (int)Settings.CaseIDBin.CASE_PLAYER)
+            if (m_matrixBin.Get(i, j) == (int)Settings.CaseIDBin.CASE_PLAYER)
             {
                 continue;
             }
@@ -482,7 +437,7 @@ public class World : MonoBehaviour
                     break;
             }
 
-            m_matrixNN.Set(i, j, value);
+            m_matrixBin.Set(i, j, value);
         }
     }
 
