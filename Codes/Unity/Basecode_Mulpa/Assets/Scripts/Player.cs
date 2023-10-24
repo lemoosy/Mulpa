@@ -102,10 +102,6 @@ public class Player : Agent
 
     #endregion
 
-
-
-
-
     #region Functions
 
 
@@ -277,10 +273,10 @@ public class Player : Agent
 
             // Joueur.
 
-            Vector3 positionPlayer = transform.localPosition;
+            Vector2Int positionPlayer = GetPositionIJ();
 
-            int iPlayer = (int)(positionPlayer.x / (float)World.m_tileSize.x);
-            int jPlayer = (int)(positionPlayer.y / (float)World.m_tileSize.y);
+            int iPlayer = positionPlayer.x;
+            int jPlayer = positionPlayer.y;
 
             // Sortie.
             
@@ -443,41 +439,41 @@ public class Player : Agent
     /// Position ///
     ////////////////
 
-    public Vector3 GetPosition()
+    public Vector2 GetPosition()
     {
-        return transform.localPosition;
+        return (Vector2)transform.localPosition;
     }
 
-    public Vector2 GetPositionIJ()
+    public Vector2Int GetPositionIJ()
     {
-        Vector3 position = GetPosition();
+        Vector2 position = GetPosition();
 
         int i = (int)(position.x / (float)World.m_tileSize.x);
         int j = (int)(position.y / (float)World.m_tileSize.y);
 
-        return new Vector2(i, j);
+        return (new Vector2Int(i, j));
     }
 
-    public void SetPosition(Vector3 position)
+    public void SetPosition(Vector2 position)
     {
-        transform.localPosition = position;
+        transform.localPosition = (Vector3)position;
     }
 
     public void ResetPosition()
     {
         World worldScr = m_world.GetComponent<World>();
 
-        Vector3 positionSpawn = worldScr.m_spawn.transform.localPosition;
+        Vector2 positionSpawn = (Vector2)worldScr.m_spawn.transform.localPosition;
 
         SetPosition(positionSpawn);
     }
 
     public bool OutOfDimension()
     {
-        Vector3 position = GetPosition();
+        Vector2Int position = GetPositionIJ();
 
-        int i = (int)(position.x / (float)World.m_tileSize.x);
-        int j = (int)(position.y / (float)World.m_tileSize.y);
+        int i = position.x;
+        int j = position.y;
 
         return ((i < 0) || (i >= World.m_matrixSize.x) || (j < 0) || (j >= World.m_matrixSize.y));
     }
@@ -500,14 +496,14 @@ public class Player : Agent
 
     public override void OnEpisodeBegin()
     {
-        // Monde.
+        // Monde
 
         World worldScr = m_world.GetComponent<World>();
-        worldScr.m_levelCursor = 0;
         worldScr.DestroyLevel();
+        worldScr.m_levelCursor = 0;
         worldScr.CreateLevel();
 
-        // Joueur.
+        // Joueur
 
         m_tick = 0;
         ResetPosition();
@@ -515,11 +511,20 @@ public class Player : Agent
         m_step = 0;
     }
 
-    public int[] IntToBin(int n, int resSize)
+    public int[] IntToBin(int n, int tabSize)
     {
+        int[] res = new int[tabSize];
 
+        int index = 0;
 
-        return;
+        while (n > 0)
+        {
+            res[tabSize - index - 1] = n % 2;
+            n /= 2;
+            index++;
+        }
+
+        return res;
     }
 
     public override void CollectObservations(VectorSensor sensor)
@@ -559,6 +564,7 @@ public class Player : Agent
 
         if (m_isDead)
         {
+            m_init = true;
             EndEpisode();
             return;
         }
