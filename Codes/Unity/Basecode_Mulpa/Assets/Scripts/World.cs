@@ -73,7 +73,7 @@ public class World : MonoBehaviour
     // Se met à jour dans MatrixBinUpdate().
     [HideInInspector]
     public Matrix m_matrixBin = new Matrix(m_matrixSize.x, m_matrixSize.y);
-    
+
 
 
 
@@ -152,11 +152,7 @@ public class World : MonoBehaviour
 
 
 
-    /////////////
-    /// Unity ///
-    /////////////
-
-    public void Awake()
+    public void Init()
     {
         switch (m_levelDifficulty)
         {
@@ -184,6 +180,17 @@ public class World : MonoBehaviour
         m_objects.Add(m_player);
     }
 
+    public void DestroyDoor()
+    {
+        foreach (GameObject obj in m_objects)
+        {
+            if (obj.tag == "tag_door")
+            {
+                Destroy(obj);
+            }
+        }
+    }
+
 
 
 
@@ -192,7 +199,7 @@ public class World : MonoBehaviour
     /// Niveau ///
     //////////////
 
-    public void LevelCreate()
+    public void CreateLevel()
     {
         // m_matrixChar
 
@@ -294,7 +301,7 @@ public class World : MonoBehaviour
         Debug.Assert(m_exit);
     }
 
-    public void LevelDestroy()
+    public void DestroyLevel()
     {
         foreach (GameObject obj in m_objects)
         {

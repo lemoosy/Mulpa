@@ -6,9 +6,9 @@ using Unity.MLAgents.Actuators;
 using Unity.VisualScripting;
 using System;
 
-using _Settings;
 using _Graph;
 using _Matrix;
+using _Settings;
 
 // CLasse représentant un joueur.
 public class Player : Agent
@@ -50,14 +50,16 @@ public class Player : Agent
     ////////////
     /// État ///
     ////////////
-    
+
+    [HideInInspector] public bool m_init = false; // Pour être sûr que OnEpisodeBegin() est appelée avant FixedUpdate().
+
     [HideInInspector] public bool m_onGround = false;
     [HideInInspector] public bool m_collisionMonster = false; // Monster + Spade + Lava.
     [HideInInspector] public bool m_collisionCoin = false;
     [HideInInspector] public bool m_collisionLever = false;
     [HideInInspector] public bool m_collisionExit = false;
-    [HideInInspector] public bool m_timerIsOver = false; // Si l'agent prend trop de temps pour finir le niveau.
     [HideInInspector] public bool m_outOfDimension = false;
+    [HideInInspector] public bool m_timerIsOver = false; // Si l'agent prend trop de temps pour finir le niveau.
     [HideInInspector] public bool m_isDead = false; // m_collisionMonster + m_timerIsOver + m_outOfDimension.
 
 
@@ -114,8 +116,18 @@ public class Player : Agent
     /// Unity ///
     /////////////
 
+    public void Awake()
+    {
+        World world = m_world.GetComponent<World>();
+        world.Init();
+
+        m_init = true;
+    }
+
     public void FixedUpdate()
     {
+        if (m_init) return;
+
         m_tick += 1;
 
         if (m_tick >= m_tickMax)
@@ -129,6 +141,8 @@ public class Player : Agent
 
     public void OnTriggerEnter2D(Collider2D collider)
     {
+        if (m_init) return;
+
         if (collider.gameObject.CompareTag("tag_monster"))
         {
             m_collisionMonster = true;
@@ -167,6 +181,8 @@ public class Player : Agent
 
     public void OnCollisionStay2D(Collision2D collision)
     {
+        if (m_init) return;
+
         if (collision.gameObject.CompareTag("tag_wall"))
         {
             foreach (ContactPoint2D point in collision.contacts)
@@ -194,22 +210,22 @@ public class Player : Agent
         m_collisionCoin = false;
         m_collisionLever = false;
         m_collisionExit = false;
-        m_timerIsOver = false;
         m_outOfDimension = false;
+        m_timerIsOver = false;
         m_isDead = false;
     }
 
     public void UpdateState()
     {
-        if (m_step >= m_stepMax)
-        {
-            m_timerIsOver = true;
-            m_isDead = true;
-        }
-
         if (OutOfDimension())
         {
             m_outOfDimension = true;
+            m_isDead = true;
+        }
+
+        if (m_step >= m_stepMax)
+        {
+            m_timerIsOver = true;
             m_isDead = true;
         }
     }
@@ -298,7 +314,32 @@ public class Player : Agent
 
             Debug.Assert(PCC != -1.0f);
 
-            AddReward(-PCC / 10.0f); // pire cas 2x24 + 2x14 = 76.
+            AddReward(-PCC); // pire cas 2x24 + 2x14 = 76.
+        }
+    }
+
+
+
+
+
+    /////////////
+    /// Monde ///
+    /////////////
+
+    public void UpdateWorld()
+    {
+        World worldScr = m_world.GetComponent<World>();
+
+        if (m_collisionLever)
+        {
+            worldScr.DestroyDoor();
+        }
+
+        if (m_collisionExit)
+        {
+            worldScr.DestroyLevel();
+            worldScr.m_levelCursor++;
+            worldScr.CreateLevel();
         }
     }
 
@@ -402,14 +443,19 @@ public class Player : Agent
     /// Position ///
     ////////////////
 
-    public Vector2 GetPositionIJ()
-    {
-
-    }
-
     public Vector3 GetPosition()
     {
         return transform.localPosition;
+    }
+
+    public Vector2 GetPositionIJ()
+    {
+        Vector3 position = GetPosition();
+
+        int i = (int)(position.x / (float)World.m_tileSize.x);
+        int j = (int)(position.y / (float)World.m_tileSize.y);
+
+        return new Vector2(i, j);
     }
 
     public void SetPosition(Vector3 position)
@@ -419,18 +465,29 @@ public class Player : Agent
 
     public void ResetPosition()
     {
-        World world = m_world.GetComponent<World>();
+        World worldScr = m_world.GetComponent<World>();
 
-        Debug.Assert(world.m_matrixPlayerPosition.x != -1);
+        Vector3 positionSpawn = worldScr.m_spawn.transform.localPosition;
 
-        Vector3 position = (Vector3Int)(world.m_matrixPlayerPosition * World.m_tileSize);
-
-        SetPosition(position);
+        SetPosition(positionSpawn);
     }
 
     public bool OutOfDimension()
     {
-        return false;
+        Vector3 position = GetPosition();
+
+        int i = (int)(position.x / (float)World.m_tileSize.x);
+        int j = (int)(position.y / (float)World.m_tileSize.y);
+
+        return ((i < 0) || (i >= World.m_matrixSize.x) || (j < 0) || (j >= World.m_matrixSize.y));
+    }
+
+    public void UpdatePosition()
+    {
+        if (m_collisionExit)
+        {
+            ResetPosition();
+        }
     }
 
 
@@ -443,17 +500,18 @@ public class Player : Agent
 
     public override void OnEpisodeBegin()
     {
-        // Monde
+        // Monde.
 
         World worldScr = m_world.GetComponent<World>();
         worldScr.m_levelCursor = 0;
-        worldScr.LevelDestroy();
-        worldScr.LevelCreate();
+        worldScr.DestroyLevel();
+        worldScr.CreateLevel();
 
-        // Joueur
+        // Joueur.
 
         m_tick = 0;
         ResetPosition();
+        m_init = false;
         m_step = 0;
     }
 
@@ -466,8 +524,6 @@ public class Player : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        if (m_isDead) return;
-
         World worldScr = m_world.GetComponent<World>();
         worldScr.MatrixBinUpdate();
 
@@ -507,6 +563,8 @@ public class Player : Agent
             return;
         }
 
+        UpdateWorld();
+
         int index = actions.DiscreteActions[0];
         
         ResetInput();
@@ -514,6 +572,8 @@ public class Player : Agent
         SetInput(index);
         
         UpdateVelocity();
+
+        UpdatePosition();
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
