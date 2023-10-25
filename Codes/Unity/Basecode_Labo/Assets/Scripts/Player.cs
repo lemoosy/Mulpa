@@ -30,6 +30,7 @@ public class Player : Agent
     public int m_step = 0;
 
     // Matrix
+    static public Vector2 m_tileSize = new Vector2(1.0f, 1.0f);
     static public Vector2Int m_matrixSize = new Vector2Int(10, 10);
     public int[] m_matrix = new int[m_matrixSize.x * m_matrixSize.y];
     
@@ -45,23 +46,32 @@ public class Player : Agent
     // Parent
     public Transform m_parent = null;
 
+    // States
+    public bool m_timeOut = false;
+    public bool m_collisionCoin = false;
+    public bool m_collisionMonster = false;
+
     #endregion
 
     #region Functions
 
     // Unity
 
-    public void Awake()
+    public void FixedUpdate()
     {
-        // Coin
+        m_tick++;
 
-        m_coin = Instantiate(m_coinCopy, m_parent);
-        
-        // Monsters
-
-        for (int i = 0; i < m_monstersSize; i++)
+        if (m_tick >= 300)
         {
-            m_monsters.Add(Instantiate(m_monsterCopy, m_parent));
+            m_tick = 0;
+            m_step++;
+
+            if (m_step >= 30) // >30 étapes ? On tue l'agent.
+            {
+                m_timeOut = true;
+            }
+
+            RequestDecision();
         }
     }
 
@@ -69,35 +79,12 @@ public class Player : Agent
     {
         if (collider.gameObject.CompareTag("tag_coin"))
         {
-            AddReward(+3.0f);
-            EndEpisode();
+            m_collisionCoin = true;
         }
 
         if (collider.gameObject.CompareTag("tag_monster"))
         {
-            SetReward(-3.0f);
-            EndEpisode();
-        }
-    }
-
-    public void FixedUpdate()
-    {
-        m_tick++;
-
-        if ((float)m_tick / 10.0f > 1.0f)
-        {
-            m_tick = 0;
-            m_step++;
-
-            RequestDecision();
-            RequestAction();
-
-            AddReward(-0.1f);
-
-            if (m_step > 30) // >30 étapes ? On tue l'agent.
-            {
-                EndEpisode();
-            }
+            m_collisionMonster = true;
         }
     }
 
@@ -148,7 +135,7 @@ public class Player : Agent
 
         // Player
 
-        Vector2 position = GetPosition();
+        Vector3 position = transform.localPosition;
 
         int i = (int)position.x;
         int j = (int)position.y;
@@ -196,6 +183,10 @@ public class Player : Agent
         ResetPosition();
         ResetPositionCoin();
         ResetPositionMonsters();
+
+        m_timeOut = false;
+        m_collisionCoin = false;
+        m_collisionMonster = false;
     }
 
     public override void CollectObservations(VectorSensor sensor)
@@ -227,14 +218,39 @@ public class Player : Agent
                 break;
 
                 default:
+                    print("ERROR - CollectObservations()");
                     break;
             }
-
         }
     }
 
     public override void OnActionReceived(ActionBuffers actionBuffers)
     {
+        AddReward(-0.01f);
+
+        if (m_timeOut)
+        {
+            print(GetCumulativeReward());
+            EndEpisode();
+            return;
+        }
+
+        if (m_collisionCoin)
+        {
+            AddReward(+3.0f);
+            print(GetCumulativeReward());
+            EndEpisode();
+            return;
+        }
+
+        if (m_collisionMonster)
+        {
+            AddReward(-2.0f);
+            print(GetCumulativeReward());
+            EndEpisode();
+            return;
+        }
+
         int index = actionBuffers.DiscreteActions[0];
 
         ResetInput();
@@ -243,78 +259,98 @@ public class Player : Agent
 
         if (OutOfDimension())
         {
-            SetReward(-3.0f);
+            AddReward(-5.0f);
+            print(GetCumulativeReward());
             EndEpisode();
+            return;
         }
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
     {
-        var discreteActionsOut = actionsOut.DiscreteActions;
+        var actionBuffers = actionsOut.DiscreteActions;
 
         if (Input.GetKey(KeyCode.LeftArrow))
         {
-            discreteActionsOut[0] = 1;
+            actionBuffers[0] = 1;
         }
         else if (Input.GetKey(KeyCode.RightArrow))
         {
-            discreteActionsOut[0] = 2;
+            actionBuffers[0] = 2;
         }
         else if (Input.GetKey(KeyCode.UpArrow))
         {
-            discreteActionsOut[0] = 3;
+            actionBuffers[0] = 3;
         }
         else if (Input.GetKey(KeyCode.DownArrow))
         {
-            discreteActionsOut[0] = 4;
+            actionBuffers[0] = 4;
         }
     }
 
     // Position
-
-    public Vector3 GetPosition()
-    {
-        return transform.localPosition;
-    }
-
-    public void SetPosition(Vector2 position)
-    {
-        transform.localPosition = position;
-    }
 
     public void ResetPosition()
     {
         int i = m_randomGenerator.Next(0, m_matrixSize.x);
         int j = m_randomGenerator.Next(0, m_matrixSize.y);
 
-        Vector2 size = GetSize();
+        Vector2 position = new Vector2((float)i, (float)j);
         
-        Vector2 position = new Vector2(i, j);
-        position += (size / 2.0f);
-        
-        SetPosition(position);
+        transform.localPosition = (Vector3)position;
     }
 
     public void UpdatePosition()
     {
-        Vector2 position = GetPosition();
+        Vector3 position = transform.localPosition;
 
         if (m_left)     position.x -= m_speed.x;
         if (m_right)    position.x += m_speed.x;
         if (m_up)       position.y += m_speed.y;
         if (m_down)     position.y -= m_speed.y;
 
-        SetPosition(position);
+        transform.localPosition = position;
     }
-    
+
+    public bool OutOfDimension()
+    {
+        Vector3 position = transform.localPosition;
+
+        if (position.x < 0.0f)
+        {
+            return true;
+        }
+
+        if (position.x >= (float)m_matrixSize.x)
+        {
+            return true;
+        }
+
+        if (position.y < 0.0f)
+        {
+            return true;
+        }
+
+        if (position.y >= (float)m_matrixSize.y)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     // Coin
 
     public void ResetPositionCoin()
     {
-        Vector2 position = GetPosition();
+        if (!m_coin)
+        {
+            m_coin = Instantiate(m_coinCopy, m_parent);
+        }
 
-        int iPlayer = (int)position.x;
-        int jPlayer = (int)position.y;
+        Vector2 positionPlayer = transform.localPosition;
+        int iPlayer = (int)positionPlayer.x;
+        int jPlayer = (int)positionPlayer.y;
 
         while (true)
         {
@@ -323,12 +359,9 @@ public class Player : Agent
 
             if ((i == iPlayer) && (j == jPlayer)) continue;
 
-            Vector2 size = new Vector2(1.0f, 1.0f);
-
-            position = new Vector2(i, j);
-            position += (size / 2.0f);
+            Vector2 positionCoin = new Vector2((float)i, (float)j);
             
-            m_coin.transform.localPosition = position;
+            m_coin.transform.localPosition = (Vector3)positionCoin;
 
             break;
         }
@@ -338,15 +371,24 @@ public class Player : Agent
 
     public void ResetPositionMonsters()
     {
-        Vector2 positionPlayer = GetPosition();
-
+        Vector2 positionPlayer = transform.localPosition;
         int iPlayer = (int)positionPlayer.x;
         int jPlayer = (int)positionPlayer.y;
 
         Vector2 positionCoin = m_coin.transform.localPosition;
-
         int iCoin = (int)positionCoin.x;
         int jCoin = (int)positionCoin.y;
+
+        // On supprime tous les monstres.
+
+        foreach (GameObject obj in m_monsters)
+        {
+            Destroy(obj);
+        }
+
+        m_monsters.Clear();
+
+        // On crée les monstres.
 
         for (int k = 0; k < m_monstersSize; k++)
         {
@@ -356,61 +398,14 @@ public class Player : Agent
             if ((iMonster == iPlayer) && (jMonster == jPlayer)) continue;
             if ((iMonster == iCoin) && (jMonster == jCoin)) continue;
 
-            Vector2 size = new Vector2(1.0f, 1.0f);
+            Vector2 positionMonster = new Vector2((float)iMonster, (float)jMonster);
 
-            Vector2 position = new Vector2(iMonster, jMonster);
-            position += (size / 2.0f);
-            
-            m_monsters[k].transform.localPosition = position;
+            GameObject obj = Instantiate(m_monsterCopy, m_parent);
+            obj.transform.localPosition = (Vector3)positionMonster;
+
+            m_monsters.Add(obj);
         }
-    }
-
-    // Utils
-
-    public float GetW()
-    {
-        BoxCollider2D collider = GetComponent<BoxCollider2D>();
-        return collider.size.x;
-    }
-
-    public float GetH()
-    {
-        BoxCollider2D collider = GetComponent<BoxCollider2D>();
-        return collider.size.y;
-    }
-
-    public Vector2 GetSize()
-    {
-        Vector2 size = new Vector2(GetW(), GetH());
-        return size;
     }
     
-    public bool OutOfDimension()
-    {
-        Vector3 position = GetPosition();
-
-        if (position.x < GetW() / 2.0f)
-        {
-            return true;
-        }
-
-        if (position.x + GetW() / 2.0f > m_matrixSize.x)
-        {
-            return true;
-        }
-
-        if (position.y < GetH() / 2.0f)
-        {
-            return true;
-        }
-
-        if (position.y + GetH() / 2.0f > m_matrixSize.y)
-        {
-            return true;
-        }
-
-        return false;
-    }
-
     #endregion
 }
