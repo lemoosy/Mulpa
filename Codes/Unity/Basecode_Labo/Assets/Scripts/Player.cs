@@ -66,7 +66,7 @@ public class Player : Agent
             m_tick = 0;
             m_step++;
 
-            if (m_step >= 30) // >30 étapes ? On tue l'agent.
+            if (m_step >= 100) // >100 étapes ? On tue l'agent.
             {
                 m_timeOut = true;
             }
@@ -226,7 +226,7 @@ public class Player : Agent
 
     public override void OnActionReceived(ActionBuffers actionBuffers)
     {
-        AddReward(-0.01f);
+        AddReward(-0.1f);
 
         if (m_timeOut)
         {
@@ -237,7 +237,7 @@ public class Player : Agent
 
         if (m_collisionCoin)
         {
-            AddReward(+3.0f);
+            AddReward(+5.0f);
             print(GetCumulativeReward());
             EndEpisode();
             return;
@@ -245,7 +245,7 @@ public class Player : Agent
 
         if (m_collisionMonster)
         {
-            AddReward(-2.0f);
+            AddReward(-5.0f);
             print(GetCumulativeReward());
             EndEpisode();
             return;
