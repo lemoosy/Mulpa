@@ -1,8 +1,6 @@
 #pragma once
 
 #include <cassert>
+#include <iomanip>
 #include <iostream>
-
-using namespace std;
-
-//#define GRAPH_MATRIX
+#include <vector>

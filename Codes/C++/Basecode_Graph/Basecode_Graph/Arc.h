@@ -23,10 +23,3 @@ public:
 	/// @brief Affiche les informations de l'arc.
 	void Print() const;
 };
-
-/// @brief Vérifie à l'aide de la commande == si deux arcs sont égaux
-/// (si les noeuds d'arrivée sont égaux).
-bool operator==(const Arc& a, const Arc& b);
-
-/// @brief Affiche les informations de l'arc à l'aide de la commande <<.
-ostream& operator<<(ostream& stream, Arc& arc);

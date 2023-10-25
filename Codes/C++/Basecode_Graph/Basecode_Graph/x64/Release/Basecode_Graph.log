@@ -1,6 +1,10 @@
 ﻿  Arc.cpp
   Graph.cpp
-  GraphList.cpp
-  GraphMatrix.cpp
   main.cpp
-  Basecode_Graph.vcxproj -> C:\Users\PC Lemoosy\OneDrive\Bureau\Mulpa\Codes\C++\Basecode_Graph\x64\Release\Basecode_Graph.lib
+  Mulpa.cpp
+     Création de la bibliothèque C:\Users\PC Lemoosy\OneDrive\Bureau\Mulpa\Codes\C++\Basecode_Graph\x64\Release\Basecode_Graph.lib et de l'objet C:\Users\PC Lemoosy\OneDrive\Bureau\Mulpa\Codes\C++\Basecode_Graph\x64\Release\Basecode_Graph.exp
+  Génération de code en cours
+  Previous IPDB not found, fall back to full compilation.
+  All 93 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Fin de la génération du code
+  Basecode_Graph.vcxproj -> C:\Users\PC Lemoosy\OneDrive\Bureau\Mulpa\Codes\C++\Basecode_Graph\x64\Release\Basecode_Graph.dll

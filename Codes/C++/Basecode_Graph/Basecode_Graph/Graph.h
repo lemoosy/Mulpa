@@ -1,15 +1,15 @@
 #pragma once
 
 #include "Arc.h"
-#include "DList.h"
 #include "Settings.h"
 
-#ifdef GRAPH_MATRIX
-
-/// @brief Classe mère pour la classe Graph (matrice d'adjacence).
-class GraphMother
+/// @brief Classe représentant un graphe (matrice d'adjacence).
+class Graph
 {
-public:
+private:
+
+	/// @brief Nombre de noeuds dans le graphe.
+	int m_size;
 
 	/// @brief Tableau qui stocke le nombre d'arcs entrants pour chaque noeud.
 	int* m_negValency;
@@ -19,58 +19,11 @@ public:
 
 	/// @brief Matrice qui stocke les poids du graphe.
 	float** m_matrix;
-};
-
-#else
-
-/// @brief Classe représentant un noeud dans un graphe (liste d'adjacence).
-class GraphNode
-{
-public:
-
-	/// @brief Identifiant du noeud.
-	int m_id;
-
-	/// @brief Liste des arcs sortant du noeud.
-	DList<Arc>* m_arcs;
-
-	/// @brief Nombre de noeuds entrant dans le noeud.
-	int m_negValency;
-
-	/// @brief Nombre de noeuds sortant dans le noeud.
-	int m_posValency;
-
-	GraphNode();
-
-	~GraphNode();
-};
-
-/// @brief Classe mère pour la classe Graph (liste d'adjacence).
-class GraphMother
-{
-public:
-
-	/// @brief Nombre de noeuds dans le graphe.
-	int m_size;
-
-	/// @brief Noeuds du graphe.
-	GraphNode* m_nodes;
-};
-
-#endif // GRAPH_MATRIX
-
-/// @brief Classe représentant un graphe.
-class Graph : private GraphMother
-{
-private:
-
-	/// @brief Nombre de noeuds dans le graphe.
-	int m_size;
 
 public:
 
-	/// @brief Crée un graphe avec 'size' noeuds.
-	Graph(int size);
+	/// @brief Crée un graphe avec 'p_size' noeuds.
+	Graph(int p_size);
 
 	~Graph();
 
@@ -81,30 +34,30 @@ public:
 	void Print() const;
 
 	/// @brief Modifie le poids d'un arc dans le graphe.
-	/// @param u Identifiant du noeud de départ.
-	/// @param v Identifiant du noeud d'arrivée.
-	/// @param w Si 'w' est négatif, l'arc est supprimé, sinon il est créé ou modifié.
-	void SetWeight(int u, int v, float w);
+	/// @param p_u Identifiant du noeud de départ.
+	/// @param p_v Identifiant du noeud d'arrivée.
+	/// @param p_w Si 'w' est négatif, l'arc est supprimé, sinon il est ajouté ou modifié.
+	void SetWeight(int p_u, int p_v, float p_w);
 
 	/// @brief Retourne le poids d'un arc dans le graphe.
-	float GetWeight(int u, int v);
+	float GetWeight(int p_u, int p_v) const;
 
 	/// @brief Retourne la liste des arcs sortant du noeud 'u'.
-	/// @param u Identifiant du noeud.
-	/// @param size Pointeur vers un entier qui contiendra le nombre d'arcs sortant.
+	/// @param p_u Identifiant du noeud.
+	/// @param p_size Pointeur vers un entier qui contiendra le nombre d'arcs sortant.
 	/// @return Un tableau d'arcs sortant.
-	Arc* GetSuccessors(int u, int* size);
+	Arc* GetSuccessors(int p_u, int* p_size) const;
 
 	/// @brief Retourne la liste des arcs entrant du noeud 'v'.
-	/// @param v Identifiant du noeud.
-	/// @param size Pointeur vers un entier qui contiendra le nombre d'arcs entrant.
+	/// @param p_v Identifiant du noeud.
+	/// @param p_size Pointeur vers un entier qui contiendra le nombre d'arcs entrant.
 	/// @return Un tableau d'arcs entrant.
-	Arc* GetPredecessors(int v, int* size);
+	Arc* GetPredecessors(int p_v, int* p_size) const;
 
 	/// @brief Calcule le Plus Court Chemin (PCC) entre deux noeuds.
-	/// @param start Identifiant du noeud de départ.
-	/// @param end Identifiant du noeud d'arrivée.
-	/// @param distance Pointeur vers un float qui contiendra la distance totale du chemin (négatif si le chemin n'existe pas).
+	/// @param p_start Identifiant du noeud de départ.
+	/// @param p_end Identifiant du noeud d'arrivée.
+	/// @param p_distance Pointeur vers un float qui contiendra la distance totale du chemin (négatif si le chemin n'existe pas).
 	/// @return Liste d'entiers (identifiants des noeuds) correspondant au PCC.
-	DList<int>* Dijkstra(int start, int end, float* distance);
+	std::vector<int>* Dijkstra(int p_start, int p_end, float* p_distance) const;
 };
