@@ -226,7 +226,7 @@ public class Player : Agent
 
     public override void OnActionReceived(ActionBuffers actionBuffers)
     {
-        AddReward(-0.1f);
+        AddReward(-0.01f);
 
         if (m_timeOut)
         {
@@ -237,15 +237,22 @@ public class Player : Agent
 
         if (m_collisionCoin)
         {
-            AddReward(+5.0f);
-            print(GetCumulativeReward());
-            EndEpisode();
+            AddReward(+3.0f);
+
+            m_tick = 0;
+            m_step = 0;
+
+            ResetPositionCoin();
+            ResetPositionMonsters();
+
+            m_collisionCoin = false;
+
             return;
         }
 
         if (m_collisionMonster)
         {
-            AddReward(-5.0f);
+            AddReward(-3.0f);
             print(GetCumulativeReward());
             EndEpisode();
             return;
