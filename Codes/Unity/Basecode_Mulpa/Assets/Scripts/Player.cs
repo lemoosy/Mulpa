@@ -292,15 +292,15 @@ public class Player : Agent
                 positionExit = worldScr.m_exit.transform.localPosition;
             }
 
-            int iExit = (int)(positionExit.x / (float)World.m_tileSize.x);
-            int jExit = (int)(positionExit.y / (float)World.m_tileSize.y);
+            int iExit = (int)(positionExit.x / (float)World.s_tileSize.x);
+            int jExit = (int)(positionExit.y / (float)World.s_tileSize.y);
 
             // PCC.
 
             float PCC = _Graph.Graph.GetSP(
                 worldScr.m_matrixBin.m_matrix,
-                World.m_matrixSize.x,
-                World.m_matrixSize.y,
+                World.s_matrixSize.x,
+                World.s_matrixSize.y,
                 iPlayer,
                 jPlayer,
                 iExit,
@@ -448,8 +448,8 @@ public class Player : Agent
     {
         Vector2 position = GetPosition();
 
-        int i = (int)(position.x / (float)World.m_tileSize.x);
-        int j = (int)(position.y / (float)World.m_tileSize.y);
+        int i = (int)(position.x / (float)World.s_tileSize.x);
+        int j = (int)(position.y / (float)World.s_tileSize.y);
 
         return (new Vector2Int(i, j));
     }
@@ -475,7 +475,7 @@ public class Player : Agent
         int i = position.x;
         int j = position.y;
 
-        return ((i < 0) || (i >= World.m_matrixSize.x) || (j < 0) || (j >= World.m_matrixSize.y));
+        return ((i < 0) || (i >= World.s_matrixSize.x) || (j < 0) || (j >= World.s_matrixSize.y));
     }
 
     public void UpdatePosition()
@@ -532,9 +532,9 @@ public class Player : Agent
         World worldScr = m_world.GetComponent<World>();
         worldScr.MatrixBinUpdate();
 
-        for (int j = 0; j < World.m_matrixSize.y; j++)
+        for (int j = 0; j < World.s_matrixSize.y; j++)
         {
-            for (int i = 0; i < World.m_matrixSize.x; i++)
+            for (int i = 0; i < World.s_matrixSize.x; i++)
             {
                 int value = worldScr.m_matrixBin.Get(i, j);
 

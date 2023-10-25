@@ -58,21 +58,21 @@ public class World : MonoBehaviour
 
     // Taille de la matrice.
     [HideInInspector]
-    public static Vector2Int m_matrixSize = new Vector2Int(24, 14);
+    public static Vector2Int s_matrixSize = new Vector2Int(24, 14);
 
     // Matrice du niveau actuel.
     // Elle représente le fichier level_X.txt avec X = m_levelIndex[m_levelCursor].
     // Chaque case est un CaseIDChar.
     // Se met à jour dans CreateLevel().
     [HideInInspector]
-    public Matrix m_matrixChar = new Matrix(m_matrixSize.x, m_matrixSize.y);
+    public Matrix m_matrixChar = new Matrix(s_matrixSize.x, s_matrixSize.y);
 
     // Matrice du niveau actuel (optimisé pour l'agent).
     // Elle représente les tuiles + tous les objets du niveau actuel.
     // Chaque case est un CaseIDBin.
     // Se met à jour dans MatrixBinUpdate().
     [HideInInspector]
-    public Matrix m_matrixBin = new Matrix(m_matrixSize.x, m_matrixSize.y);
+    public Matrix m_matrixBin = new Matrix(s_matrixSize.x, s_matrixSize.y);
 
 
 
@@ -84,7 +84,7 @@ public class World : MonoBehaviour
 
     // Taille d'une tuile.
     [HideInInspector]
-    public static Vector2Int m_tileSize = new Vector2Int(16, 16);
+    public static Vector2Int s_tileSize = new Vector2Int(16, 16);
 
     // Carte des tuiles.
     public Tilemap m_tileMap = null;
@@ -135,7 +135,7 @@ public class World : MonoBehaviour
 
     // Taille du monde.
     [HideInInspector]
-    public static Vector2Int m_size = m_tileSize * m_matrixSize;
+    public static Vector2Int s_size = s_tileSize * s_matrixSize;
 
     // Position de l'objet parent (environnement).
     public Transform m_environment = null;
@@ -215,16 +215,16 @@ public class World : MonoBehaviour
 
         bool existDoor = false;
 
-        for (int j = 0; j < m_matrixSize.y; j++)
+        for (int j = 0; j < s_matrixSize.y; j++)
         {
-            for (int i = 0; i < m_matrixSize.x; i++)
+            for (int i = 0; i < s_matrixSize.x; i++)
             {
                 int value = m_matrixChar.Get(i, j);
 
                 GameObject obj = null;
 
                 Vector2Int positionIJ = new Vector2Int(i, j);
-                Vector2 position = (Vector2)(positionIJ * m_tileSize);
+                Vector2 position = (Vector2)(positionIJ * s_tileSize);
 
                 // Clear des tuiles.
 
@@ -330,9 +330,9 @@ public class World : MonoBehaviour
 
     public void MatrixBinClear()
     {
-        for (int j = 0; j < m_matrixSize.y; j++)
+        for (int j = 0; j < s_matrixSize.y; j++)
         {
-            for (int i = 0; i < m_matrixSize.x; i++)
+            for (int i = 0; i < s_matrixSize.x; i++)
             {
                 int value = (int)Settings.CaseIDBin.CASE_VOID;
 
@@ -349,9 +349,9 @@ public class World : MonoBehaviour
 
         Tilemap tileMapScr = m_tileMap.GetComponent<Tilemap>();
 
-        for (int j = 0; j < m_matrixSize.y; j++)
+        for (int j = 0; j < s_matrixSize.y; j++)
         {
-            for (int i = 0; i < m_matrixSize.x; i++)
+            for (int i = 0; i < s_matrixSize.x; i++)
             {
                 Vector3Int position = new Vector3Int(i, j, 0);
 
@@ -374,13 +374,13 @@ public class World : MonoBehaviour
             }
 
             Vector2 position = (Vector2)obj.transform.localPosition;
-            position += (Vector2)(m_tileSize / 2);
-            position /= (Vector2)m_tileSize;
+            position += (Vector2)(s_tileSize / 2);
+            position /= (Vector2)s_tileSize;
 
             int i = (int)position.x;
             int j = (int)position.y;
 
-            if ((i < 0) || (i >= m_matrixSize.x) || (j < 0) || (j >= m_matrixSize.y))
+            if ((i < 0) || (i >= s_matrixSize.x) || (j < 0) || (j >= s_matrixSize.y))
             {
                 continue;
             }
@@ -458,7 +458,7 @@ public class World : MonoBehaviour
 
     public Matrix GenerateRandom()
     {
-        Matrix matrix = new Matrix(m_matrixSize.x, m_matrixSize.y);
+        Matrix matrix = new Matrix(s_matrixSize.x, s_matrixSize.y);
         
         // ...
         
