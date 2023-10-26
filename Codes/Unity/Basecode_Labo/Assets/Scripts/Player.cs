@@ -59,6 +59,8 @@ public class Player : Agent
 
     public void FixedUpdate()
     {
+        print("FixedUpdate()");
+
         m_tick++;
 
         if (m_tick >= 300)
@@ -71,20 +73,136 @@ public class Player : Agent
                 m_timeOut = true;
             }
 
+            print("RequestDecision()");
+
             RequestDecision();
+        }
+    }
+
+    public override void OnEpisodeBegin()
+    {
+        print("OnEpisodeBegin()");
+
+        m_tick = 0;
+        m_step = 0;
+
+        ResetPosition();
+        ResetPositionCoin();
+        ResetPositionMonsters();
+
+        m_timeOut = false;
+        m_collisionCoin = false;
+        m_collisionMonster = false;
+    }
+
+    public override void CollectObservations(VectorSensor sensor)
+    {
+        print("CollectObservations()");
+
+        UpdateMatrix();
+
+        for (int k = 0; k < m_matrix.Length; k++)
+        {
+            switch (m_matrix[k])
+            {
+                case 0: // void
+                    sensor.AddObservation(0.0f);
+                    sensor.AddObservation(0.0f);
+                    break;
+
+                case 1: // player
+                    sensor.AddObservation(0.0f);
+                    sensor.AddObservation(1.0f);
+                    break;
+
+                case 2: // coin
+                    sensor.AddObservation(1.0f);
+                    sensor.AddObservation(0.0f);
+                    break;
+
+                case 3: // monster
+                    sensor.AddObservation(1.0f);
+                    sensor.AddObservation(1.0f);
+                    break;
+
+                default:
+                    print("ERROR - CollectObservations()");
+                    break;
+            }
+        }
+    }
+
+    public override void Heuristic(in ActionBuffers actionsOut)
+    {
+        print("Heuristic()");
+
+        var actionBuffers = actionsOut.DiscreteActions;
+
+        if (Input.GetKey(KeyCode.LeftArrow))
+        {
+            actionBuffers[0] = 1;
+        }
+        else if (Input.GetKey(KeyCode.RightArrow))
+        {
+            actionBuffers[0] = 2;
+        }
+        else if (Input.GetKey(KeyCode.UpArrow))
+        {
+            actionBuffers[0] = 3;
+        }
+        else if (Input.GetKey(KeyCode.DownArrow))
+        {
+            actionBuffers[0] = 4;
+        }
+    }
+
+    public override void OnActionReceived(ActionBuffers actionBuffers)
+    {
+        print("OnActionReceived()");
+
+        AddReward(-0.01f);
+
+        if (m_timeOut)
+        {
+            print(GetCumulativeReward());
+            EndEpisode();
+            return;
+        }
+
+        int index = actionBuffers.DiscreteActions[0];
+
+        ResetInput();
+        SetInput(index);
+        UpdatePosition();
+
+        if (OutOfDimension())
+        {
+            AddReward(-5.0f);
+            print(GetCumulativeReward());
+            EndEpisode();
+            return;
         }
     }
 
     public void OnTriggerEnter2D(Collider2D collider)
     {
+        print("OnTriggerEnter2D()");
+
         if (collider.gameObject.CompareTag("tag_coin"))
         {
-            m_collisionCoin = true;
+            AddReward(+3.0f);
+            print(GetCumulativeReward());
+            m_tick = 0;
+            m_step = 0;
+            ResetPositionCoin();
+            ResetPositionMonsters();
         }
 
         if (collider.gameObject.CompareTag("tag_monster"))
         {
-            m_collisionMonster = true;
+            AddReward(-3.0f);
+            print(GetCumulativeReward());
+            EndEpisode();
         }
     }
 
@@ -170,128 +288,6 @@ public class Player : Agent
             index = j * m_matrixSize.x + i;
 
             m_matrix[index] = 3;
-        }
-    }
-
-    // Agent
-
-    public override void OnEpisodeBegin()
-    {
-        m_tick = 0;
-        m_step = 0;
-
-        ResetPosition();
-        ResetPositionCoin();
-        ResetPositionMonsters();
-
-        m_timeOut = false;
-        m_collisionCoin = false;
-        m_collisionMonster = false;
-    }
-
-    public override void CollectObservations(VectorSensor sensor)
-    {
-        UpdateMatrix();
-
-        for (int k = 0; k < m_matrix.Length; k++)
-        {
-            switch (m_matrix[k])
-            {
-                case 0: // void
-                    sensor.AddObservation(0.0f);
-                    sensor.AddObservation(0.0f);
-                    break;
-
-                case 1: // player
-                    sensor.AddObservation(0.0f);
-                    sensor.AddObservation(1.0f);
-                break;
-
-                case 2: // coin
-                    sensor.AddObservation(1.0f);
-                    sensor.AddObservation(0.0f);
-                break;
-
-                case 3: // monster
-                    sensor.AddObservation(1.0f);
-                    sensor.AddObservation(1.0f);
-                break;
-
-                default:
-                    print("ERROR - CollectObservations()");
-                    break;
-            }
-        }
-    }
-
-    public override void OnActionReceived(ActionBuffers actionBuffers)
-    {
-        AddReward(-0.01f);
-
-        if (m_timeOut)
-        {
-            print(GetCumulativeReward());
-            EndEpisode();
-            return;
-        }
-
-        if (m_collisionCoin)
-        {
-            AddReward(+3.0f);
-
-            m_tick = 0;
-            m_step = 0;
-
-            ResetPositionCoin();
-            ResetPositionMonsters();
-
-            m_collisionCoin = false;
-
-            return;
-        }
-
-        if (m_collisionMonster)
-        {
-            AddReward(-3.0f);
-            print(GetCumulativeReward());
-            EndEpisode();
-            return;
-        }
-
-        int index = actionBuffers.DiscreteActions[0];
-
-        ResetInput();
-        SetInput(index);
-        UpdatePosition();
-
-        if (OutOfDimension())
-        {
-            AddReward(-5.0f);
-            print(GetCumulativeReward());
-            EndEpisode();
-            return;
-        }
-    }
-
-    public override void Heuristic(in ActionBuffers actionsOut)
-    {
-        var actionBuffers = actionsOut.DiscreteActions;
-
-        if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            actionBuffers[0] = 1;
-        }
-        else if (Input.GetKey(KeyCode.RightArrow))
-        {
-            actionBuffers[0] = 2;
-        }
-        else if (Input.GetKey(KeyCode.UpArrow))
-        {
-            actionBuffers[0] = 3;
-        }
-        else if (Input.GetKey(KeyCode.DownArrow))
-        {
-            actionBuffers[0] = 4;
         }
     }
 
