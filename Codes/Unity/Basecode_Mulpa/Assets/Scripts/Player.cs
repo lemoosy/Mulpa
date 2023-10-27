@@ -9,6 +9,7 @@ using System;
 using _Graph;
 using _Matrix;
 using _Settings;
+using _Utils;
 
 // CLasse représentant un joueur.
 public class Player : Agent
@@ -37,11 +38,11 @@ public class Player : Agent
     // Ajoute +1 à chaque fois que la fonction FixedUpdate() est appelée.
     [HideInInspector] public int m_tick = 0;
 
-    // Met à jour le joueur tous les 120 ticks.
-    [HideInInspector] public int m_tickMax = 120;
+    // Met à jour le joueur tous les 10 ticks.
+    [HideInInspector] public int m_tickMax = 10;
 
     // Vitesse du joueur.
-    [HideInInspector] public Vector2 m_speed = new Vector2(128.0f, 256.0f);
+    [HideInInspector] public Vector2 m_speed = new Vector2(5.0f, 20.0f);
 
 
 
@@ -51,16 +52,15 @@ public class Player : Agent
     /// État ///
     ////////////
 
-    [HideInInspector] public bool m_init = false; // Pour être sûr que OnEpisodeBegin() est appelée avant FixedUpdate().
-
-    [HideInInspector] public bool m_onGround = false;
-    [HideInInspector] public bool m_collisionMonster = false; // Monster + Spade + Lava.
-    [HideInInspector] public bool m_collisionCoin = false;
-    [HideInInspector] public bool m_collisionLever = false;
-    [HideInInspector] public bool m_collisionExit = false;
-    [HideInInspector] public bool m_outOfDimension = false;
-    [HideInInspector] public bool m_timerIsOver = false; // Si l'agent prend trop de temps pour finir le niveau.
-    [HideInInspector] public bool m_isDead = false; // m_collisionMonster + m_timerIsOver + m_outOfDimension.
+    [HideInInspector] public bool m_collisionMonster = false;   // Update dans OnTriggerEnter2D().
+    [HideInInspector] public bool m_collisionCoin = false;      // Update dans OnTriggerEnter2D().
+    [HideInInspector] public bool m_collisionLever = false;     // Update dans OnTriggerEnter2D().
+    [HideInInspector] public bool m_collisionExit = false;      // Update dans OnTriggerEnter2D().
+    [HideInInspector] public bool m_onGround = false;           // Update dans OnCollisionStay2D().
+     
+    [HideInInspector] public bool m_outOfDimension = false;     // Update dans UpdateState().
+    [HideInInspector] public bool m_timerIsOver = false;        // Update dans UpdateState().
+    [HideInInspector] public bool m_isDead = false;             // Update dans UpdateState().
 
 
 
@@ -78,11 +78,11 @@ public class Player : Agent
 
     // Récompenses.
     [HideInInspector] public float m_rewardMove = -0.1f;
-    [HideInInspector] public float m_rewardMonster = -5.0f; // Monster + Spade + Lava.
+    [HideInInspector] public float m_rewardMonster = -5.0f;             // Monster + Spade + Lava.
     [HideInInspector] public float m_rewardCoin = 1.0f;
-    [HideInInspector] public float m_rewardExit = 5.0f; // Lever + Exit.
+    [HideInInspector] public float m_rewardExit = 5.0f;                 // Lever + Exit.
     [HideInInspector] public float m_rewardTimerIsOver = -5.0f;
-    [HideInInspector] public float m_rewardOutOfDimension = -5.0f;
+    [HideInInspector] public float m_rewardOutOfDimension = -10.0f;
 
 
 
@@ -114,81 +114,125 @@ public class Player : Agent
 
     public void Awake()
     {
-        World world = m_world.GetComponent<World>();
-        world.Init();
-
-        m_init = true;
+        World worldSrc = m_world.GetComponent<World>();
+        worldSrc.Init();
     }
 
     public void FixedUpdate()
     {
-        if (m_init) return;
-
         m_tick += 1;
 
         if (m_tick >= m_tickMax)
         {
             m_tick = 0;
-            ResetState();
             m_step++;
             RequestDecision();
         }
     }
 
-    public void OnTriggerEnter2D(Collider2D collider)
+
+
+
+
+    //////////
+    /// IA ///
+    //////////
+
+    public override void OnEpisodeBegin()
     {
-        if (m_init) return;
+        // Monde.
 
-        if (collider.gameObject.CompareTag("tag_monster"))
-        {
-            m_collisionMonster = true;
-            m_isDead = true;
-        }
+        World worldScr = m_world.GetComponent<World>();
+        worldScr.DestroyLevel();
+        worldScr.m_levelCursor = 0;
+        worldScr.CreateLevel();
 
-        if (collider.gameObject.CompareTag("tag_spade"))
-        {
-            m_collisionMonster = true;
-            m_isDead = true;
-        }
+        // Joueur.
 
-        if (collider.gameObject.CompareTag("tag_lava"))
-        {
-            m_collisionMonster = true;
-            m_isDead = true;
-        }
-
-        if (collider.gameObject.CompareTag("tag_coin"))
-        {
-            m_collisionCoin = true;
-            Destroy(collider.gameObject);
-        }
-
-        if (collider.gameObject.CompareTag("tag_lever"))
-        {
-            m_collisionLever = true;
-            Destroy(collider.gameObject);
-        }
-
-        if (collider.gameObject.CompareTag("tag_exit"))
-        {
-            m_collisionExit = true;
-        }
+        m_tick = 0;
+        ResetState();
+        m_step = 0;
+        ResetPosition();
     }
 
-    public void OnCollisionStay2D(Collision2D collision)
+    public override void CollectObservations(VectorSensor sensor)
     {
-        if (m_init) return;
+        World worldScr = m_world.GetComponent<World>();
+        worldScr.MatrixBinUpdate();
 
-        if (collision.gameObject.CompareTag("tag_wall"))
+        for (int j = 0; j < World.s_matrixSize.y; j++)
         {
-            foreach (ContactPoint2D point in collision.contacts)
+            for (int i = 0; i < World.s_matrixSize.x; i++)
             {
-                if (point.normal.y > 0.9f)
+                int value = worldScr.m_matrixBin.Get(i, j);
+
+                int[] bin = Utils.IntToBin(value, 3);
+
+                for (int k = 0; k < bin.Length; k++)
                 {
-                    m_onGround = true;
+                    sensor.AddObservation(bin[k]);
                 }
             }
         }
+    }
+
+    public override void Heuristic(in ActionBuffers actionsOut)
+    {
+        var actions = actionsOut.DiscreteActions;
+
+        if (Input.GetKey(KeyCode.LeftArrow))
+        {
+            actions[0] = 1;
+        }
+
+        if (Input.GetKey(KeyCode.RightArrow))
+        {
+            actions[0] = 2;
+        }
+
+        if (Input.GetKey(KeyCode.UpArrow))
+        {
+            actions[0] = 3;
+        }
+    }
+
+    public override void OnActionReceived(ActionBuffers actions)
+    {
+        // FixedUpdate();
+
+        // CollectObservations();
+
+        // Heuristic();
+
+        UpdateState();
+
+        UpdateReward();
+
+        if (m_isDead)
+        {
+            EndEpisode();
+            // CollectObservations();
+            // OnEpisodeBegin();
+            return;
+        }
+
+        UpdateWorld();
+
+        int index = actions.DiscreteActions[0];
+
+        ResetInput();
+
+        SetInput(index);
+
+        UpdateVelocity();
+
+        UpdatePosition();
+
+        ResetState();
+
+        // OnTriggerEnter2D();
+
+        // OnCollisionStay2D();
     }
 
 
@@ -201,11 +245,12 @@ public class Player : Agent
 
     public void ResetState()
     {
-        m_onGround = false;
         m_collisionMonster = false;
         m_collisionCoin = false;
         m_collisionLever = false;
         m_collisionExit = false;
+        m_onGround = false;
+
         m_outOfDimension = false;
         m_timerIsOver = false;
         m_isDead = false;
@@ -213,17 +258,9 @@ public class Player : Agent
 
     public void UpdateState()
     {
-        if (OutOfDimension())
-        {
-            m_outOfDimension = true;
-            m_isDead = true;
-        }
-
-        if (m_step >= m_stepMax)
-        {
-            m_timerIsOver = true;
-            m_isDead = true;
-        }
+        m_outOfDimension = OutOfDimension();
+        m_timerIsOver = (m_step >= m_stepMax);
+        m_isDead = (m_collisionMonster || m_outOfDimension || m_timerIsOver);
     }
 
 
@@ -253,18 +290,18 @@ public class Player : Agent
 
         if (m_collisionExit)
         {
-            AddReward(m_rewardExit); 
-        }
-
-        if (m_timerIsOver)
-        {
-            AddReward(m_rewardTimerIsOver);
+            AddReward(m_rewardExit);
         }
 
         if (m_outOfDimension)
         {
             AddReward(m_rewardOutOfDimension);
             return; // Inutile de calculer le PCC.
+        }
+
+        if (m_timerIsOver)
+        {
+            AddReward(m_rewardTimerIsOver);
         }
 
         if (m_isDead)
@@ -279,11 +316,10 @@ public class Player : Agent
             int jPlayer = positionPlayer.y;
 
             // Sortie.
-            
-            Vector3 positionExit = Vector3.zero;
 
-            // Si un levier existe, la sortie sera le levier.
-            if (worldScr.m_lever)
+            Vector3 positionExit = Vector3.zero;
+            
+            if (worldScr.m_lever) // Si un levier existe, la sortie sera le levier.
             {
                 positionExit = worldScr.m_lever.transform.localPosition;
             }
@@ -343,9 +379,9 @@ public class Player : Agent
 
 
 
-    //////////////
-    /// Entrée ///
-    //////////////
+    ///////////////
+    /// Entrée ////
+    ///////////////
 
     public void ResetInput()
     {
@@ -383,9 +419,10 @@ public class Player : Agent
 
 
 
-    ////////////////
-    /// Vélocité ///
-    ////////////////
+
+    /////////////////
+    /// Vélocité ////
+    /////////////////
 
     public Vector2 GetVelocity()
     {
@@ -407,22 +444,22 @@ public class Player : Agent
     public void UpdateVelocity()
     {
         Vector2 velocity = GetVelocity();
-    
+
         if (m_left)
         {
             velocity.x = -m_speed.x;
         }
-    
+
         if (m_right)
         {
             velocity.x = +m_speed.x;
         }
-    
+
         if (!m_left && !m_right)
         {
             velocity.x *= 0.9f;
         }
-    
+
         if (m_jump)
         {
             velocity.y = m_speed.y;
@@ -435,9 +472,9 @@ public class Player : Agent
 
 
 
-    ////////////////
-    /// Position ///
-    ////////////////
+    /////////////////
+    /// Position ////
+    /////////////////
 
     public Vector2 GetPosition()
     {
@@ -490,115 +527,61 @@ public class Player : Agent
 
 
 
-    /////////////
-    /// Agent ///
-    /////////////
+    //////////////
+    /// Unity ////
+    //////////////
 
-    public override void OnEpisodeBegin()
+    public void OnTriggerEnter2D(Collider2D collider)
     {
-        // Monde
+        m_collisionMonster = false;
+        m_collisionCoin = false;
+        m_collisionLever = false;
+        m_collisionExit = false;
 
-        World worldScr = m_world.GetComponent<World>();
-        worldScr.DestroyLevel();
-        worldScr.m_levelCursor = 0;
-        worldScr.CreateLevel();
-
-        // Joueur
-
-        m_tick = 0;
-        ResetPosition();
-        m_init = false;
-        m_step = 0;
-    }
-
-    public int[] IntToBin(int n, int tabSize)
-    {
-        int[] res = new int[tabSize];
-
-        int index = 0;
-
-        while (n > 0)
+        if (collider.gameObject.CompareTag("tag_monster"))
         {
-            res[tabSize - index - 1] = n % 2;
-            n /= 2;
-            index++;
+            m_collisionMonster = true;
         }
 
-        return res;
+        if (collider.gameObject.CompareTag("tag_spade"))
+        {
+            m_collisionMonster = true;
+        }
+
+        if (collider.gameObject.CompareTag("tag_lava"))
+        {
+            m_collisionMonster = true;
+        }
+
+        if (collider.gameObject.CompareTag("tag_coin"))
+        {
+            m_collisionCoin = true;
+            Destroy(collider.gameObject);
+        }
+
+        if (collider.gameObject.CompareTag("tag_lever"))
+        {
+            m_collisionLever = true;
+            Destroy(collider.gameObject);
+        }
+
+        if (collider.gameObject.CompareTag("tag_exit"))
+        {
+            m_collisionExit = true;
+        }
     }
 
-    public override void CollectObservations(VectorSensor sensor)
+    public void OnCollisionStay2D(Collision2D collision)
     {
-        World worldScr = m_world.GetComponent<World>();
-        worldScr.MatrixBinUpdate();
-
-        for (int j = 0; j < World.s_matrixSize.y; j++)
+        if (collision.gameObject.CompareTag("tag_wall"))
         {
-            for (int i = 0; i < World.s_matrixSize.x; i++)
+            foreach (ContactPoint2D point in collision.contacts)
             {
-                int value = worldScr.m_matrixBin.Get(i, j);
-
-                int[] bin = IntToBin(value, 3);
-
-                for (int k = 0; k < bin.Length; k++)
+                if (point.normal.y > 0.9f)
                 {
-                    sensor.AddObservation(bin[k]);
+                    m_onGround = true;
                 }
             }
-        }
-    }
-
-    public override void OnActionReceived(ActionBuffers actions)
-    {
-        // ResetState()
-
-        // OnTriggerEnter2D()
-        
-        // OnCollisionStay2D()
-        
-        // CollectObservations()
-        
-        UpdateState();
-        
-        UpdateReward();
-
-        if (m_isDead)
-        {
-            m_init = true;
-            EndEpisode();
-            return;
-        }
-
-        UpdateWorld();
-
-        int index = actions.DiscreteActions[0];
-        
-        ResetInput();
-
-        SetInput(index);
-        
-        UpdateVelocity();
-
-        UpdatePosition();
-    }
-
-    public override void Heuristic(in ActionBuffers actionsOut)
-    {
-        var actions = actionsOut.DiscreteActions;
-
-        if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            actions[0] = 1;
-        }
-
-        if (Input.GetKey(KeyCode.RightArrow))
-        {
-            actions[0] = 2;
-        }
-
-        if (Input.GetKey(KeyCode.UpArrow))
-        {
-            actions[0] = 3;
         }
     }
 

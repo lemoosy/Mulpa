@@ -46,7 +46,7 @@ namespace _Settings
             CASE_COIN       =   0b011,
             CASE_SPAWN      =   0b000,
             CASE_LEVER      =   0b101,
-            CASE_EXIT       =   0b101,
+            CASE_EXIT       =   0b101, // 0b000 si un levier est présent.
             CASE_PLAYER     =   0b100
         }
 

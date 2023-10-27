@@ -10,6 +10,11 @@ using _Settings;
 // Un monde possède un joueur unique.
 public class World : MonoBehaviour
 {
+
+
+
+
+
     #region Variables
 
 
@@ -146,6 +151,10 @@ public class World : MonoBehaviour
 
     #endregion
 
+
+
+
+
     #region Functions
 
 
@@ -224,9 +233,8 @@ public class World : MonoBehaviour
                 GameObject obj = null;
 
                 Vector2Int positionIJ = new Vector2Int(i, j);
-                Vector2 position = (Vector2)(positionIJ * s_tileSize);
 
-                // Clear des tuiles.
+                // Suppression des tuiles.
 
                 tileMapScr.SetTile((Vector3Int)positionIJ, null);
 
@@ -288,8 +296,12 @@ public class World : MonoBehaviour
                         break;
                 }
 
+                // Ajout de l'objet dans la liste m_objects.
+
                 if (obj)
                 {
+                    Vector2 distance = new Vector2(0.5f, 0.5f);
+                    Vector2 position = (Vector2)positionIJ + distance;
                     obj.transform.localPosition = (Vector3)position;
                     m_objects.Add(obj);
                 }
@@ -373,9 +385,9 @@ public class World : MonoBehaviour
                 continue;
             }
 
+            Vector2 distance = new Vector2(0.5f, 0.5f);
             Vector2 position = (Vector2)obj.transform.localPosition;
-            position += (Vector2)(s_tileSize / 2);
-            position /= (Vector2)s_tileSize;
+            position -= distance;
 
             int i = (int)position.x;
             int j = (int)position.y;
@@ -432,7 +444,8 @@ public class World : MonoBehaviour
                     break;
 
                 case "tag_exit":
-                    value = (int)Settings.CaseIDBin.CASE_EXIT;
+                    if (m_lever) value = (int)Settings.CaseIDBin.CASE_VOID;
+                    else value = (int)Settings.CaseIDBin.CASE_EXIT;
                     break;
 
                 case "tag_player":
@@ -470,4 +483,9 @@ public class World : MonoBehaviour
 
 
     #endregion
+
+
+
+
+
 }
