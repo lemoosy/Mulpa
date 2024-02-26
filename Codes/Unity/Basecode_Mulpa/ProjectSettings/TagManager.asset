@@ -4,16 +4,12 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - tag_wall
-  - tag_door
-  - tag_monster
-  - tag_spade
-  - tag_lava
   - tag_coin
-  - tag_spawn
   - tag_lever
   - tag_exit
-  - tag_player
+  - tag_bonus
+  - tag_danger
+  - tag_block
   layers:
   - Default
   - TransparentFX

@@ -1,6 +1,6 @@
 #include "Mulpa.h"
 
-UnityDLL float GetSP(int* p_world, int p_w, int p_h, int p_i1, int p_j1, int p_i2, int p_j2, bool p_cross)
+UnityDLL float GetSP(int* p_world, int p_w, int p_h, int p_i1, int p_j1, int p_i2, int p_j2, bool p_cross, float p_crossValue)
 {
 	if (OutOfDimension(p_i1, p_j1, p_w, p_h))
 	{
@@ -15,14 +15,12 @@ UnityDLL float GetSP(int* p_world, int p_w, int p_h, int p_i1, int p_j1, int p_i
 	int A = CoordToID(p_i1, p_j1, p_w);
 	int B = CoordToID(p_i2, p_j2, p_w);
 
-	if (!p_cross && (p_world[A] == CASE_WALL))
+	if (!p_cross)
 	{
-		return -1.0f;
-	}
-
-	if (!p_cross && (p_world[A] == CASE_MONSTER))
-	{
-		return -1.0f;
+		if ((p_world[A] == CASE_BLOCK))
+		{
+			return -1.0f;
+		}
 	}
 
 	// Création du graphe.
@@ -41,11 +39,11 @@ UnityDLL float GetSP(int* p_world, int p_w, int p_h, int p_i1, int p_j1, int p_i
 			{
 				int v = CoordToID(i + 1, j, p_w);
 
-				if ((p_world[v] == CASE_WALL) || (p_world[v] == CASE_MONSTER))
+				if ((p_world[v] == CASE_BLOCK) || (p_world[v] == CASE_DANGER))
 				{
 					if (p_cross)
 					{
-						graph->SetWeight(u, v, 10.0f);
+						graph->SetWeight(u, v, p_crossValue);
 					}
 				}
 				else
@@ -58,11 +56,11 @@ UnityDLL float GetSP(int* p_world, int p_w, int p_h, int p_i1, int p_j1, int p_i
 			{
 				int v = CoordToID(i - 1, j, p_w);
 
-				if ((p_world[v] == CASE_WALL) || (p_world[v] == CASE_MONSTER))
+				if ((p_world[v] == CASE_BLOCK) || (p_world[v] == CASE_DANGER))
 				{
 					if (p_cross)
 					{
-						graph->SetWeight(u, v, 10.0f);
+						graph->SetWeight(u, v, p_crossValue);
 					}
 				}
 				else
@@ -75,11 +73,11 @@ UnityDLL float GetSP(int* p_world, int p_w, int p_h, int p_i1, int p_j1, int p_i
 			{
 				int v = CoordToID(i, j + 1, p_w);
 
-				if ((p_world[v] == CASE_WALL) || (p_world[v] == CASE_MONSTER))
+				if ((p_world[v] == CASE_BLOCK) || (p_world[v] == CASE_DANGER))
 				{
 					if (p_cross)
 					{
-						graph->SetWeight(u, v, 10.0f);
+						graph->SetWeight(u, v, p_crossValue);
 					}
 				}
 				else
@@ -92,11 +90,11 @@ UnityDLL float GetSP(int* p_world, int p_w, int p_h, int p_i1, int p_j1, int p_i
 			{
 				int v = CoordToID(i, j - 1, p_w);
 
-				if ((p_world[v] == CASE_WALL) || (p_world[v] == CASE_MONSTER))
+				if ((p_world[v] == CASE_BLOCK) || (p_world[v] == CASE_DANGER))
 				{
 					if (p_cross)
 					{
-						graph->SetWeight(u, v, 10.0f);
+						graph->SetWeight(u, v, p_crossValue);
 					}
 				}
 				else
