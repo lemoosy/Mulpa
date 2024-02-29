@@ -196,7 +196,7 @@ public class LevelAI : MonoBehaviour
 
             // Position.
 
-            int x = k * (LevelInformation.s_matrixSize.x + 2);
+            int x = k * (LevelInformation.matrixSize.x + 2);
             int y = 0;
             
             Vector2 position = new Vector2((float)x, (float)y);
@@ -320,7 +320,7 @@ public class LevelAI : MonoBehaviour
 
             // Position.
 
-            int x = k * (LevelInformation.s_matrixSize.x + 2);
+            int x = k * (LevelInformation.matrixSize.x + 2);
             int y = 0;
 
             Vector2 position = new Vector2((float)x, (float)y);

@@ -1,7 +1,7 @@
 using Unity.MLAgents;
 using UnityEngine;
 
-public class PlayerUser : Agent
+public class PlayerUser : Player
 {
     public GameObject m_objectLevelEditor = null;
 
@@ -388,8 +388,8 @@ public class PlayerUser : Agent
 
     public bool OutOfDimension()
     {
-        int w = LevelInformation.s_matrixSize.x;
-        int h = LevelInformation.s_matrixSize.y;
+        int w = LevelInformation.matrixSize.x;
+        int h = LevelInformation.matrixSize.y;
 
         Vector2Int positionIJ = GetPositionIJ();
 

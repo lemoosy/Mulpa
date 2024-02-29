@@ -29,8 +29,8 @@ public class LevelMaker
     }
 
     public Matrix m_matrix = new Matrix(
-        LevelInformation.s_matrixSize.x,
-        LevelInformation.s_matrixSize.y
+        LevelInformation.matrixSize.x,
+        LevelInformation.matrixSize.y
     );
 
     public LevelMaker(bool p_hasLever, Vector2Int p_positionSpawn, Vector2Int p_positionLever, Vector2Int p_positionExit)

@@ -1,8 +1,9 @@
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
 using UnityEngine;
+using Unity.MLAgents;
 
-public class PlayerAI : PlayerUser
+public class PlayerAI : Agent, Player
 {
     public int m_step = 0;
     public int m_stepMax = 1000;
@@ -17,18 +18,18 @@ public class PlayerAI : PlayerUser
     [HideInInspector] public int m_nMonsters;
 
     public Matrix m_matrix_nCases = new Matrix(
-        LevelInformation.s_matrixSize.x,
-        LevelInformation.s_matrixSize.y
+        LevelInformation.matrixSize.x,
+        LevelInformation.matrixSize.y
     );
 
     public Matrix m_matrix_nSpades = new Matrix(
-        LevelInformation.s_matrixSize.x,
-        LevelInformation.s_matrixSize.y
+        LevelInformation.matrixSize.x,
+        LevelInformation.matrixSize.y
     );
 
     public Matrix m_matrix_nMonsters = new Matrix(
-        LevelInformation.s_matrixSize.x,
-        LevelInformation.s_matrixSize.y
+        LevelInformation.matrixSize.x,
+        LevelInformation.matrixSize.y
     );
 
     public override void ResetLevel()
@@ -138,8 +139,8 @@ public class PlayerAI : PlayerUser
 
         Vector2Int positionPlayerIJ = GetPositionIJ();
 
-        positionPlayerIJ.x = Mathf.Clamp(positionPlayerIJ.x, 0, LevelInformation.s_matrixSize.x - 1);
-        positionPlayerIJ.y = Mathf.Clamp(positionPlayerIJ.y, 0, LevelInformation.s_matrixSize.y - 1);
+        positionPlayerIJ.x = Mathf.Clamp(positionPlayerIJ.x, 0, LevelInformation.matrixSize.x - 1);
+        positionPlayerIJ.y = Mathf.Clamp(positionPlayerIJ.y, 0, LevelInformation.matrixSize.y - 1);
 
         int value = (int)Graph.CaseID.CASE_VOID;
 
@@ -154,8 +155,8 @@ public class PlayerAI : PlayerUser
         {
             SP_1 = Graph.GetSP(
                 matrix.m_matrix,
-                LevelInformation.s_matrixSize.x,
-                LevelInformation.s_matrixSize.y,
+                LevelInformation.matrixSize.x,
+                LevelInformation.matrixSize.y,
                 positionPlayerIJ.x,
                 positionPlayerIJ.y,
                 (int)levelEditor.m_lever.transform.localPosition.x,
@@ -168,8 +169,8 @@ public class PlayerAI : PlayerUser
 
             SP_2 = Graph.GetSP(
                 matrix.m_matrix,
-                LevelInformation.s_matrixSize.x,
-                LevelInformation.s_matrixSize.y,
+                LevelInformation.matrixSize.x,
+                LevelInformation.matrixSize.y,
                 (int)levelEditor.m_lever.transform.localPosition.x,
                 (int)levelEditor.m_lever.transform.localPosition.y,
                 (int)levelEditor.m_exit.transform.localPosition.x,
@@ -184,8 +185,8 @@ public class PlayerAI : PlayerUser
         {
             SP_2 = Graph.GetSP(
                 matrix.m_matrix,
-                LevelInformation.s_matrixSize.x,
-                LevelInformation.s_matrixSize.y,
+                LevelInformation.matrixSize.x,
+                LevelInformation.matrixSize.y,
                 positionPlayerIJ.x,
                 positionPlayerIJ.y,
                 (int)levelEditor.m_exit.transform.localPosition.x,

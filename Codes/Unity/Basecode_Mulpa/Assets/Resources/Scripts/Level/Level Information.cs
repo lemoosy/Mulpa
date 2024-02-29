@@ -2,5 +2,6 @@ using UnityEngine;
 
 public class LevelInformation
 {
-    static public Vector2Int s_matrixSize = new Vector2Int(24, 14);
+    public static Vector2Int matrixSize = new Vector2Int(24, 14);
+    public static Vector2 tileSize = new Vector2(1.0f, 1.0f);
 }

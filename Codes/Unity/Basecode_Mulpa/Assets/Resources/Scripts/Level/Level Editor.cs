@@ -35,8 +35,8 @@ public class LevelEditor : MonoBehaviour
 
     public Matrix GetMatrix()
     {
-        int w = LevelInformation.s_matrixSize.x;
-        int h = LevelInformation.s_matrixSize.y;
+        int w = LevelInformation.matrixSize.x;
+        int h = LevelInformation.matrixSize.y;
 
         Matrix matrix = new Matrix(w, h);
 
