@@ -1,4 +1,4 @@
-public class PlayerStateIdle : IPlayerState
+public class PlayerStateStart : IPlayerState
 {
     public void Enter(Player player) { }
 
@@ -6,10 +6,6 @@ public class PlayerStateIdle : IPlayerState
 
     public void Update(Player player)
     {
-        PlayerInput playerInput = new PlayerInput();
-        playerInput.Update(player);
-
-
 
     }
 }

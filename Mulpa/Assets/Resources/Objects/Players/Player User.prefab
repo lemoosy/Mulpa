@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 4803251359704141494}
   - component: {fileID: 3665224072257311395}
   - component: {fileID: 6325679679619519199}
-  - component: {fileID: 1340398828093217349}
   - component: {fileID: 1815472312983886646}
   - component: {fileID: 2625443752937856643}
   m_Layer: 0
@@ -29,13 +28,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7662820822353678063}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 1
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 8, y: 6, z: 0}
+  m_LocalScale: {x: 128, y: 128, z: 128}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &4803251359704141494
 SpriteRenderer:
@@ -161,36 +160,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
---- !u!114 &1340398828093217349
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7662820822353678063}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d1c4e0b1822b495aa52bc52839ecb30, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_BrainParameters:
-    VectorObservationSize: 0
-    NumStackedVectorObservations: 1
-    m_ActionSpec:
-      m_NumContinuousActions: 0
-      BranchSizes: 01000000
-    VectorActionSize: 01000000
-    VectorActionDescriptions: []
-    VectorActionSpaceType: 0
-    hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 0}
-  m_InferenceDevice: 0
-  m_BehaviorType: 0
-  m_BehaviorName: My Behavior
-  TeamId: 0
-  m_UseChildSensors: 1
-  m_UseChildActuators: 1
-  m_ObservableAttributeHandling: 0
 --- !u!114 &1815472312983886646
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -203,10 +172,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9275dc27e13712459cbed1d2e66665c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agentParameters:
-    maxStep: 0
-  hasUpgradedFromAgentParameters: 1
-  MaxStep: 0
   m_objectLevelEditor: {fileID: 0}
   m_collisionDanger: 0
   m_collisionCoin: 0
@@ -220,8 +185,7 @@ MonoBehaviour:
   m_left: 0
   m_right: 0
   m_up: 0
-  m_speed: {x: 10, y: 12}
-  m_speedImpulse: 0
+  m_impulse: 0
   animator: {fileID: 2625443752937856643}
   m_faceRight: 1
 --- !u!95 &2625443752937856643

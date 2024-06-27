@@ -4,31 +4,31 @@ public class Player : MonoBehaviour
 {
     public GameObject m_objectLevelEditor = null;
 
-    [HideInInspector] public bool m_collisionDanger = false;
-    [HideInInspector] public bool m_collisionCoin = false;
-    [HideInInspector] public bool m_collisionLever = false;
-    [HideInInspector] public bool m_collisionExit = false;
-    [HideInInspector] public bool m_collisionBonus = false;
+
 
     [HideInInspector] public bool m_onGround = false;
     [HideInInspector] public bool m_resetPosition = false;
     [HideInInspector] public bool m_atExit = false;
     [HideInInspector] public bool m_isDead = false;
 
-    [HideInInspector] public bool m_left = false;
-    [HideInInspector] public bool m_right = false;
-    [HideInInspector] public bool m_up = false;
-
-    [HideInInspector] static public Vector2 m_speed = new Vector2(10.0f, 12.0f);
-    [HideInInspector] public bool m_impulse = false;
-
     public Animator animator = null;
 
-    [HideInInspector] public bool m_faceRight = true;
+
+
+
+    private PlayerCollision collision = null;
+
+    private PlayerInput input = null;
+
+    private PlayerSprite sprite = null;
+
+    private IPlayerState state = null;
+
+
 
     public void ResetLevel()
     {
-        Debug.Assert(m_objectLevelEditor);
+        //Debug.Assert(m_objectLevelEditor);
 
         ResetVelocity();
 
@@ -40,14 +40,17 @@ public class Player : MonoBehaviour
         animator.SetBool("IsWalking", false);
         animator.SetBool("OnGround", false);
 
-        m_faceRight = (transform.localScale.x > 0.0f);
     }
 
     public void Start()
     {
-        ResetLevel();
+        collision = new PlayerCollision();
 
-        m_impulse = false;
+        sprite = new PlayerSprite();
+
+        input = new PlayerInput();
+
+        SetState(new PlayerStateStart());
     }
 
     public void OnTriggerEnter2D(Collider2D collider)
@@ -128,8 +131,14 @@ public class Player : MonoBehaviour
         }
     }
 
+
+
     public void Update()
     {
+        state.Update(this);
+
+
+
         UpdateStates();
         UpdateInputs();
         UpdateVelocity();
@@ -144,6 +153,8 @@ public class Player : MonoBehaviour
             gameObject.SetActive(false);
         }
     }
+
+
 
     public void LateUpdate()
     {
@@ -160,6 +171,47 @@ public class Player : MonoBehaviour
         m_collisionBonus = false;
     }
     
+
+
+
+
+
+    // Input.
+
+    public PlayerInput GetInput()
+    {
+        return input;
+    }
+
+    // Position.
+
+
+
+    // State.
+
+    public IPlayerState GetState()
+    {
+        return state;
+    }
+
+    public void SetState(IPlayerState state)
+    {
+        if (state != null)
+        {
+            state.Exit(this);
+        }
+
+        this.state = state;
+
+        state.Enter(this);
+    }
+
+
+
+
+
+
+
 
 
     // States.
@@ -218,12 +270,9 @@ public class Player : MonoBehaviour
         {
             m_atExit = true;
         }
-
-        if (OutOfDimension())
-        {
-            m_isDead = true;
-        }
     }
+
+
 
     // Inputs.
 
@@ -280,6 +329,9 @@ public class Player : MonoBehaviour
             m_up = true;
         }
     }
+
+
+
 
     // Velocity.
 

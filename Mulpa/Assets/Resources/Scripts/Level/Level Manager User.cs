@@ -62,7 +62,7 @@ public class LevelManagerUser : MonoBehaviour
 
         foreach (GameObject objectButton in m_buttons)
         {
-            Button button = objectButton.GetComponent<Button>();
+            ButtonStart button = objectButton.GetComponent<ButtonStart>();
 
             if (button.m_pressed)
             {

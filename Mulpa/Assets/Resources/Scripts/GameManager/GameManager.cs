@@ -1,45 +1,21 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     public List<GameObject> m_buttons = new List<GameObject>();
 
+    private IGameManagerState state = null;
+
     void Start()
     {
         Resource.Init();
+
+        state = new GameManagerStateHome();
     }
 
     private void Update()
     {
-        int index = 0;
-
-        foreach (GameObject objectButton in m_buttons)
-        {
-            Button button = objectButton.GetComponent<Button>();
-
-            if (button.m_pressed)
-            {
-                switch (index)
-                {
-                    case 0:
-                        SceneManager.LoadScene("SceneGame");
-                        break;
-
-                    case 1:
-                        Application.Quit();
-                        break;
-
-                    default:
-                        Debug.Assert(false);
-                        break;
-                }
-
-                return;
-            }
-
-            index++;
-        }
+        state.Update(this);
     }
 }

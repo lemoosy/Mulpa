@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Button : MonoBehaviour
+public class ButtonStart : MonoBehaviour
 {
     public Sprite m_spriteA = null;
     
