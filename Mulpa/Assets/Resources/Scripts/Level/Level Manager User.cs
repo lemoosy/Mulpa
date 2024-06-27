@@ -21,7 +21,7 @@ public class LevelManagerUser : MonoBehaviour
 
         SetLevel(0);
 
-        PlayerUser player = m_player.GetComponent<PlayerUser>();
+        Player player = m_player.GetComponent<Player>();
 
         player.m_objectLevelEditor = m_current;
         
@@ -30,7 +30,7 @@ public class LevelManagerUser : MonoBehaviour
 
     private void Update()
     {
-        PlayerUser player = m_player.GetComponent<PlayerUser>();
+        Player player = m_player.GetComponent<Player>();
 
         if (player.m_isDead)
         {

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class MenuManager : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
     public List<GameObject> m_buttons = new List<GameObject>();
 
@@ -24,7 +24,7 @@ public class MenuManager : MonoBehaviour
                 switch (index)
                 {
                     case 0:
-                        SceneManager.LoadScene(1);
+                        SceneManager.LoadScene("SceneGame");
                         break;
 
                     case 1:
