@@ -2,41 +2,38 @@ using UnityEngine;
 
 public class Coin : EntityAbstract
 {
-    
-    private ICoinState state = null;
-
     void Start()
     {
         Debug.Assert(movement != null);
         
-        Debug.Assert(state != null);
+        //Debug.Assert(state != null);
     }
 
     void Update()
     {
-        state.Update(this);
+        //state.Update(this);
     }
 
-    public void SetMovement(ICoinMovement movement)
+    public void SetMovement(IEntityMovement movement)
     {
         this.movement = movement;
     }
 
-    public ICoinMovement GetMovement()
+    public IEntityMovement GetMovement()
     {
         return movement;
     }
 
-    public void SetState(ICoinState state)
+    public void SetState(IEntityState state)
     {
-        if (state != null)
-        {
-            this.state.Exit(this);
-        }
+        //if (state != null)
+        //{
+        //    this.state.Exit(this);
+        //}
 
-        this.state = state;
+        //this.state = state;
 
-        this.state.Enter(this);
+        //this.state.Enter(this);
     }
 
     public Vector2 GetPosition()
@@ -44,11 +41,8 @@ public class Coin : EntityAbstract
         return transform.localPosition;
     }
 
-    public void override CollisionWithEntity(EntityAbstract entity)
+    public override void CollisionWithEntity(EntityAbstract entity)
     {
-        if (entity is Player)
-        {
-            SetState(new CoinStateFromPlayer());
-        }
+        throw new System.NotImplementedException();
     }
 }

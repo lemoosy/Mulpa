@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class MonsterSpade : MonoBehaviour
+public class Skeleton : MonoBehaviour
 {
     // Start is called before the first frame update
     void Start()

@@ -24,13 +24,13 @@ public class Player : MonoBehaviour
     public void OnTriggerEnter2D(Collider2D collider)
     {
         IColliderManager entity = collider.gameObject.GetComponent<IColliderManager>();
-        entity.CollisionWithPlayer(this);
+        //entity.CollisionWithPlayer(this);
     }
 
     public void OnCollisionEnter2D(Collision2D collision)
     {
         IColliderManager entity = collision.gameObject.GetComponent<IColliderManager>();
-        entity.CollisionWithPlayer(this);
+        //entity.CollisionWithPlayer(this);
     }
 
     public void Update()
@@ -80,11 +80,6 @@ public class Player : MonoBehaviour
 
     public void SetState(IPlayerState state)
     {
-        if (state != null)
-        {
-            state.Exit(this);
-        }
-
         this.state = state;
 
         state.Enter(this);

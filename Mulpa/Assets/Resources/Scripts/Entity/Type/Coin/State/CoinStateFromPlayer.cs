@@ -1,17 +1,18 @@
-public class CoinStateFromPlayer : ICoinState
+public class CoinStateFromPlayer
 {
-    public void Enter(Coin coin)
-    {
-        throw new System.NotImplementedException();
-    }
 
-    public void Exit(Coin coin)
-    {
-        throw new System.NotImplementedException();
-    }
+    //public void Enter(Coin coin)
+    //{
+    //    throw new System.NotImplementedException();
+    //}
 
-    public void Update(Coin coin)
-    {
-        throw new System.NotImplementedException();
-    }
+    //public void Exit(Coin coin)
+    //{
+    //    throw new System.NotImplementedException();
+    //}
+
+    //public void Update(Coin coin)
+    //{
+    //    throw new System.NotImplementedException();
+    //}
 }
