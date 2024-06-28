@@ -1,11 +1,11 @@
 public class PlayerStateFalling : IPlayerState
 {
-    public void Enter(Player player) { }
+    public void Enter(Player player)
+    {
+        // Animation
+    }
 
     public void Exit(Player player) { }
 
-    public void Update(Player player)
-    {
-
-    }
+    public void Update(Player player) { }
 }

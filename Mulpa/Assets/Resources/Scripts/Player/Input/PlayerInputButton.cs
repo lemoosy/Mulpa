@@ -14,4 +14,9 @@ public class PlayerInputButton : IPlayerInput
     {
         throw new System.NotImplementedException();
     }
+
+    public void Update(Player player)
+    {
+        throw new System.NotImplementedException();
+    }
 }

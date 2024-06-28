@@ -1,13 +1,20 @@
+using UnityEngine;
+
 public class PlayerStateIdle : IPlayerState
 {
-    public void Enter(Player player) { }
+    public void Enter(Player player)
+    {
+        // Animation
+    }
 
     public void Exit(Player player) { }
 
     public void Update(Player player)
     {
-        PlayerInput playerInput = new PlayerInput();
-        playerInput.Update(player);
+        player.GetInput().Update(player);
+        player.GetSprite().Update(player);
+        player.GetMovement().Update(player);
+
 
 
 

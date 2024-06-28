@@ -3,147 +3,151 @@ using UnityEngine.Tilemaps;
 
 public class LevelEditor : MonoBehaviour
 {
-    public Tilemap m_decorations = null;
-    public Tilemap m_blocks = null;
-    public GameObject m_doors = null;
-    public GameObject m_dangers = null;
-    public GameObject m_coins = null;
-    public GameObject m_lever = null;
-    public GameObject m_exit = null;
-    public GameObject m_spawn = null;
+    public ILevelState[] states = null;
 
-    public enum CaseID
-    {
-        CASE_VOID       =       Graph.CaseID.CASE_VOID,
-        CASE_BLOCK      =       Graph.CaseID.CASE_BLOCK,    // blocks + doors
-        CASE_DANGER     =       Graph.CaseID.CASE_DANGER,   // spades + lava + monsters
-        CASE_COIN       =       3,
-        CASE_EXIT       =       4,                          // lever + exit
-        CASE_PLAYER     =       5
-    }
+    public int statesCursor = 0;
 
-    public void Start()
-    {
-        Debug.Assert(m_decorations);
-        Debug.Assert(m_blocks);
-        //Debug.Assert(!(m_doors ^ m_lever));
-        Debug.Assert(m_dangers);
-        Debug.Assert(m_coins);
-        Debug.Assert(m_exit);
-        Debug.Assert(m_spawn);
-    }
+    //public Tilemap m_decorations = null;
+    //public Tilemap m_blocks = null;
+    //public GameObject m_doors = null;
+    //public GameObject m_dangers = null;
+    //public GameObject m_coins = null;
+    //public GameObject m_lever = null;
+    //public GameObject m_exit = null;
+    //public GameObject m_spawn = null;
 
-    public Matrix GetMatrix()
-    {
-        int w = LevelInformation.matrixSize.x;
-        int h = LevelInformation.matrixSize.y;
+    //public enum CaseID
+    //{
+    //    CASE_VOID       =       Graph.CaseID.CASE_VOID,
+    //    CASE_BLOCK      =       Graph.CaseID.CASE_BLOCK,    // blocks + doors
+    //    CASE_DANGER     =       Graph.CaseID.CASE_DANGER,   // spades + lava + monsters
+    //    CASE_COIN       =       3,
+    //    CASE_EXIT       =       4,                          // lever + exit
+    //    CASE_PLAYER     =       5
+    //}
 
-        Matrix matrix = new Matrix(w, h);
+    //public void Start()
+    //{
+    //    Debug.Assert(m_decorations);
+    //    Debug.Assert(m_blocks);
+    //    //Debug.Assert(!(m_doors ^ m_lever));
+    //    Debug.Assert(m_dangers);
+    //    Debug.Assert(m_coins);
+    //    Debug.Assert(m_exit);
+    //    Debug.Assert(m_spawn);
+    //}
 
-        // Blocks.
+    //public Matrix GetMatrix()
+    //{
+    //    int w = LevelInformation.matrixSize.x;
+    //    int h = LevelInformation.matrixSize.y;
 
-        for (int j = 0; j < h; j++)
-        {
-            for (int i = 0; i < w; i++)
-            {
-                Vector3Int positionIJK = new Vector3Int(i, j, 0);
+    //    Matrix matrix = new Matrix(w, h);
 
-                if (m_blocks.GetTile(positionIJK))
-                {
-                    int value = (int)CaseID.CASE_BLOCK;
+    //    // Blocks.
 
-                    matrix.Set1x1(i, j, value);
-                }
-            }
-        }
+    //    for (int j = 0; j < h; j++)
+    //    {
+    //        for (int i = 0; i < w; i++)
+    //        {
+    //            Vector3Int positionIJK = new Vector3Int(i, j, 0);
 
-        // Doors.
+    //            if (m_blocks.GetTile(positionIJK))
+    //            {
+    //                int value = (int)CaseID.CASE_BLOCK;
 
-        if (m_doors)
-        {
-            foreach (Transform _ in m_doors.transform)
-            {
-                Vector2 doorPosition = (Vector2)_.localPosition;
+    //                matrix.Set1x1(i, j, value);
+    //            }
+    //        }
+    //    }
 
-                int i = (int)doorPosition.x;
-                int j = (int)doorPosition.y;
+    //    // Doors.
 
-                if (matrix.OutOfDimension(i, j))
-                {
-                    continue;
-                }
+    //    if (m_doors)
+    //    {
+    //        foreach (Transform _ in m_doors.transform)
+    //        {
+    //            Vector2 doorPosition = (Vector2)_.localPosition;
 
-                int value = (int)CaseID.CASE_BLOCK;
+    //            int i = (int)doorPosition.x;
+    //            int j = (int)doorPosition.y;
 
-                matrix.Set1x1(i, j, value);
-            }
-        }
+    //            if (matrix.OutOfDimension(i, j))
+    //            {
+    //                continue;
+    //            }
 
-        // Dangers.
+    //            int value = (int)CaseID.CASE_BLOCK;
 
-        foreach (Transform _ in m_dangers.transform)
-        {
-            Vector2 spadePosition = (Vector2)_.localPosition;
+    //            matrix.Set1x1(i, j, value);
+    //        }
+    //    }
 
-            int i = (int)spadePosition.x;
-            int j = (int)spadePosition.y;
+    //    // Dangers.
 
-            if (matrix.OutOfDimension(i, j))
-            {
-                continue;
-            }
+    //    foreach (Transform _ in m_dangers.transform)
+    //    {
+    //        Vector2 spadePosition = (Vector2)_.localPosition;
 
-            int value = (int)CaseID.CASE_DANGER;
+    //        int i = (int)spadePosition.x;
+    //        int j = (int)spadePosition.y;
 
-            matrix.Set1x1(i, j, value);
-        }
+    //        if (matrix.OutOfDimension(i, j))
+    //        {
+    //            continue;
+    //        }
 
-        // Coins.
+    //        int value = (int)CaseID.CASE_DANGER;
 
-        foreach (Transform _ in m_coins.transform)
-        {
-            Vector2 coinPosition = (Vector2)_.localPosition;
+    //        matrix.Set1x1(i, j, value);
+    //    }
 
-            int i = (int)coinPosition.x;
-            int j = (int)coinPosition.y;
+    //    // Coins.
 
-            if (matrix.OutOfDimension(i, j))
-            {
-                continue;
-            }
+    //    foreach (Transform _ in m_coins.transform)
+    //    {
+    //        Vector2 coinPosition = (Vector2)_.localPosition;
 
-            int value = (int)CaseID.CASE_COIN;
+    //        int i = (int)coinPosition.x;
+    //        int j = (int)coinPosition.y;
 
-            matrix.Set1x1(i, j, value);
-        }
+    //        if (matrix.OutOfDimension(i, j))
+    //        {
+    //            continue;
+    //        }
 
-        // Lever & Exit.
+    //        int value = (int)CaseID.CASE_COIN;
 
-        {
-            GameObject leverOrExit = null;
+    //        matrix.Set1x1(i, j, value);
+    //    }
+
+    //    // Lever & Exit.
+
+    //    {
+    //        GameObject leverOrExit = null;
             
-            if (m_lever)
-            {
-                leverOrExit = m_lever;
-            }
-            else
-            {
-                leverOrExit = m_exit;
-            }
+    //        if (m_lever)
+    //        {
+    //            leverOrExit = m_lever;
+    //        }
+    //        else
+    //        {
+    //            leverOrExit = m_exit;
+    //        }
             
-            Vector2 leverOrExitPosition = (Vector2)leverOrExit.transform.localPosition;
+    //        Vector2 leverOrExitPosition = (Vector2)leverOrExit.transform.localPosition;
             
-            int i = (int)leverOrExitPosition.x;
-            int j = (int)leverOrExitPosition.y;
+    //        int i = (int)leverOrExitPosition.x;
+    //        int j = (int)leverOrExitPosition.y;
             
-            if (!matrix.OutOfDimension(i, j))
-            {
-                int value = (int)CaseID.CASE_EXIT;
+    //        if (!matrix.OutOfDimension(i, j))
+    //        {
+    //            int value = (int)CaseID.CASE_EXIT;
             
-                matrix.Set1x1(i, j, value);
-            }
-        }
+    //            matrix.Set1x1(i, j, value);
+    //        }
+    //    }
 
-        return matrix;
-    }
+    //    return matrix;
+    //}
 }

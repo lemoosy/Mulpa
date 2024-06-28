@@ -17,31 +17,31 @@ public class GameManagerStateHome : IGameManagerState
     {
         int index = 0;
 
-        foreach (GameObject objectButton in gameManager.m_buttons)
-        {
-            ButtonStart button = objectButton.GetComponent<ButtonStart>();
+        //foreach (GameObject objectButton in gameManager.m_buttons)
+        //{
+        //    ButtonStart button = objectButton.GetComponent<ButtonStart>();
 
-            if (button.m_pressed)
-            {
-                switch (index)
-                {
-                    case 0:
-                        SceneManager.LoadScene("SceneGame");
-                        break;
+        //    if (button.m_pressed)
+        //    {
+        //        switch (index)
+        //        {
+        //            case 0:
+        //                SceneManager.LoadScene("SceneGame");
+        //                break;
 
-                    case 1:
-                        Application.Quit();
-                        break;
+        //            case 1:
+        //                Application.Quit();
+        //                break;
 
-                    default:
-                        Debug.Assert(false);
-                        break;
-                }
+        //            default:
+        //                Debug.Assert(false);
+        //                break;
+        //        }
 
-                return;
-            }
+        //        return;
+        //    }
 
-            index++;
-        }
+        //    index++;
+        //}
     }
 }

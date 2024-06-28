@@ -2,9 +2,9 @@ public class PlayerSprite
 {
     public void Update(Player player)
     {
-        PlayerInput input = player.GetInput();
+        IPlayerInput input = player.GetInput();
 
-        if (input.left && (player.transform.localScale.x > 0.0f))
+        if (input.PressLeft(player) && (player.transform.localScale.x > 0.0f))
         {
 
         }
