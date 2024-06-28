@@ -1,8 +1,8 @@
 public interface IEntityState
 {
-    public void Enter(Player player);
+    public void Enter(PlayerUser player);
 
-    public void Exit(Player player);
+    public void Exit(PlayerUser player);
 
-    public void Update(Player player);
+    public void Update(PlayerUser player);
 }

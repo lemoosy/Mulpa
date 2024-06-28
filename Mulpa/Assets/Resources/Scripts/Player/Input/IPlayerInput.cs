@@ -1,10 +1,10 @@
 public interface IPlayerInput
 {
-    public bool PressJump(Player player);
+    public bool PressJump(PlayerAbstract player);
 
-    public bool PressLeft(Player player);
+    public bool PressLeft(PlayerAbstract player);
 
-    public bool PressRight(Player player);
+    public bool PressRight(PlayerAbstract player);
 
-    public void Update(Player player);
+    public void Update(PlayerAbstract player);
 }

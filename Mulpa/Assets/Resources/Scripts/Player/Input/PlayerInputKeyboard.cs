@@ -6,22 +6,22 @@ public class PlayerInputKeyboard : IPlayerInput
     private bool left = false;
     private bool right = false;
 
-    public bool PressJump(Player player)
+    public bool PressJump(PlayerAbstract player)
     {
         return jump;
     }
 
-    public bool PressLeft(Player player)
+    public bool PressLeft(PlayerAbstract player)
     {
         return left;
     }
 
-    public bool PressRight(Player player)
+    public bool PressRight(PlayerAbstract player)
     {
         return right;
     }
 
-    public void Update(Player player)
+    public void Update(PlayerAbstract player)
     {
         jump = Input.GetKey(KeyCode.UpArrow) && (player.GetState() is PlayerStateIdle);
         left = Input.GetKey(KeyCode.LeftArrow);

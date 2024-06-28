@@ -1,19 +1,13 @@
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class PlayerUser : PlayerAbstract
 {
-    private bool onGround = false;
 
-    private Level level = null;
-    private IPlayerInput input = null;
-    private PlayerSprite sprite = null;
-    private PlayerMovement movement = null;
-    private PlayerInventory inventory = null;
-    private IPlayerState state = null;
+    
 
     public void Start()
     {
-        Debug.Assert(level != null);
+        //Debug.Assert(level != null);
         input = new PlayerInputKeyboard();
         sprite = new PlayerSprite();
         movement = new PlayerMovement();
@@ -38,52 +32,6 @@ public class Player : MonoBehaviour
         state.Update(this);
     }
 
-    public void SetLevel(Level level)
-    {
-        this.level = level;
-    }
-
-    public Level GetLevel()
-    {
-        return level;
-    }
-
-    public IPlayerInput GetInput()
-    {
-        return input;
-    }
-
-    public void SetInput(IPlayerInput input)
-    {
-        this.input = input;
-    }
-
-    public PlayerSprite GetSprite()
-    {
-        return sprite;
-    }
-
-    public PlayerMovement GetMovement()
-    {
-        return movement;
-    }
-
-    public PlayerInventory GetInventory()
-    {
-        return inventory;
-    }
-
-    public IPlayerState GetState()
-    {
-        return state;
-    }
-
-    public void SetState(IPlayerState state)
-    {
-        this.state = state;
-
-        state.Enter(this);
-    }
 
 
 

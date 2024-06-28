@@ -4,7 +4,6 @@ public class Coin : EntityAbstract
 {
     void Start()
     {
-        Debug.Assert(movement != null);
         
         //Debug.Assert(state != null);
     }

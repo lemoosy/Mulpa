@@ -1,6 +1,6 @@
 public class PlayerSprite
 {
-    public void Update(Player player)
+    public void Update(PlayerAbstract player)
     {
         IPlayerInput input = player.GetInput();
 

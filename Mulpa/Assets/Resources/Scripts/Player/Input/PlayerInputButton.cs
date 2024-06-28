@@ -1,21 +1,21 @@
 public class PlayerInputButton : IPlayerInput
 {
-    public bool PressJump(Player player)
+    public bool PressJump(PlayerAbstract player)
     {
         throw new System.NotImplementedException();
     }
 
-    public bool PressLeft(Player player)
+    public bool PressLeft(PlayerAbstract player)
     {
         throw new System.NotImplementedException();
     }
 
-    public bool PressRight(Player player)
+    public bool PressRight(PlayerAbstract player)
     {
         throw new System.NotImplementedException();
     }
 
-    public void Update(Player player)
+    public void Update(PlayerAbstract player)
     {
         throw new System.NotImplementedException();
     }
